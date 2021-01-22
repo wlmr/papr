@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  crypto-charm:
+    build:
+      context: .
+    volumes:
+      - ./src/:/work
+
