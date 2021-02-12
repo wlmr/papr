@@ -10,11 +10,11 @@ def setup(k):
 def cred_keygen(params,n):
     (G,p,g,h) = params
     (sk, iparams) = keygen(params, n)
-    (x_tilde, y_tilde, z_tilde) = (G.random(), G.random(), G.random())
-    c_x_0 = (g**sk[0]) * (h**x_tilde)
-    c_y_0 = (g**sk[2]) * (h**y_tilde)
-    c_z   = (g**sk[4]) * (h**z_tilde)
-    return iparams + [c_x_0]
+    (sk['x_tilde'], sk['y_tilde', sk['z_tilde']) = (G.random(), G.random(), G.random())
+    iparams['c_x_0'] = (g**sk['x0']) * (h**sk['x_tilde'])
+    iparams['c_y_0'] = (g**sk['y0']) * (h**sk['y_tilde'])
+    iparams['c_z']   = (g**sk['z'])  * (h**sk['z_tilde'])
+    return (sk,iparams)
 
 def blind_issue(sk, S):
     pass
