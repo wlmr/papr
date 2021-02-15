@@ -58,12 +58,11 @@ def verify(params, sk, m, sigma):
 
 #Debug
 def test():
-    params = setup(300)
+    params = setup(500)
     m = b'my secret identity'
     n = len(m)
     (sk,iparams) = keygen(params, 1)
     sigma = mac(params, sk, m)
-    result = verify(params, sk, m, sigma)
-    assert result == True
+    assert verify(params, sk, m, sigma)
 
 test()
