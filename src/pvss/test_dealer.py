@@ -15,12 +15,30 @@ def test_enc():
     
     expected = [12**12, 13**37, 94**45, 56**34]
 
-    import pdb; pdb.set_trace()
+   
     assert d.get_encrypted_shares(pubkeys, px) == expected
+
+
+
+def test_calc_poly():
+    px = [12, 37, 94, 56]
+
+    x = 5 
+    q = 1024
+
+    import pdb; pdb.set_trace()
+    assert d.calc_poly(px, x, q) == 903
+    # 12*5^3 + 37 * 5^2 + 94 * 5 + 56  MOD 1024 = 903 
+
+
+
+
+
 
 
 
 
 
 test_commit()
-test_enc()
+# test_enc()
+test_calc_poly()
