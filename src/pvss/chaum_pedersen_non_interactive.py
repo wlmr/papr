@@ -33,7 +33,8 @@ def DLEQ_prover_1(Gq, g, X_list, y_list, Y_list, n):
    # Y_i = h_2
    # X_i = h_1
 
-    c_list = [hash(X_list[i], Y_list[i], a_1_list[i], a_2_list[i]) for i in range(len(w_list))]
+    # c_list = [hash(X_list[i], Y_list[i], a_1_list[i], a_2_list[i]) for i in range(len(w_list))]
+    c =  hash([X_list[:], Y_list[:], a_1_list[:], a_2_list[:]]) 
     # FIXME only one c ??
     # Multiple r 
 
@@ -46,7 +47,12 @@ def DLEQ_prover_1(Gq, g, X_list, y_list, Y_list, n):
 
     q = Gq.q
     r = (w - alpha * c)%q
-    return r
+    #return r
+
+    r_list = [w-alpha*c%q for w in w_list]
+    # FIXME: How do we know alpha?
+
+
 
     #return (a_1, a_2)
 
