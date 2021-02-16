@@ -18,9 +18,17 @@ def gen_polynomial(params, t, k, n , secret):
     coeff = [Gp.random() for i in range(size)]
     coeff = [coeff[:], enc_secret]
 
+    import pdb; pdb.set_trace()
+
+    commitments = get_commitments(g, px)
     shares_list = [calc_poly(coeff, i, q) for i in range(n)] 
+    enc_shares = encrypted_shares(pub_keys, shares[:-1])
+
+    X_i_list = [get_X_i(commitments, i) for i in range(1, n+1)]
+
     
-    return (coeff, shares_list)
+    return (commitments, enc_shares, X_i_list)
+    #(coeff, shares_list)
     # pass
     # return px = [a3 a2 a1 a0] in a3 x**3 + a2 x**2 + a1 x**1 + a0 
 
@@ -33,12 +41,17 @@ def calc_poly(px, x, q):
     
 
 def rev_range(list):
+    '''
+    A counting list from length(list)-1 to 0
+    '''
     length = len(list)
     return range(length-1, -1 , -1) # A reverse list. If length is 4 then the result is [3, 2, 1, 0]
 
+
+
 def get_commitments(g, px):
-    return  [g**p_i for p_i in px[:-1]]
-    # return [C_3 C_2 C_1]
+    return  [g**p_i for p_i in px]
+    # return [C_3 C_2 C_1 C_0]
 
 def get_encrypted_shares(pub_keys, shares):
     #assert len(pub_keys) < (len(shares)-1)
