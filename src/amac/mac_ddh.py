@@ -1,12 +1,12 @@
-from charm.toolbox.integergroup import IntegerGroup
+from charm.toolbox.ecgroup import ECGroup
+from charm.toolbox.eccurve import prime192v1
 
 
 def setup(k):
     """ generate all public parameters """
-    G = IntegerGroup()
-    G.paramgen(k)
-    g = G.randomGen()
-    h = G.randomGen()
+    G = ECGroup(prime192v1)
+    g = G.random(G)
+    h = G.random(G)
     return (G, G.p, g, h)
 
 

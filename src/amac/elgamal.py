@@ -1,6 +1,7 @@
-from charm.toolbox.integergroup import IntegerGroup
+#from charm.toolbox.integergroup import IntegerGroup
 from charm.toolbox.PKEnc import PKEnc
-
+from charm.toolbox.ecgroup import ECGroup, G, ZR, order 
+from charm.toolbox.eccurve import prime192v2
 
 class ElGamal(PKEnc):
     """
@@ -11,39 +12,38 @@ class ElGamal(PKEnc):
     generators g and h
     """
 
-    def __init__(self, params, p=0, q=0):
-        global G
+    def __init__(self, params):
+        global group
         global g
-        (G,_,g,_) = params
+        (group,_,g,_) = params
 
     def keygen(self):
-        x = G.random() 
+        x = group.random(ZR) 
         h = g ** x
-        pk = {'g':g, 'h':h, 'G':G}
+        pk = {'g':g, 'h':h, 'G':group}
         sk = {'x':x}
         return (pk, sk)
 
     def encrypt(self, pk, m):
-        y = pk['G'].random()
+        y = pk['G'].random(ZR)
         c1 = pk['g'] ** y 
-        s = pk['h'] ** y
-        c2 = m * s
+        s = pk['h'] ** y 
+        c2 = (pk['g']**m) * s
         return ({'c1':c1, 'c2':c2}, y)
 
     def decrypt(self, pk, sk, c):
-        s = c['c1'] ** sk['x']
+        s = c['c1'] * sk['x']
         m = c['c2'] * (s ** -1)
-        return m
+        return m#c['c2'] - pk['x']*c['c1']
 
 if __name__ == "__main__":
-    G = IntegerGroup()
-    G.paramgen(100)
-    g = G.randomGen()
-    h = G.randomGen()
-    M = g ** (G.encode(b'god is dead'))
-    print(M)
-    params = (G, G.p, g, h)
+    group = ECGroup(prime192v2)
+    g = group.random(G)
+    h = group.random(G)
+    M = g * group.encode(b'god is dead         ')
+    #print(M)
+    params = (group, group.order(), g, h)
     el = ElGamal(params)
     (pk, sk) = el.keygen()
     (c,r) = el.encrypt(pk, M)
-    print(el.decrypt(pk,sk,c) % G.p)
+    print(el.decrypt(pk,sk,c))

@@ -1,4 +1,4 @@
-from charm.toolbox.integergroup import IntegerGroup
+from charm.toolbox.ecgroup import ECGroup, G, ZR
 #from charm.schemes.pkenc.pkenc_elgamal85 import *
 
 from mac_ddh import setup as setup_ddh
