@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import dealer as d
+import common as common
 
 def test_commit(): 
     px = [12, 37, 94, 56]
@@ -32,13 +33,20 @@ def test_calc_poly():
 
 
 
+def test_a():
+    size = 170
+    params = common.gen_params(size)
+    d.gen_polynomial(params, 5, 3, 8, 712)
 
 
 
 
 
+test_a()
 
 
-test_commit()
+
+#test_commit()
 # test_enc()
-test_calc_poly()
+#test_calc_poly()
+

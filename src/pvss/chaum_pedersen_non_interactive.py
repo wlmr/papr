@@ -50,7 +50,7 @@ def DLEQ_prover_1(Gq, g, X_list, y_list, Y_list, n):
     #return r
 
     r_list = [w-alpha*c%q for w in w_list]
-    # FIXME: How do we know alpha?
+    # FIXME: How do we know alpha? 
 
 
 
