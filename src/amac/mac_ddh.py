@@ -1,43 +1,36 @@
-from charm.toolbox.ecgroup import ECGroup
-from charm.toolbox.eccurve import prime192v1
-
+from petlib.ec import EcGroup
+from petlib.bn import Bn
 
 def setup(k):
     """ generate all public parameters """
-    G = ECGroup(prime192v1)
-    g = G.random(G)
-    h = G.random(G)
-    return (G, G.p, g, h)
+    G = EcGroup()
+    g = G.hash_to_point(b"g")
+    h = G.hash_to_point(b"h")
+    return (G, G.order(), g, h)
 
 
 def keygen(params, n):
     """ mac DDH keygen """
     assert n > 0
-    (G, p, g, h) = params
-    #sk = [G.random() for _ in range(2*n+3)] # case n = 1 gives us x0, x1, y0, y1, z (3+2*n).  
+    (_, p, _, h) = params
     sk_names = ['x0','x1','y0','y1','z']
-    sk = {name:G.random() for name in sk_names}
-    iparams = {name.upper():h**sk[name] for name in sk_names[:-1]}
+    sk = {name:p.random() for name in sk_names}
+    iparams = {name.upper():sk[name]*h for name in sk_names[:-1]}
     return (sk, iparams)
 
 
 def mac(params, sk, m):
     """ compute mac GGM """
     assert len(sk) > 0 and m
-    (G, p, g, h) = params
-    r = G.random() 
-    em = G.encode(m)
-    #import pdb; pdb.set_trace()
-    Hx = sk['x0'] + sk['x1'] * em   #x0 + x1*m                  # Hx becomes larger than mod value??!??!
-    Hy = sk['y0'] + sk['y1'] * em   #y0 + y1*m
-    #Hx = sk[0] + sum([sk[i+1] * em[i] for i in range(n)])
-    #Hy = sk[0+n] + sum([sk[n+i+1] * em[i] for i in range(n)])
-    
-    sigma_w = g**r 
-    sigma_x = g**(r*Hx)
-    sigma_y = g**(r*Hy)
-    sigma_z = g**(r*sk['z']) # g**(r*z)
-    
+    (_, p, g, _) = params
+    r = p.random() 
+    em = Bn.from_binary(m)
+    Hx = sk['x0'] + sk['x1'] * em
+    Hy = sk['y0'] + sk['y1'] * em
+    sigma_w = r * g
+    sigma_x = r * Hx * g
+    sigma_y = r * Hy * g
+    sigma_z = r * sk['z'] * g
     sigma = (sigma_w, sigma_x, sigma_y, sigma_z) 
     return sigma
 
@@ -45,24 +38,18 @@ def mac(params, sk, m):
 def verify(params, sk, m, sigma):
     """ verify mac DDH """
     assert len(sk) > 0 and m
-    (G, p, g, h) = params
     (sigma_w, sigma_x, sigma_y, sigma_z) = sigma
-    em = G.encode(m)
-    Hx = sk['x0'] + sk['x1']*em   #x0 + x1*m
-    Hy = sk['y0'] + sk['y1']*em   #y0 + y1*m
-    #Hx = sk[0]   + sum([sk[i+1]*m[i] for i in range(n)])
-    #Hy = sk[0+n] + sum([sk[n+i+1]*m[i] for i in range(n)])
-
-    return sigma_w != 1 and sigma_x == sigma_w**Hx and sigma_y == sigma_w**Hy and sigma_z == sigma_w**sk['z']
+    em = Bn.from_binary(m)
+    Hx = sk['x0'] + sk['x1'] * em   #x0 + x1*m
+    Hy = sk['y0'] + sk['y1'] * em   #y0 + y1*m
+    # TODO: figure out if the commented out term of the next line is neccessary under EC
+    return sigma_x == Hx * sigma_w and sigma_y == Hy * sigma_w and sigma_z == sk['z'] * sigma_w #and sigma_w != 1
 
 
-#Debug
-def test():
+if __name__ == "__main__":
     params = setup(500)
     m = b'my secret identity'
     n = len(m)
-    (sk,iparams) = keygen(params, 1)
+    (sk,_) = keygen(params, 1)
     sigma = mac(params, sk, m)
     assert verify(params, sk, m, sigma)
-
-test()

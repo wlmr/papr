@@ -1,22 +1,25 @@
-from charm.toolbox.ecgroup import ECGroup, G, ZR
-#from charm.schemes.pkenc.pkenc_elgamal85 import *
+from petlib.ec import EcGroup
+from petlib.bn import Bn
 
 from mac_ddh import setup as setup_ddh
-from mac_ddh import keygen as keygen
-from mac_ddh import mac as mac
+from mac_ddh import keygen
+from mac_ddh import mac
+from elgamal import ElGamal
 
-from elgamal import *
 
 def setup(k):
+    """
+    Returns params := (G,p,g,h)
+    """
     return setup_ddh(k)
 
 def cred_keygen(params,n):
-    (G,p,g,h) = params
+    (_,p,g,h) = params
     (sk, iparams) = keygen(params, n)
-    sk['x_tilde'], sk['y_tilde'], sk['z_tilde'] = G.random(), G.random(), G.random()
-    iparams['c_x_0'] = (g**sk['x0']) * (h**sk['x_tilde'])
-    iparams['c_y_0'] = (g**sk['y0']) * (h**sk['y_tilde'])
-    iparams['c_z']   = (g**sk['z'])  * (h**sk['z_tilde'])
+    sk['x_tilde'], sk['y_tilde'], sk['z_tilde'] = p.random(), p.random(), p.random()
+    iparams['c_x_0'] = (sk['x0']*g) + (sk['x_tilde']*h)
+    iparams['c_y_0'] = (sk['y0']*g) + (sk['y_tilde']*h)
+    iparams['c_z']   = (sk['z'] *g) + (sk['z_tilde']*h)
     return (sk,iparams)
 
 def blind_issue(params, sk, S):
@@ -24,11 +27,11 @@ def blind_issue(params, sk, S):
 
 def blind_obtain(params, iparams, m):
     (G,p,g,h) = params
-    el = Elgamal(params)
+    el = ElGamal(params)
     (pk,sk) = el.keygen()
     d = sk['x']
     gamma = pk['h']
-    M = g ** (G.encode(m))
+    M = Bn.from_binary(m) * g
     (e,r) = el.encrypt(pk, M)
     # send e to issuer along with a proof of knowledge of r,m
 
@@ -62,6 +65,8 @@ def blind_obtain(params, iparams, m):
 def show_verify(sk, phi):
     pass
 
-def test():
-    setup(k)
-    blind_issue(1,2)
+if __name__ == "__main__":
+    params = setup(100)
+    (sk,iparams) = cred_keygen(params,1)
+    m = b"DreadPirateRoberts"
+    blind_obtain(params, iparams, m)
