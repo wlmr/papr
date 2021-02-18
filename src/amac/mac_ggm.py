@@ -10,40 +10,34 @@ def setup(k):
 
 
 def keygen(params, n):
-    """ mac DDH keygen """
     assert n > 0
     (_, p, _, h) = params
-    sk_names = ['x0','x1','y0','y1','z']
+    sk_names = ['x0','x1']
     sk = {name:p.random() for name in sk_names}
-    iparams = {name.upper():sk[name]*h for name in sk_names[:-1]}
+    iparams = {name.upper():sk[name]*h for name in sk_names[1:]}
     return (sk, iparams)
 
 
 def mac(params, sk, m):
     """ compute mac GGM """
     assert len(sk) > 0 and m
-    (_, p, g, _) = params
-    r = p.random() 
+    (G, p, g, _) = params
+    u = G.hash_to_point(b"u")
     em = Bn.from_binary(m)
-    Hx = sk['x0'] + sk['x1'] * em
-    Hy = sk['y0'] + sk['y1'] * em
-    sigma_w = r * g
-    sigma_x = r * Hx * g
-    sigma_y = r * Hy * g
-    sigma_z = r * sk['z'] * g
-    sigma = (sigma_w, sigma_x, sigma_y, sigma_z) 
+    hx = sk['x0'] + sk['x1'] * em
+    u_prime = hx * u
+    sigma = (u, u_prime)
     return sigma
 
 
 def verify(params, sk, m, sigma):
     """ verify mac DDH """
     assert len(sk) > 0 and m
-    (sigma_w, sigma_x, sigma_y, sigma_z) = sigma
+    (G,_,_,_) = params
+    (u, u_prime) = sigma
     em = Bn.from_binary(m)
-    Hx = sk['x0'] + sk['x1'] * em   #x0 + x1*m
-    Hy = sk['y0'] + sk['y1'] * em   #y0 + y1*m
-    # TODO: figure out if the commented out term of the next line is neccessary under EC
-    return sigma_x == Hx * sigma_w and sigma_y == Hy * sigma_w and sigma_z == sk['z'] * sigma_w #and sigma_w != 1
+    hx = sk['x0'] + sk['x1'] * em
+    return u != G.infinite() and u_prime == hx * u
 
 
 if __name__ == "__main__":
