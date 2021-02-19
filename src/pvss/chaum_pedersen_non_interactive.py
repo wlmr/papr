@@ -7,6 +7,9 @@ from petlib.ec import EcGroup, EcPt
 from petlib.bn import Bn
 from dealer import PVSS
 
+from hashlib import sha256
+
+
 
 # y_i = g_2 
 # X_i = h_1
@@ -70,46 +73,83 @@ class DLEQ():
         
         # FIXME only one c ??
         # Multiple r 
-
-        c = h(str([X_list[:], Y_list[:], a_1_list[:], a_2_list[:]]))
         import pdb; pdb.set_trace()
+
+
+        state = str([X_list[:], Y_list[:], a_1_list[:], a_2_list[:]])
+        H = sha256()
+        H.update(state.encode("utf8"))
+        hash_c = H.digest()
+     
+
+        #c = c % p #???
+
+
+        # c = Gq.hash_to_point(state.encode("utf8"))
+        #c = sha256(str([X_list[:], Y_list[:], a_1_list[:], a_2_list[:]]))
+        #import pdb; pdb.set_trace()
+
+
+
+        #hash_c = challenge(state)
+        c = Bn.from_binary(hash_c) % p
+        
+        #return (c, r)
+
 
 
 
         #for
 
         # q = Gq.q
-        r = (w - alpha * c)#%q
+       # r = (w - alpha * c)#%q
         #return r
 
-        q = p
+        #q = p
 
-        r_list = [w-alpha*c%q for (alpha, w) in zip(p_of_i,  w_list)]
+
+        # SHOUDL BE MOD ps
+        #r_list = [w-alpha*c for (alpha, w) in zip(p_of_i,  w_list)]
         # FIXME: How do we know alpha? 
 
+        r_list = [self.calc_r(w,alpha,c) for (alpha, w) in zip(p_of_i, w_list)]
 
-
+        return (c, r_list)
         #return (a_1, a_2)
 
     #def DLEQ_verifyer_1(Gq, a_1, a_2):
     #    c = Gq.random()
     #    return c
 
-    def DLEQ_prover_2(Gq, w, c, alpha):
-        # q = Gq.q
-        r = (w - alpha * c) #%q
+    def calc_r(self, w, alpha, c):
+        r = (w - c * alpha) % p
         return r
 
-    def DLEQ_verifyer_2(Gq, r, c, g_1, h_1, g_2, h_2):
-        a_1 = g_1**r * h_1 ** c
-        a_2 = g_2**r * h_2 ** c
+
+  #  def DLEQ_prover_2(Gq, w, c, alpha):
+        # q = Gq.q
+  #      r = (w - alpha * c) #%q
+  #      return r
+
+
+    def DLEQ_verify(self, params, y_list, X_list, Y_list, r_list, c):
+        
+        for (r_i, X_i, y_i, Y_i) in zip(r_list, X_list, y_list, Y_list):
+            res = self.DLEQ_verifyer_2(params, r_i, c, g, X_i, y_i, Y_i)
+            if res != True:
+                return False    
+        return True
+
+    def DLEQ_verifyer_2(self, params, r, c, g_1, h_1, g_2, h_2):
+        a_1 = r* g_1 + c* h_1 
+        a_2 = r*g_2 + c* h_2
         return a_1 == a_2
 
 
-    def hash(X_i, Y_i, a_1_i, a_2_i):
-        hash_func = Hash()
-        hash_result = hash_func.hashToZr(X_i, Y_i, a_1_i, a_2_i)
-        return hash_result
+    #def hash(X_i, Y_i, a_1_i, a_2_i):
+    #    hash_func = Hash()
+    #    hash_result = hash_func.hashToZr(X_i, Y_i, a_1_i, a_2_i)
+    #    return hash_result
 
 
    # def random(q):
@@ -142,7 +182,9 @@ if __name__ == "__main__":
 
     (C_list, Y_list, X_list, shares_list) = pvss.gen_polynomial(t, n, m, demo_pub_keys)
 
-    cpni.DLEQ_prover_1(g, X_list, demo_pub_keys , Y_list, shares_list)
+    (c, r_list) = cpni.DLEQ_prover_1(g, X_list, demo_pub_keys , Y_list, shares_list)
+    
+    assert cpni.DLEQ_verify(params, demo_pub_keys ,X_list,Y_list,r_list,c) == True
 
 
     #X_list = [0, 1, 2, 3]

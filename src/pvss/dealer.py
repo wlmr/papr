@@ -33,11 +33,11 @@ class PVSS():
         px = [p.random() for i in range(t)]
         px.append(enc_secret)
 
-        import pdb; pdb.set_trace()
+  
 
         commitments = self.get_commitments(g, px)
         shares_list = [self.calc_poly(px, t, i) for i in range(n)]
-        import pdb; pdb.set_trace()
+
         enc_shares = self.get_encrypted_shares(pub_keys, shares_list) #  shares_list[:-1] ???
 
         X_i_list = [self.get_X_i(commitments, i) for i in range(1, n+1)]
@@ -81,7 +81,7 @@ class PVSS():
 
     def get_encrypted_shares(self, pub_keys, shares):
         #assert len(pub_keys) < (len(shares)-1)
-        import pdb; pdb.set_trace()
+
         
         assert len(pub_keys) == len(shares) 
         Y_i_list = [shares[i]*y_i for (y_i, i) in zip(pub_keys, range(len(pub_keys)))]  # FIXME: Should we have mod p
