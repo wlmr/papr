@@ -23,34 +23,53 @@ class PVSS():
         #size = k-1
         #assert size > 1
         assert n > t
-        assert len(pub_keys) >= n-1
+        assert len(pub_keys) == n
 
      #   import pdb; pdb.set_trace()
         #enc_secret = G.encode(secret)
         enc_secret = secret  # Should we encode it to be on curve?
 
         # Random number on the curve? Is that what we want?
-        px = [p.random() for i in range(t)]
-        px.append(enc_secret)
+        px_rand = [p.random() for i in range(t-2)] # t-1 constants including secret, thus t-2 random 
+        #px.prepend(enc_secret)
 
+  
+        px = [enc_secret] + px_rand
+
+      
   
 
         commitments = self.get_commitments(g, px)
-        shares_list = [self.calc_poly(px, t, i) for i in range(n)]
+        shares_list = [self.calc_poly(px, t, i) for i in range(1,n+1)]
 
         enc_shares = self.get_encrypted_shares(pub_keys, shares_list) #  shares_list[:-1] ???
 
+      
         X_i_list = self.get_X_i_list(commitments,n)
+
+
+
+
+
+        #Debug:
+        assert len(px) == t-1
+        assert len(commitments) == t-1
+        assert len(shares_list) == n
+        assert shares_list[0] != enc_secret  # I think this is correct
+        assert len(enc_shares) == n
+        assert len(X_i_list)  == n # Should be n, but we use t in the creation
+
+       
 
         return (commitments, enc_shares, X_i_list, shares_list)
 
     def calc_poly(self, px, t, x):
-        order_list = self.rev_range(t)
+    #    order_list = self.rev_range(t)
         result = 0
 
         q = p
         
-        for (alpha, j) in zip(px, order_list):
+        for (alpha, j) in zip(px, range(t)):
             result = (result + alpha * (x**j)) % q
             #result = result * j * x * alpha
         
@@ -60,13 +79,13 @@ class PVSS():
 
         return result
 
-    def rev_range(self, length):
-        '''
-        A counting list from length(list)-1 to 0
-        '''
-        
-        # A reverse list. If length is 4 then the result is [3, 2, 1, 0]
-        return range(length-1, -1, -1)
+  #  def rev_range(self, length):
+  #      '''
+  #      A counting list from length(list)-1 to 0
+  #      '''
+  #      
+  #      # A reverse list. If length is 4 then the result is [3, 2, 1, 0]
+  #      return range(length-1, -1, -1)
 
     def get_commitments(self, g, px):
         #import pdb; pdb.set_trace()
@@ -86,16 +105,17 @@ class PVSS():
         return Y_i_list
 
     def get_X_i_list(self, commitments, n):
-        return [self.get_X_i(commitments, i) for i in range(1, n+1)]
+        return [self.get_X_i(commitments, i) for i in range(1,n+1)]
 
     def get_X_i(self, C_list, i):
-        elements = [j*i*C_j for (C_j, j) in zip(C_list, reversed(range(len(C_list))))]
+        #import pdb; pdb.set_trace()
+        elements = [j*i*C_j for (C_j, j) in zip(C_list, range(len(C_list)))]
         #elements = [
         #    C_j**i**j for (C_j, j) in zip(C_list, reversed(range(len(C_list))))]
         
         ans = elements[0]
         for e in elements[1:]:
-            ans + e
+            ans = ans + e
         
 
        # result = sum(elements) ##FIXME: Product, is this correct in eliptic curve??
@@ -109,7 +129,7 @@ class PVSS():
     def decode(self, S_list):
         ans = 1
         for (S_i, i) in zip(S_list, range(len(S_list))):  # Invert ??
-            ans = ans * S_i**lagrange(i)
+            ans = ans * S_i**self.lagrange(i)
 
         return ans  # G**s
 

@@ -18,6 +18,8 @@ class DLEQ():
                         # g X_i y_i Y_i
     def DLEQ_prover_1(self,g, X_list, y_list, Y_list, p_of_i):                   
     #(Gq, q, g, X_list, y_list, Y_list, n):
+
+        import pdb; pdb.set_trace()
         assert len(X_list) == len(y_list)
         assert len(Y_list) == len(y_list)
         n = len(X_list)
@@ -31,6 +33,8 @@ class DLEQ():
         a_1_list = [w_list[i] * g           for i in range(n)]
         a_2_list = [w_list[i] * y_list[i]   for i in range(n)]
 
+        print("Debug a_1_list:" + str(a_1_list))
+        print("Debug a_2_list:" + str(a_2_list))
        
         c = self.hash(X_list, Y_list, a_1_list, a_2_list)
         r_list = [self.calc_r(w,alpha,c) for (alpha, w) in zip(p_of_i, w_list)]
@@ -54,17 +58,21 @@ class DLEQ():
 
 
     def DLEQ_verify(self, params, y_list, X_list, Y_list, r_list, c):
+        a_res = []
         for (r_i, X_i, y_i, Y_i) in zip(r_list, X_list, y_list, Y_list):
-            res = self.DLEQ_verifyer_2(params, r_i, c, g, X_i, y_i, Y_i)
-            if res != True:
-                return False    
-        return True
+            a_res.append(self.DLEQ_verifyer_2(params, r_i, c, g, X_i, y_i, Y_i))
+            #if res != True:
+            #    return False
+        print(str(a_res))    
+        import pdb; pdb.set_trace()
+        #return True
 
     def DLEQ_verifyer_2(self, params, r, c, g_1, h_1, g_2, h_2):
-        a_1 = r* g_1 + c* h_1 
-        a_2 = r*g_2 + c* h_2
-        return a_1 == a_2
-
+        a_1 = r * g_1 + c * h_1 
+        a_2 = r * g_2 + c * h_2
+        # import pdb; pdb.set_trace()
+        return (a_1, a_2)#a_1 == a_2
+        # FIXME: START HERE. a_2 gives wanted result, a_1's differ!
 
 if __name__ == "__main__":
     Gq = EcGroup()
