@@ -21,7 +21,7 @@ class ElGamal():
     def keygen(self):
         x = p.random() 
         h = x * g
-        pk = {'g':g, 'h':h, 'G':G, 'p':p}
+        pk = {'g':g, 'h':h, 'p':p}
         sk = {'x':x}
         return (pk, sk)
 
@@ -32,14 +32,14 @@ class ElGamal():
         c2 = m + s
         return ({'c1':c1, 'c2':c2}, y)
 
-    def decrypt(self, pk, sk, c):
+    def decrypt(self, sk, c):
         return c['c2'] - sk['x'] * c['c1']
 
 if __name__ == "__main__":
     G = EcGroup()
     p = G.order()
     g = G.generator()
-    h = G.hash_to_point("mac_ggm".encode("utf8"))
+    h = G.hash_to_point(b"h")
 
     m = Bn.from_binary(b'god is dead') * g
     params = (G, p, g, h)

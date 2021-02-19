@@ -1,7 +1,14 @@
-from petlib.ec import EcGroup
+from petlib.ec import EcGroup, EcPt
 from petlib.bn import Bn
 
-def setup(k):
+from typing import Tuple
+
+Params = Tuple[EcGroup, Bn, EcPt, EcPt]
+KeyDict = dict[str,Bn]
+PointDict = dict[str,EcPt]
+Mac = Tuple[EcPt, EcPt]
+
+def setup(k: int) -> Params:
     """ generate all public parameters """
     G = EcGroup()
     g = G.hash_to_point(b"g")
@@ -9,7 +16,7 @@ def setup(k):
     return (G, G.order(), g, h)
 
 
-def keygen(params, n):
+def keygen(params: Params, n: int) -> Tuple[KeyDict,PointDict]:
     assert n > 0
     (_, p, _, h) = params
     sk_names = ['x0','x1']
@@ -18,7 +25,7 @@ def keygen(params, n):
     return (sk, iparams)
 
 
-def mac(params, sk, m):
+def mac(params: Params, sk: KeyDict, m: bytes) -> Mac:
     """ compute mac GGM """
     assert len(sk) > 0 and m
     (G, p, g, _) = params
@@ -30,7 +37,7 @@ def mac(params, sk, m):
     return sigma
 
 
-def verify(params, sk, m, sigma):
+def verify(params: Params, sk: KeyDict, m: bytes, sigma: Mac) -> bool:
     """ verify mac DDH """
     assert len(sk) > 0 and m
     (G,_,_,_) = params
