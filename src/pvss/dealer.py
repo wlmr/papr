@@ -43,17 +43,12 @@ class PVSS():
         X_i_list = [self.get_X_i(commitments, i) for i in range(1, n+1)]
 
         return (commitments, enc_shares, X_i_list, shares_list)
-        #(coeff, shares_list)
-        # pass
-        # return px = [a3 a2 a1 a0] in a3 x**3 + a2 x**2 + a1 x**1 + a0
 
     def calc_poly(self, px, t, x):
         order_list = self.rev_range(t)
         result = 0
 
         q = p
-        
-       # import pdb; pdb.set_trace()
         
         for (alpha, j) in zip(px, order_list):
             result = (result + alpha * (x**j)) % q
@@ -104,9 +99,6 @@ class PVSS():
 
         return ans # result #prod(elements)  # X_i
 
-    # Decrypt
-
-    # Pooling
 
     def verify_correct_decryption(self, S_i, Y_i):
         pass
