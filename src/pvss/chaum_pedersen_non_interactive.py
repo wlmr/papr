@@ -52,6 +52,7 @@ class DLEQ():
         return r
 
 
+
     def DLEQ_verify(self, params, y_list, X_list, Y_list, r_list, c):
         for (r_i, X_i, y_i, Y_i) in zip(r_list, X_list, y_list, Y_list):
             res = self.DLEQ_verifyer_2(params, r_i, c, g, X_i, y_i, Y_i)
@@ -88,6 +89,11 @@ if __name__ == "__main__":
 
     (C_list, Y_list, X_list, shares_list) = pvss.gen_polynomial(t, n, m, demo_pub_keys)
 
+
+
+
     (c, r_list) = cpni.DLEQ_prover_1(g, X_list, demo_pub_keys , Y_list, shares_list)
-    
+
+    verifyer_X_list = pvss.get_X_i_list(C_list, n)
+
     assert cpni.DLEQ_verify(params, demo_pub_keys ,X_list,Y_list,r_list,c) == True

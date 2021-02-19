@@ -40,7 +40,7 @@ class PVSS():
 
         enc_shares = self.get_encrypted_shares(pub_keys, shares_list) #  shares_list[:-1] ???
 
-        X_i_list = [self.get_X_i(commitments, i) for i in range(1, n+1)]
+        X_i_list = self.get_X_i_list(commitments,n)
 
         return (commitments, enc_shares, X_i_list, shares_list)
 
@@ -84,6 +84,9 @@ class PVSS():
         # Y_i_list = [y_i**shares[i]
         #           for (y_i, i) in zip(pub_keys, range(len(pub_keys)))]
         return Y_i_list
+
+    def get_X_i_list(self, commitments, n):
+        return [self.get_X_i(commitments, i) for i in range(1, n+1)]
 
     def get_X_i(self, C_list, i):
         elements = [j*i*C_j for (C_j, j) in zip(C_list, reversed(range(len(C_list))))]
