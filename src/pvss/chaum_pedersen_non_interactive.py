@@ -16,7 +16,7 @@ class DLEQ():
         (Gq, p, g, G, h) = params
         pass
                         # g X_i y_i Y_i
-    def DLEQ_prover_1(self,g, X_list, y_list, Y_list, p_of_i):                   
+    def DLEQ_prover_1(self, X_list, y_list, Y_list, p_of_i):                   
     #(Gq, q, g, X_list, y_list, Y_list, n):
 
         import pdb; pdb.set_trace()
@@ -39,7 +39,7 @@ class DLEQ():
         c = self.hash(X_list, Y_list, a_1_list, a_2_list)
         r_list = [self.calc_r(w,alpha,c) for (alpha, w) in zip(p_of_i, w_list)]
 
-        return (c, r_list)
+        return (c, r_list, a_1_list, a_2_list)
        
 
     def hash(self, X_list, Y_list, a_1_list, a_2_list):
@@ -57,15 +57,18 @@ class DLEQ():
 
 
 
-    def DLEQ_verify(self, params, y_list, X_list, Y_list, r_list, c):
-        a_res = []
-        for (r_i, X_i, y_i, Y_i) in zip(r_list, X_list, y_list, Y_list):
-            a_res.append(self.DLEQ_verifyer_2(params, r_i, c, g, X_i, y_i, Y_i))
+    def DLEQ_verify(self, params, y_list, X_list, Y_list, r_list, c, a_1_orig_list, a_2_orig_list):
+        # a_res = []
+        for (r_i, X_i, y_i, Y_i, a_1_orig, a_2_orig) in zip(r_list, X_list, y_list, Y_list, a_1_orig_list, a_2_orig_list):
+            (a_1_new, a_2_new) = self.DLEQ_verifyer_2(params, r_i, c, g, X_i, y_i, Y_i)
+            
+            if a_1_new != a_1_orig or a_2_new != a_2_orig:
+                return False
             #if res != True:
             #    return False
-        print(str(a_res))    
-        import pdb; pdb.set_trace()
-        #return True
+        #print(str(a_res))    
+        #import pdb; pdb.set_trace()
+        return True
 
     def DLEQ_verifyer_2(self, params, r, c, g_1, h_1, g_2, h_2):
         a_1 = r * g_1 + c * h_1 
@@ -81,7 +84,12 @@ if __name__ == "__main__":
     G = Gq.hash_to_point(b'G')
     h = Gq.hash_to_point("mac_ggm".encode("utf8"))
 
-    m = Bn.from_binary(b'This is a test')
+    #m_val = Bn.from_binary(b'This is a test')
+    #m = Gq.hash_to_point(m_val)
+    
+    #m=Bn.from_binary(b'This is a test')
+    m = p.random()
+
     params = (Gq, p, g, G, h)
     cpni = DLEQ(params)
     pvss = PVSS(params)
@@ -100,8 +108,8 @@ if __name__ == "__main__":
 
 
 
-    (c, r_list) = cpni.DLEQ_prover_1(g, X_list, demo_pub_keys , Y_list, shares_list)
+    (c, r_list, a_1_list, a_2_list) = cpni.DLEQ_prover_1(X_list, demo_pub_keys , Y_list, shares_list)
 
     verifyer_X_list = pvss.get_X_i_list(C_list, n)
 
-    assert cpni.DLEQ_verify(params, demo_pub_keys ,X_list,Y_list,r_list,c) == True
+    assert cpni.DLEQ_verify(params, demo_pub_keys ,X_list,Y_list,r_list,c, a_1_list, a_2_list) == True

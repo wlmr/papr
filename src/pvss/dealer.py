@@ -32,7 +32,7 @@ class PVSS():
         # Random number on the curve? Is that what we want?
         px_rand = [p.random() for i in range(t-2)] # t-1 constants including secret, thus t-2 random 
         #px.prepend(enc_secret)
-
+        import pdb; pdb.set_trace()
   
         px = [enc_secret] + px_rand
 
@@ -109,7 +109,7 @@ class PVSS():
 
     def get_X_i(self, C_list, i):
         #import pdb; pdb.set_trace()
-        elements = [j*i*C_j for (C_j, j) in zip(C_list, range(len(C_list)))]
+        elements = [(i**j) * C_j for (C_j, j) in zip(C_list, range(len(C_list)))]
         #elements = [
         #    C_j**i**j for (C_j, j) in zip(C_list, reversed(range(len(C_list))))]
         
