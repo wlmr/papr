@@ -87,8 +87,8 @@ if __name__ == "__main__":
     #m_val = Bn.from_binary(b'This is a test')
     #m = Gq.hash_to_point(m_val)
     
-    #m=Bn.from_binary(b'This is a test')
-    m = p.random()
+    m=Bn.from_binary(b'This is a test')
+    #m = p.random()
 
     params = (Gq, p, g, G, h)
     cpni = DLEQ(params)
@@ -112,4 +112,4 @@ if __name__ == "__main__":
 
     verifyer_X_list = pvss.get_X_i_list(C_list, n)
 
-    assert cpni.DLEQ_verify(params, demo_pub_keys ,X_list,Y_list,r_list,c, a_1_list, a_2_list) == True
+    assert cpni.DLEQ_verify(params, demo_pub_keys ,verifyer_X_list,Y_list,r_list,c, a_1_list, a_2_list) == True
