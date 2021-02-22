@@ -23,32 +23,26 @@ class PVSS():
 
         enc_secret = secret  # Should we encode it to be on curve?
 
-        px_rand = [p.random() for i in range(t-2)] # t-1 constants including secret, thus t-2 random 
-        
+        # t-1 constants including secret, thus t-2 random
+        px_rand = [p.random() for i in range(t-2)]
+
         px = [enc_secret] + px_rand
 
-              
-  
-
         commitments = self.get_commitments(g, px)
-        shares_list = [self.calc_poly(px, t, i) for i in range(1,n+1)]
+        shares_list = [self.calc_poly(px, t, i) for i in range(1, n+1)]
 
         enc_shares = self.get_encrypted_shares(pub_keys, shares_list)
-        X_i_list = self.get_X_i_list(commitments,n)
+        X_i_list = self.get_X_i_list(commitments, n)
 
-
-
-
-
-        #Debug:
+        # Debug:
         assert len(px) == t-1
         assert len(commitments) == t-1
         assert len(shares_list) == n
         assert shares_list[0] != enc_secret  # I think this is correct
         assert len(enc_shares) == n
-        assert len(X_i_list)  == n # Should be n, but we use t in the creation
+        assert len(X_i_list) == n  # Should be n, but we use t in the creation
 
-        pub = {'C_list':commitments, 'Y_list': enc_shares, 'X_list': X_i_list}       
+        pub = {'C_list': commitments, 'Y_list': enc_shares, 'X_list': X_i_list}
 
         return (pub, shares_list)
 
@@ -59,26 +53,28 @@ class PVSS():
         return result
 
     def get_commitments(self, g, px):
-        return [p_i * g for p_i in px] # Reverse order, why does it not work in default order?
+        # Reverse order, why does it not work in default order?
+        return [p_i * g for p_i in px]
 
     def get_encrypted_shares(self, pub_keys, shares):
-        assert len(pub_keys) == len(shares) 
-        Y_i_list = [shares[i]*y_i for (y_i, i) in zip(pub_keys, range(len(pub_keys)))]  # FIXME: Should we have mod p
+        assert len(pub_keys) == len(shares)
+        # FIXME: Should we have mod p
+        Y_i_list = [shares[i]*y_i for (y_i, i)
+                    in zip(pub_keys, range(len(pub_keys)))]
         return Y_i_list
 
-
     def get_X_i_list(self, commitments, n):
-        return [self.get_X_i(commitments, i) for i in range(1,n+1)]
+        return [self.get_X_i(commitments, i) for i in range(1, n+1)]
 
     def get_X_i(self, C_list, i):
-        elements = [(i**j) * C_j for (C_j, j) in zip(C_list, range(len(C_list)))]
+        elements = [(i**j) * C_j for (C_j, j)
+                    in zip(C_list, range(len(C_list)))]
 
         ans = elements[0]
         for e in elements[1:]:
             ans = ans + e
-        
-        return ans
 
+        return ans
 
     def verify_correct_decryption(self, S_i, Y_i):
         pass
