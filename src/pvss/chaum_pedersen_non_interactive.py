@@ -16,10 +16,11 @@ class DLEQ():
         (Gq, p, g, G, h) = params
         pass
                         # g X_i y_i Y_i
-    def DLEQ_prover_1(self, pub, y_list, p_of_i):                   
+    def DLEQ_prove(self, pub, y_list, p_of_i):                   
 
         X_list = pub['X_list']
         Y_list = pub['Y_list']
+      
         
         assert len(X_list) == len(y_list)
         assert len(Y_list) == len(y_list)
@@ -67,16 +68,13 @@ class DLEQ():
             
             if a_1_new != a_1_orig or a_2_new != a_2_orig:
                 return False
-            #if res != True:
-            #    return False
-        #print(str(a_res))    
-        #import pdb; pdb.set_trace()
+
         return True
 
     def DLEQ_verifyer_2(self, params, r, c, g_1, h_1, g_2, h_2):
         a_1 = r * g_1 + c * h_1 
         a_2 = r * g_2 + c * h_2
-        return (a_1, a_2)#a_1 == a_2
+        return (a_1, a_2)
       
 
 if __name__ == "__main__":
@@ -104,7 +102,7 @@ if __name__ == "__main__":
 
 
 
-    proof = cpni.DLEQ_prover_1(pub, demo_pub_keys, shares_list)
+    proof = cpni.DLEQ_prove(pub, demo_pub_keys, shares_list)
 
     verifyer_X_list = pvss.get_X_i_list(pub['C_list'], n)
 

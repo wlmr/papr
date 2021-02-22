@@ -33,7 +33,7 @@ class PVSS():
         commitments = self.get_commitments(g, px)
         shares_list = [self.calc_poly(px, t, i) for i in range(1,n+1)]
 
-        enc_shares = self.get_encrypted_shares(pub_keys, shares_list) #  shares_list[:-1] ???
+        enc_shares = self.get_encrypted_shares(pub_keys, shares_list)
         X_i_list = self.get_X_i_list(commitments,n)
 
 
@@ -53,63 +53,31 @@ class PVSS():
         return (pub, shares_list)
 
     def calc_poly(self, px, t, x):
-    #    order_list = self.rev_range(t)
         result = 0
-
-        q = p
-        
         for (alpha, j) in zip(px, range(t)):
-            result = (result + alpha * (x**j)) % q
-            #result = result * j * x * alpha
-        
-        #result = 0
-        #for (alpha, i) in zip(px, rev_range(px)):
-        #    result = (result + alpha * (x**i)) % q
-
+            result = (result + alpha * (x**j)) % p
         return result
 
-  #  def rev_range(self, length):
-  #      '''
-  #      A counting list from length(list)-1 to 0
-  #      '''
-  #      
-  #      # A reverse list. If length is 4 then the result is [3, 2, 1, 0]
-  #      return range(length-1, -1, -1)
-
     def get_commitments(self, g, px):
-        #import pdb; pdb.set_trace()
         return [p_i * g for p_i in px] # Reverse order, why does it not work in default order?
-        # return [g**p_i for p_i in px]
-        # return [C_3 C_2 C_1 C_0]
 
     def get_encrypted_shares(self, pub_keys, shares):
-        #assert len(pub_keys) < (len(shares)-1)
-
-        
         assert len(pub_keys) == len(shares) 
         Y_i_list = [shares[i]*y_i for (y_i, i) in zip(pub_keys, range(len(pub_keys)))]  # FIXME: Should we have mod p
-
-        # Y_i_list = [y_i**shares[i]
-        #           for (y_i, i) in zip(pub_keys, range(len(pub_keys)))]
         return Y_i_list
+
 
     def get_X_i_list(self, commitments, n):
         return [self.get_X_i(commitments, i) for i in range(1,n+1)]
 
     def get_X_i(self, C_list, i):
-        #import pdb; pdb.set_trace()
         elements = [(i**j) * C_j for (C_j, j) in zip(C_list, range(len(C_list)))]
-        #elements = [
-        #    C_j**i**j for (C_j, j) in zip(C_list, reversed(range(len(C_list))))]
-        
+
         ans = elements[0]
         for e in elements[1:]:
             ans = ans + e
         
-
-       # result = sum(elements) ##FIXME: Product, is this correct in eliptic curve??
-
-        return ans # result #prod(elements)  # X_i
+        return ans
 
 
     def verify_correct_decryption(self, S_i, Y_i):
