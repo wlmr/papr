@@ -18,33 +18,22 @@ class PVSS():
         (Gq, p, g, G, h) = params
 
     def gen_polynomial(self, t, n, secret, pub_keys):
-        #assert k-1 <= t-1
-
-        #size = k-1
-        #assert size > 1
         assert n > t
         assert len(pub_keys) == n
 
-     #   import pdb; pdb.set_trace()
-        #enc_secret = G.encode(secret)
         enc_secret = secret  # Should we encode it to be on curve?
 
-        # Random number on the curve? Is that what we want?
         px_rand = [p.random() for i in range(t-2)] # t-1 constants including secret, thus t-2 random 
-        #px.prepend(enc_secret)
-        import pdb; pdb.set_trace()
-  
+        
         px = [enc_secret] + px_rand
 
-      
+              
   
 
         commitments = self.get_commitments(g, px)
         shares_list = [self.calc_poly(px, t, i) for i in range(1,n+1)]
 
         enc_shares = self.get_encrypted_shares(pub_keys, shares_list) #  shares_list[:-1] ???
-
-      
         X_i_list = self.get_X_i_list(commitments,n)
 
 
@@ -59,9 +48,9 @@ class PVSS():
         assert len(enc_shares) == n
         assert len(X_i_list)  == n # Should be n, but we use t in the creation
 
-       
+        pub = {'C_list':commitments, 'Y_list': enc_shares, 'X_list': X_i_list}       
 
-        return (commitments, enc_shares, X_i_list, shares_list)
+        return (pub, shares_list)
 
     def calc_poly(self, px, t, x):
     #    order_list = self.rev_range(t)
