@@ -95,8 +95,6 @@ class PVSS():
         y_i = x_i * G
         decrypt_proof = self.DLEQ_prove(G, S_i, y_i, Y_i, x_i)
 
-        #proved_decryption = {'S_i': S_i, 'decrypt_proof': decrypt_proof}
-
         return (S_i, decrypt_proof)
 
     def decode(self, S_list, t):
@@ -172,7 +170,7 @@ class PVSS():
 
         return proof
 
-    def hash(self, g_1, g_2, a_1, a_2):
+    def hash(self, g_1, g_2, a_1, a_2) -> Bn:
         state = str([g_1, g_2, a_1, a_2])
         H = sha256()
         H.update(state.encode("utf8"))
