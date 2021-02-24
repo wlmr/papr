@@ -108,13 +108,12 @@ if __name__ == "__main__":
     S_list = [pvss.participant_decrypt(private_key, share) for (private_key, share) in zip(demo_priv_keys, pub['Y_list'])]
 
 
-    import pdb; pdb.set_trace()
     actual_decryption = pvss.decode(S_list[0:-1],t)
 
     assert expected_decryption == actual_decryption
 
 
     # TODO: 
-    # Solve decryption
+    # Solve decryption  - DONE
     # DLEQ proof on S_i beeing correct decryption of Y_i 
     # Refactor 
