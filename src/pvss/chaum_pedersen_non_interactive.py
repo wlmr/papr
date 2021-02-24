@@ -82,7 +82,6 @@ if __name__ == "__main__":
     m = Bn.from_binary(b'This is a test')
     #m = Gq.hash_to_point(b'This is a test')
 
-
     params = (Gq, p, g, G, h)
     cpni = DLEQ(params)
     pvss = PVSS(params)
@@ -102,18 +101,16 @@ if __name__ == "__main__":
     assert cpni.DLEQ_verify(params, demo_pub_keys,
                             verifyer_X_list, pub['Y_list'], proof) == True
 
-
     expected_decryption = m * G
 
-    S_list = [pvss.participant_decrypt(private_key, share) for (private_key, share) in zip(demo_priv_keys, pub['Y_list'])]
+    S_list = [pvss.participant_decrypt(private_key, share) for (
+        private_key, share) in zip(demo_priv_keys, pub['Y_list'])]
 
-
-    actual_decryption = pvss.decode(S_list[0:-1],t)
+    actual_decryption = pvss.decode(S_list[0:-1], t)
 
     assert expected_decryption == actual_decryption
 
-
-    # TODO: 
+    # TODO:
     # Solve decryption  - DONE
-    # DLEQ proof on S_i beeing correct decryption of Y_i 
-    # Refactor 
+    # DLEQ proof on S_i beeing correct decryption of Y_i
+    # Refactor

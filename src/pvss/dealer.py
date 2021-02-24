@@ -81,23 +81,21 @@ class PVSS():
 
     def participant_decrypt(self, x_i, Y_i):
         return x_i.mod_inverse(p) * Y_i
-   
-
 
     def decode(self, S_list, t):
         assert len(S_list) == t
-        ans = self.lagrange(1,t) * S_list[0]
+        ans = self.lagrange(1, t) * S_list[0]
         parts = []
         parts.append(ans)
 
         for (S_i, i) in zip(S_list[1:], range(2, t+1)):  # Invert ??
             ans = ans + self.lagrange(i, t) * S_i
-     
+
         return ans  # G**s
 
     def lagrange(self, i, t) -> int:
         res = 1
-        for j in range(1,t+1):
+        for j in range(1, t+1):
             if j != i:
                 res = res * (j)/((j-i))
         return int(res)
