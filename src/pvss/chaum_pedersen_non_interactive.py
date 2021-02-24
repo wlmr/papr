@@ -14,9 +14,8 @@ class DLEQ():
         global G
         global h
         (Gq, p, g, G, h) = params
-        pass
-        # g X_i y_i Y_i
-
+        
+        
     def DLEQ_prove(self, pub, y_list, p_of_i):
 
         X_list = pub['X_list']
@@ -80,8 +79,7 @@ if __name__ == "__main__":
     h = Gq.hash_to_point("mac_ggm".encode("utf8"))
 
     m = Bn.from_binary(b'This is a test')
-    #m = Gq.hash_to_point(b'This is a test')
-
+ 
     params = (Gq, p, g, G, h)
     cpni = DLEQ(params)
     pvss = PVSS(params)
@@ -90,7 +88,7 @@ if __name__ == "__main__":
     t = 3
 
     demo_priv_keys = [p.random() for i in range(n)]
-    demo_pub_keys = [priv_key * G for priv_key in demo_priv_keys]  # ?
+    demo_pub_keys = [priv_key * G for priv_key in demo_priv_keys] 
 
     (pub, shares_list) = pvss.gen_polynomial(t, n, m, demo_pub_keys)
 
