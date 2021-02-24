@@ -2,7 +2,7 @@ from petlib.ec import EcGroup
 from petlib.bn import Bn
 
 #TODO: decide whether this class should be exponential elgamal,
-# i.e. m gets raised to g in the algorithm itself.
+# i.e. m gets raised to g in the algorithm itself. (currently is)
 class ElGamal():
     """
     Simple Elgamal implementation which lets you import
@@ -28,8 +28,7 @@ class ElGamal():
     def encrypt(self, pk, m):
         y = pk['p'].random()
         c1 = y * pk['g'] 
-        s = y * pk['h'] 
-        c2 = m + s
+        c2 = m * g + y * pk['h']
         return ({'c1':c1, 'c2':c2}, y)
 
     def decrypt(self, sk, c):
