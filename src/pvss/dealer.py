@@ -140,12 +140,12 @@ class PVSS():
 
     def DLEQ_prove(self, g_1, g_2, h_1, h_2, x_i):
         w = p.random()
-        (a_1, a_2) = self.DLEQ_a_prove(g_1, g_2, w)
+        (a_1, a_2) = self.DLEQ_prover_calc_a(g_1, g_2, w)
         c = self.hash(g_1, g_2, a_1, a_2)
         r = self.DLEQ_calc_r(w, x_i, c)
         return (c, r, a_1, a_2)
 
-    def DLEQ_a_prove(self, g_1, g_2, w):
+    def DLEQ_prover_calc_a(self, g_1, g_2, w):
         a_1 = w * g_1
         a_2 = w * g_2
         return (a_1, a_2)
@@ -202,15 +202,14 @@ class PVSS():
             return False
 
         for (r_i, X_i, y_i, Y_i, a_1_orig, a_2_orig) in zip(r_list, X_list, y_list, Y_list, a_1_orig_list, a_2_orig_list):
-            (a_1_new, a_2_new) = self.DLEQ_verifyer_2(
-                params, r_i, c, g, X_i, y_i, Y_i)
+            (a_1_new, a_2_new) = self.DLEQ_verifyer_calc_a(r_i, c, g, X_i, y_i, Y_i)
 
             if a_1_new != a_1_orig or a_2_new != a_2_orig:
                 return False
 
         return True
 
-    def DLEQ_verifyer_2(self, params, r, c, g_1, h_1, g_2, h_2):
+    def DLEQ_verifyer_calc_a(self, r, c, g_1, h_1, g_2, h_2):
         a_1 = r * g_1 + c * h_1
         a_2 = r * g_2 + c * h_2
         return (a_1, a_2)
@@ -261,5 +260,5 @@ if __name__ == "__main__":
 
     # TODO:
     # Solve decryption  - DONE
-    # DLEQ proof on S_i beeing correct decryption of Y_i
+    # DLEQ proof on S_i beeing correct decryption of Y_i - DONE
     # Refactor
