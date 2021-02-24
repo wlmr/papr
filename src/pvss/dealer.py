@@ -79,12 +79,54 @@ class PVSS():
     def verify_correct_decryption(self, S_i, Y_i):
         pass
 
-    def decode(self, S_list):
-        ans = 1
-        for (S_i, i) in zip(S_list, range(len(S_list))):  # Invert ??
-            ans = ans * S_i**self.lagrange(i)
+    def participant_decrypt(self, x_i, Y_i):
+       # assert (-x_i)%p * Y_i == (-x_i) * Y_i
+        #print("akaka " + str(-x_i))
+        #print("AKKAKAKA " + str(-x_i%p))
+        #import pdb; pdb.set_trace()
 
+
+        #assert (-x_i)%(p-1) * Y_i == x_i.mod_inverse(p) * Y_i
+        return x_i.mod_inverse(p) * Y_i
+        #return #((-x_i)%(p-1)) * Y_i # FIXME: Is this valid??
+
+
+
+    def decode(self, S_list, t):
+       # t = len(S_list)
+
+        assert len(S_list) == t
+        ans = self.lagrange(1,t) * S_list[0]
+        parts = []
+        parts.append(ans)
+
+        
+        #import pdb; pdb.set_trace()
+        
+        for (S_i, i) in zip(S_list[1:], range(2, t+1)):  # Invert ??
+            #print(i)
+            ans = ans + self.lagrange(i, t) * S_i
+            # parts.append(self.lagrange(i, t) * S_i)
+
+        #import pdb; pdb.set_trace()
         return ans  # G**s
 
-    def lagrange(self, i):
-        pass
+    def lagrange(self, i, t) -> int:
+        res = 1
+        for j in range(1,t+1):
+            if j != i:
+                res = res * (j)/((j-i))
+
+        #FIXME: Ensure both upper and lower part is in correct order. (mod)
+
+
+        #res = 0
+        #for j in range(1,t+1):
+        #    if j != i:
+        #        res = res + j-(j-i)
+
+
+
+
+        print("lagraunge: " + str(int(res)))
+        return int(res)
