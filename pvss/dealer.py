@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
-#from charm.toolbox.integergroup import IntegerGroup
-
-# Distribution
 
 from petlib.ec import EcGroup, EcPt
 from petlib.bn import Bn
 from hashlib import sha256
 
 
-A = tuple([Bn, Bn])
+A = tuple[Bn, Bn]
 #Polynomial = list([Bn])
 
 
@@ -19,12 +16,12 @@ class PVSS():
         global g
         global p
         global G
-        global h
-        (Gq, p, g, G, h) = params
+        (Gq, p, g, G) = params
 
     def gen_proof(self, t, n, secret, pub_keys):
         assert n > t
         assert len(pub_keys) == n
+        assert secret == secret%p
 
         px = self.gen_polynomial(t, secret)
 
@@ -39,8 +36,8 @@ class PVSS():
         proof = self.DLEQ_prove_list(pub, pub_keys, shares_list)
 
         # Debug:
-        assert len(px) == t-1
-        assert len(commitments) == t-1
+        assert len(px) == t
+        assert len(commitments) == t
         assert len(shares_list) == n
         assert shares_list[0] != secret  # I think this is correct
         assert len(enc_shares) == n
@@ -50,7 +47,7 @@ class PVSS():
 
     def gen_polynomial(self, t, secret):
         # t-1 constants including secret, thus t-2 random
-        px_rand = [p.random() for i in range(t-2)]
+        px_rand = [p.random() for i in range(t-1)]
         px = [secret] + px_rand
         return px
 
@@ -100,8 +97,6 @@ class PVSS():
     def decode(self, S_list, t):
         assert len(S_list) == t
         ans = self.lagrange(1, t) * S_list[0]
-        parts = []
-        parts.append(ans)
 
         for (S_i, i) in zip(S_list[1:], range(2, t+1)):
             ans = ans + self.lagrange(i, t) * S_i
@@ -157,7 +152,7 @@ class PVSS():
         assert len(Y_list) == len(y_list)
         n = len(X_list)
 
-        w_list = [p.random() for i in range(n)]
+        w_list   = [p.random() for i in range(n)]
         a_1_list = [w_list[i] * g for i in range(n)]
         a_2_list = [w_list[i] * y_list[i] for i in range(n)]
 
@@ -183,7 +178,6 @@ class PVSS():
         return r
 
     def DLEQ_verify(self, y_list, pub, proof):
-
         r_list = proof['r_list']
         c_claimed = proof['c']
         a_1_orig_list = proof['a_1_list']
@@ -218,11 +212,10 @@ if __name__ == "__main__":
     p = Gq.order()
     g = Gq.generator()
     G = Gq.hash_to_point(b'G')
-    h = Gq.hash_to_point("mac_ggm".encode("utf8"))
 
-    m = Bn.from_binary(b'This is a test')
+    m = p.from_binary(b'This is a test')
 
-    params = (Gq, p, g, G, h)
+    params = (Gq, p, g, G)
     #cpni = DLEQ(params)
     pvss = PVSS(params)
 
@@ -230,7 +223,7 @@ if __name__ == "__main__":
     t = 3
 
     demo_priv_keys = [p.random() for i in range(n)]
-    demo_pub_keys = [priv_key * G for priv_key in demo_priv_keys]
+    demo_pub_keys = [priv_key * G  for priv_key in demo_priv_keys]
 
     (pub, proof) = pvss.gen_proof(t, n, m, demo_pub_keys)
 
@@ -241,10 +234,12 @@ if __name__ == "__main__":
     print("Test verify")
     assert pvss.DLEQ_verify(demo_pub_keys, pub, proof) == True
 
+
+    # Decryption 
     expected_decryption = m * G
 
-    proved_decryptions = [pvss.participant_decrypt_and_prove(private_key, share) for (
-        private_key, share) in zip(demo_priv_keys, pub['Y_list'])]
+    proved_decryptions = [pvss.participant_decrypt_and_prove(private_key, enc_share) for (
+        private_key, enc_share) in zip(demo_priv_keys, pub['Y_list'])]
 
     if pvss.batch_verify_correct_decryption(proved_decryptions, pub['Y_list'], demo_pub_keys) == False:
         print("Verification of decryption failed")
