@@ -34,7 +34,7 @@ def DLEQ_prove(params, g_1, g_2, h_1, h_2, x_i):
     (_,p,_,_) = params
     w = p.random()
     (a_1, a_2) = __DLEQ_prover_calc_a(g_1, g_2, w)
-    c = hash(params,g_1, g_2, a_1, a_2)
+    c = hash(params,h_1, h_2, a_1, a_2)
     r = __DLEQ_calc_r(params, w, x_i, c)
     return (c, r, a_1, a_2)
 
@@ -114,31 +114,34 @@ def DLEQ_verify_list(params, y_list, pub, proof):
     if c_claimed != c:
         return False
 
-    for (r_i, X_i, y_i, Y_i, a_1_orig, a_2_orig) in zip(r_list, X_list, y_list, Y_list, a_1_orig_list, a_2_orig_list):
-        (a_1_new, a_2_new) = DLEQ_verifyer_calc_a(r_i, c, g, X_i, y_i, Y_i)
 
-        if a_1_new != a_1_orig or a_2_new != a_2_orig:
+    for (g_2, h_1, h_2, r_i, a_1, a_2) in zip(y_list, X_list, Y_list, r_list, a_1_orig_list, a_2_orig_list):
+        if not DLEQ_verify(params, g, g_2, h_1, h_2, (c, r_i, a_1, a_2)):
             return False
 
-    return True
+    return True 
+
+
+
+
+def DLEQ_verify_single(params, g_1, g_2, h_1, h_2, proof):
+    (c_claimed, r, a_1, a_2) = proof
+    c = hash(params, h_1, h_2, a_1, a_2)
+    if c != c_claimed:
+        return False
+    
+    #proof = (c, r, a_1, a_2)
+    return DLEQ_verify(params, g_1, g_2, h_1, h_2, proof)
 
 
 
 
 
 def DLEQ_verify(params, g_1, g_2, h_1, h_2, proof):
-      
         '''
         Verify that a participants proof of correct decryption of their share
         '''
-        (c_claimed, r, a_1, a_2) = proof
-        
-
-        c = hash(params, g_1, g_2, a_1, a_2)
-        if c != c_claimed:
-            return False
-
-
+        (c, r, a_1, a_2) = proof 
         (a_1_new, a_2_new) = DLEQ_verifyer_calc_a(r,c,g_1,h_1,g_2,h_2)
         
         if a_1 == a_1_new and a_2 == a_2_new:

@@ -101,8 +101,11 @@ class PVSS_issuer():
 
     def verify_correct_decryption(self, S_i, Y_i, decrypt_proof, pub_key):
         params = (Gq, p, g, G)
-        return cpni.DLEQ_verify(params, G, S_i, pub_key, Y_i, decrypt_proof)
+        return self.DLEQ_verify_wrapper(params, G, S_i, pub_key, Y_i, decrypt_proof)
 
+    def DLEQ_verify_wrapper(self, params, g_1, g_2, h_1,h_2, decrypt_proof):
+        #(c_claimed, r, a_1, a_2) = decrypt_proof
+        return cpni.DLEQ_verify_single(params, g_1, g_2, h_1, h_2, decrypt_proof)
 
 
     # def verify_correct_decryption(self, S_i, Y_i, decrypt_proof, pub_key):
