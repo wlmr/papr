@@ -99,23 +99,31 @@ class PVSS_issuer():
         return int(res)
 
 
-
     def verify_correct_decryption(self, S_i, Y_i, decrypt_proof, pub_key):
-        '''
-        Verify that a participants proof of correct decryption of their share
-        '''
-        (c_claimed, r, a_1, a_2) = decrypt_proof
-        y_i = pub_key
+        params = (Gq, p, g, G)
+        return cpni.DLEQ_verify(params, G, S_i, pub_key, Y_i, decrypt_proof)
 
-        c = cpni.hash(params, G, S_i, a_1, a_2)
-        if c != c_claimed:
-            return False
 
-        a_1_new = r * G + c * y_i
-        a_2_new = r * S_i + c * Y_i
-        if a_1 == a_1_new and a_2 == a_2_new:
-            return True
-        return False
+
+    # def verify_correct_decryption(self, S_i, Y_i, decrypt_proof, pub_key):
+    #     '''
+    #     Verify that a participants proof of correct decryption of their share
+    #     '''
+    #     (c_claimed, r, a_1, a_2) = decrypt_proof
+    #     y_i = pub_key
+
+    #     c = cpni.hash(params, G, S_i, a_1, a_2)
+    #     if c != c_claimed:
+    #         return False
+
+    #     #a_1_new = r * G + c * y_i
+    #     #a_2_new = r * S_i + c * Y_i
+
+    #     (a_1_new, a_2_new) = DLEQ_verifyer_calc_a(r,c,G,y_i,S_i,Y_i)
+        
+    #     if a_1 == a_1_new and a_2 == a_2_new:
+    #         return True
+    #     return False
 
     def batch_verify_correct_decryption(self, proved_decryptions, Y_list, pub_keys):
         '''
@@ -187,7 +195,7 @@ if __name__ == "__main__":
 
     # Prove generates shares validity
     print("Test verify")
-    assert cpni.DLEQ_verify(params, pub_keys, pub, proof) == True
+    assert cpni.DLEQ_verify_list(params, pub_keys, pub, proof) == True
 
     # Decryption
     # Calulate what a correct decryption should be
