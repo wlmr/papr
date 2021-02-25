@@ -21,7 +21,7 @@ class PVSS():
     def gen_proof(self, t, n, secret, pub_keys):
         assert n > t
         assert len(pub_keys) == n
-        assert secret == secret%p
+        assert secret == secret % p
 
         px = self.gen_polynomial(t, secret)
 
@@ -152,7 +152,7 @@ class PVSS():
         assert len(Y_list) == len(y_list)
         n = len(X_list)
 
-        w_list   = [p.random() for i in range(n)]
+        w_list = [p.random() for i in range(n)]
         a_1_list = [w_list[i] * g for i in range(n)]
         a_2_list = [w_list[i] * y_list[i] for i in range(n)]
 
@@ -223,7 +223,7 @@ if __name__ == "__main__":
     t = 3
 
     demo_priv_keys = [p.random() for i in range(n)]
-    demo_pub_keys = [priv_key * G  for priv_key in demo_priv_keys]
+    demo_pub_keys = [priv_key * G for priv_key in demo_priv_keys]
 
     (pub, proof) = pvss.gen_proof(t, n, m, demo_pub_keys)
 
@@ -234,8 +234,7 @@ if __name__ == "__main__":
     print("Test verify")
     assert pvss.DLEQ_verify(demo_pub_keys, pub, proof) == True
 
-
-    # Decryption 
+    # Decryption
     expected_decryption = m * G
 
     proved_decryptions = [pvss.participant_decrypt_and_prove(private_key, enc_share) for (
