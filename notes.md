@@ -23,4 +23,8 @@
 ### show
 
 
+## JOURNAL
+
+20-02-23: have been doing proofs for the whole day. Will pick up at make_pi_issue tomorrow
+
 
