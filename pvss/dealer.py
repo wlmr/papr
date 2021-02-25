@@ -3,13 +3,14 @@
 from petlib.ec import EcGroup, EcPt
 from petlib.bn import Bn
 from hashlib import sha256
+import chaum_pedersen_non_interactive as cpni
 
 
 A = tuple[Bn, Bn]
 #Polynomial = list([Bn])
 
 
-class PVSS():
+class PVSS_prover():
 
     def __init__(self, params):
         global Gq
@@ -19,6 +20,9 @@ class PVSS():
         (Gq, p, g, G) = params
 
     def gen_proof(self, t, n, secret, pub_keys):
+        '''
+        Generate polynomial and proof
+        '''
         assert n > t
         assert len(pub_keys) == n
         assert secret == secret % p
@@ -29,11 +33,11 @@ class PVSS():
         shares_list = self.calc_shares(px, t, n)
 
         enc_shares = self.get_encrypted_shares(pub_keys, shares_list)
-        X_i_list = self.get_X_i_list(commitments, n)
+        X_i_list = cpni.get_X_i_list(commitments, n)
 
         pub = {'C_list': commitments, 'Y_list': enc_shares, 'X_list': X_i_list}
 
-        proof = self.DLEQ_prove_list(pub, pub_keys, shares_list)
+        proof = cpni.DLEQ_prove_list(params, pub, pub_keys, shares_list)
 
         # Debug:
         assert len(px) == t
@@ -70,30 +74,6 @@ class PVSS():
                     in zip(pub_keys, range(len(pub_keys)))]
         return Y_i_list
 
-    def get_X_i_list(self, commitments, n):
-        return [self.get_X_i(commitments, i) for i in range(1, n+1)]
-
-    def get_X_i(self, C_list, i):
-        elements = [(i**j) * C_j for (C_j, j)
-                    in zip(C_list, range(len(C_list)))]
-
-        ans = elements[0]
-        for e in elements[1:]:
-            ans = ans + e
-
-        return ans
-
-    def participant_decrypt(self, x_i, Y_i):
-        return x_i.mod_inverse(p) * Y_i
-
-    def participant_decrypt_and_prove(self, x_i, Y_i):
-        S_i = self.participant_decrypt(x_i, Y_i)
-
-        y_i = x_i * G
-        decrypt_proof = self.DLEQ_prove(G, S_i, y_i, Y_i, x_i)
-
-        return (S_i, decrypt_proof)
-
     def decode(self, S_list, t):
         assert len(S_list) == t
         ans = self.lagrange(1, t) * S_list[0]
@@ -110,12 +90,14 @@ class PVSS():
                 res = res * j/(j-i)
         return int(res)
 
+
+
     def verify_correct_decryption(self, S_i, Y_i, decrypt_proof, pub_key):
         #import pdb; pdb.set_trace()
         (c_claimed, r, a_1, a_2) = decrypt_proof
         y_i = pub_key
 
-        c = self.hash(G, S_i, a_1, a_2)
+        c = cpni.hash(params, G, S_i, a_1, a_2)
         if c != c_claimed:
             return False
 
@@ -131,80 +113,37 @@ class PVSS():
                 return False
         return True
 
-    def DLEQ_prove(self, g_1, g_2, h_1, h_2, x_i):
-        w = p.random()
-        (a_1, a_2) = self.DLEQ_prover_calc_a(g_1, g_2, w)
-        c = self.hash(g_1, g_2, a_1, a_2)
-        r = self.DLEQ_calc_r(w, x_i, c)
-        return (c, r, a_1, a_2)
 
-    def DLEQ_prover_calc_a(self, g_1, g_2, w):
-        a_1 = w * g_1
-        a_2 = w * g_2
-        return (a_1, a_2)
 
-    def DLEQ_prove_list(self, pub, y_list, shares_list):
 
-        X_list = pub['X_list']
-        Y_list = pub['Y_list']
 
-        assert len(X_list) == len(y_list)
-        assert len(Y_list) == len(y_list)
-        n = len(X_list)
+class PVSS_verifyer():
 
-        w_list = [p.random() for i in range(n)]
-        a_1_list = [w_list[i] * g for i in range(n)]
-        a_2_list = [w_list[i] * y_list[i] for i in range(n)]
+    def __init__(self, params):
+        global Gq
+        global g
+        global p
+        global G
+        global x_i
+        (Gq, p, g, G) = params
+   
+    def generate_key_pair(self):
+        self.x_i = p.random()
+        y_i = self.x_i * G
+        return y_i
 
-        c = self.hash(X_list, Y_list, a_1_list, a_2_list)
-        r_list = [self.DLEQ_calc_r(w, alpha, c)
-                  for (alpha, w) in zip(shares_list, w_list)]
+    def participant_decrypt(self, Y_i):
+        return self.x_i.mod_inverse(p) * Y_i
 
-        proof = {'c': c, 'r_list': r_list,
-                 'a_1_list': a_1_list, 'a_2_list': a_2_list}
+    def participant_decrypt_and_prove(self, Y_i):
+        S_i = self.participant_decrypt(Y_i)
 
-        return proof
+        y_i = self.x_i * G
+        decrypt_proof = cpni.DLEQ_prove(params, G, S_i, y_i, Y_i, self.x_i)
 
-    def hash(self, g_1, g_2, a_1, a_2) -> Bn:
-        state = str([g_1, g_2, a_1, a_2])
-        H = sha256()
-        H.update(state.encode("utf8"))
-        hash_c = H.digest()
-        c = Bn.from_binary(hash_c) % p
-        return c
+        return (S_i, decrypt_proof)
 
-    def DLEQ_calc_r(self, w, alpha, c):
-        r = (w - c * alpha) % p
-        return r
 
-    def DLEQ_verify(self, y_list, pub, proof):
-        r_list = proof['r_list']
-        c_claimed = proof['c']
-        a_1_orig_list = proof['a_1_list']
-        a_2_orig_list = proof['a_2_list']
-
-        Y_list = pub['Y_list']
-
-        X_list = pvss.get_X_i_list(pub['C_list'], n)
-
-        c = self.hash(X_list, Y_list, a_1_orig_list, a_2_orig_list)
-
-        # Prover lied about c
-        if c_claimed != c:
-            return False
-
-        for (r_i, X_i, y_i, Y_i, a_1_orig, a_2_orig) in zip(r_list, X_list, y_list, Y_list, a_1_orig_list, a_2_orig_list):
-            (a_1_new, a_2_new) = self.DLEQ_verifyer_calc_a(r_i, c, g, X_i, y_i, Y_i)
-
-            if a_1_new != a_1_orig or a_2_new != a_2_orig:
-                return False
-
-        return True
-
-    def DLEQ_verifyer_calc_a(self, r, c, g_1, h_1, g_2, h_2):
-        a_1 = r * g_1 + c * h_1
-        a_2 = r * g_2 + c * h_2
-        return (a_1, a_2)
 
 
 if __name__ == "__main__":
@@ -216,36 +155,42 @@ if __name__ == "__main__":
     m = p.from_binary(b'This is a test')
 
     params = (Gq, p, g, G)
-    #cpni = DLEQ(params)
-    pvss = PVSS(params)
+#    cp = DLEQ(params)
+    pvss_prover = PVSS_prover(params)
 
     n = 4
     t = 3
 
-    demo_priv_keys = [p.random() for i in range(n)]
-    demo_pub_keys = [priv_key * G for priv_key in demo_priv_keys]
+    #demo_priv_keys = [p.random() for i in range(n)]
+    participants = [PVSS_verifyer(params) for i in range(n)]
+    pub_keys = [p.generate_key_pair() for p in participants]
 
-    (pub, proof) = pvss.gen_proof(t, n, m, demo_pub_keys)
+    #demo_pub_keys = [priv_key * G for priv_key in demo_priv_keys]
+
+    (pub, proof) = pvss_prover.gen_proof(t, n, m, pub_keys)
 
     #proof = pvss.DLEQ_prove_list(pub, demo_pub_keys, shares_list)
 
     #verifyer_X_list = pvss.get_X_i_list(pub['C_list'], n)
 
     print("Test verify")
-    assert pvss.DLEQ_verify(demo_pub_keys, pub, proof) == True
+    assert cpni.DLEQ_verify(params, pub_keys, pub, proof) == True
 
     # Decryption
     expected_decryption = m * G
 
-    proved_decryptions = [pvss.participant_decrypt_and_prove(private_key, enc_share) for (
-        private_key, enc_share) in zip(demo_priv_keys, pub['Y_list'])]
+    #proved_decryptions = [pvss.participant_decrypt_and_prove(private_key, enc_share) for (
+    #    private_key, enc_share) in zip(demo_priv_keys, pub['Y_list'])]
 
-    if pvss.batch_verify_correct_decryption(proved_decryptions, pub['Y_list'], demo_pub_keys) == False:
+
+    proved_decryptions = [p.participant_decrypt_and_prove(enc_share) for (p, enc_share) in zip(participants, pub['Y_list'])]
+
+    if pvss_prover.batch_verify_correct_decryption(proved_decryptions, pub['Y_list'], pub_keys) == False:
         print("Verification of decryption failed")
 
     S_list = [S_i for (S_i, decrypt_proof) in proved_decryptions]
 
-    actual_decryption = pvss.decode(S_list[0:-1], t)
+    actual_decryption = pvss_prover.decode(S_list[0:-1], t)
 
     print("Test decrypt")
     assert expected_decryption == actual_decryption
