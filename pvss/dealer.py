@@ -160,51 +160,51 @@ class PVSS_participant():
 
 
 if __name__ == "__main__":
+
+    # Generate parameters (should be same in other parts of program)
     Gq = EcGroup()
     p = Gq.order()
     g = Gq.generator()
     G = Gq.hash_to_point(b'G')
+    params = (Gq, p, g, G)
 
+    # Decide on a secret to be distrubuted
     m = p.from_binary(b'This is a test')
 
-    params = (Gq, p, g, G)
-#    cp = DLEQ(params)
+    # Initialize issuer
     issuer = PVSS_issuer(params)
 
+    # Set (t,n)-threshold parameters
     n = 4
     t = 3
 
-    #demo_priv_keys = [p.random() for i in range(n)]
+    # Initiate participants, and generate their key-pairs
     participants = [PVSS_participant(params) for i in range(n)]
     pub_keys = [participant.generate_key_pair() for participant in participants]
 
-    #demo_pub_keys = [priv_key * G for priv_key in demo_priv_keys]
-
+    # Encrypt secret, create shares and proof
     (pub, proof) = issuer.gen_proof(t, n, m, pub_keys)
 
-    #proof = pvss.DLEQ_prove_list(pub, demo_pub_keys, shares_list)
-
-    #verifyer_X_list = pvss.get_X_i_list(pub['C_list'], n)
-
+    # Prove generates shares validity
     print("Test verify")
     assert cpni.DLEQ_verify(params, pub_keys, pub, proof) == True
 
     # Decryption
+    # Calulate what a correct decryption should be
     expected_decryption = m * G
 
-    #proved_decryptions = [pvss.participant_decrypt_and_prove(private_key, enc_share) for (
-    #    private_key, enc_share) in zip(demo_priv_keys, pub['Y_list'])]
-
-
+    # Let participants decrypt their shares and generate proofs
     proved_decryptions = [participant.participant_decrypt_and_prove(enc_share) for (participant, enc_share) in zip(participants, pub['Y_list'])]
 
+    # Check participants proofs
     if issuer.batch_verify_correct_decryption(proved_decryptions, pub['Y_list'], pub_keys) == False:
         print("Verification of decryption failed")
 
+    # Use participants decrypted shares to recreate secret
     S_list = [S_i for (S_i, decrypt_proof) in proved_decryptions]
-
     actual_decryption = issuer.decode(S_list[0:-1], t)
 
+    # Verify secret
     print("Test decrypt")
     assert expected_decryption == actual_decryption
 
