@@ -1,10 +1,5 @@
 version: '3'
 
 services:
-  crypto-charm:
+  python:
     build: . 
-    ports:
-      - "5000:5000"
-    volumes:
-      - ./src/:/work
-
