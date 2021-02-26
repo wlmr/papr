@@ -79,13 +79,13 @@ def DLEQ_prove_list(params, pub, y_list, shares_list):
     return proof
 
 
-def hash(params, g_1, g_2, a_1, a_2) -> Bn:
+def hash(params, h_1, h_2, a_1, a_2) -> Bn:
     (_, p, _, _) = params
-    state = str([g_1, g_2, a_1, a_2])
+    state = str([h_1, h_2, a_1, a_2])
     H = sha256()
     H.update(state.encode("utf8"))
     hash_c = H.digest()
-    c = Bn.from_binary(hash_c) % p
+    c = p.from_binary(hash_c)
     return c
 
 
