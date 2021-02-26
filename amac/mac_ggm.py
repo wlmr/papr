@@ -19,8 +19,7 @@ def setup(k: int) -> Params:
     return (G, G.order(), g, h)
 
 
-def keygen(params: Params, n: int) -> tuple[Bn, EcPtDict]:
-    assert n > 0
+def keygen(params: Params) -> tuple[Bn, EcPtDict]:
     (_, p, _, h) = params
     sk_names = ['x0', 'x1']
     sk = {name: p.random() for name in sk_names}

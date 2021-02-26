@@ -24,12 +24,12 @@ def setup(k: int) -> Params:
     return setup_ggm(k)
 
 
-def cred_keygen(params: Params, n: int) -> tuple[EcPtDict, BnDict]:
+def cred_keygen(params: Params) -> tuple[EcPtDict, BnDict]:
     """
     Run by issuer to generate issuer secret key and public issuer parameters iparams.
     """
     (_, p, g, h) = params
-    (i_sk, iparams) = keygen_ggm(params, n)
+    (i_sk, iparams) = keygen_ggm(params)
     i_sk['x0_tilde'] = p.random()
     iparams['Cx0'] = i_sk['x0'] * g + i_sk['x0_tilde'] * h
     return iparams, i_sk
