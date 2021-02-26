@@ -25,9 +25,9 @@ class PVSS_issuer():
         '''
         assert n > t
         assert len(pub_keys) == n
-        assert secret == secret % p
+        # assert secret == secret % (p-1)
 
-        px = self.__gen_polynomial(t, secret)
+        px = self.gen_polynomial(t, secret)
 
         commitments = self.__get_commitments(g, px)
         shares_list = self.__calc_shares(px, t, n)
@@ -50,7 +50,7 @@ class PVSS_issuer():
 
         return (pub, proof)
 
-    def __gen_polynomial(self, t, secret):
+    def gen_polynomial(self, t, secret):
         '''
         Generate polynomial
         '''
@@ -62,6 +62,7 @@ class PVSS_issuer():
         return [self.__calc_share(px, t, i) for i in range(1, n+1)]
 
     def __calc_share(self, px, t, x):
+        assert len(px) == t
         result = 0
         for (alpha, j) in zip(px, range(t)):
             result = (result + alpha * (x**j)) % p
@@ -73,7 +74,7 @@ class PVSS_issuer():
     def __get_encrypted_shares(self, pub_keys, shares):
         assert len(pub_keys) == len(shares)
         # FIXME: Should we have mod p
-        Y_i_list = [shares[i]*y_i for (y_i, i)
+        Y_i_list = [shares[i] * y_i for (y_i, i)
                     in zip(pub_keys, range(len(pub_keys)))]
         return Y_i_list
 
@@ -86,6 +87,18 @@ class PVSS_issuer():
 
         for (S_i, i) in zip(S_list[1:], range(2, t+1)):
             ans = ans + self.__lagrange(i, t) * S_i
+
+        return ans  # G**s
+
+    def decode_debug(self, S_list, t, index_list):
+        '''
+        Calulates secret from participants decrypted shares
+        '''
+        assert len(S_list) == t
+        ans = self.__lagrange(index_list[0], t) * S_list[0]
+
+        for (S_i, i) in zip(S_list[1:], range(1, t)):
+            ans = ans + self.__lagrange(index_list[i], t) * S_i
 
         return ans  # G**s
 
@@ -128,7 +141,7 @@ class PVSS_participant():
         return y_i
 
     def participant_decrypt(self, Y_i):
-        return self.x_i.mod_inverse(p) * Y_i
+        return self.x_i.mod_inverse(p) % (p-1) * Y_i
 
     def participant_decrypt_and_prove(self, Y_i):
         S_i = self.participant_decrypt(Y_i)
