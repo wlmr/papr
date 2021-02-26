@@ -29,8 +29,8 @@ class PVSS_issuer():
 
         px = self.gen_polynomial(t, secret)
 
-        commitments = self.__get_commitments(g, px)
-        shares_list = self.__calc_shares(px, t, n)
+        commitments = self.get_commitments(g, px)
+        shares_list = self.calc_shares(px, t, n)
 
         enc_shares = self.__get_encrypted_shares(pub_keys, shares_list)
         X_i_list = cpni.get_X_i_list(commitments, n)
@@ -58,7 +58,7 @@ class PVSS_issuer():
         px = [secret] + px_rand
         return px
 
-    def __calc_shares(self, px, t, n):
+    def calc_shares(self, px, t, n):
         return [self.__calc_share(px, t, i) for i in range(1, n+1)]
 
     def __calc_share(self, px, t, x):
@@ -68,7 +68,7 @@ class PVSS_issuer():
             result = (result + alpha * (x**j)) % p
         return result
 
-    def __get_commitments(self, g, px):
+    def get_commitments(self, g, px):
         return [p_i * g for p_i in px]
 
     def __get_encrypted_shares(self, pub_keys, shares):

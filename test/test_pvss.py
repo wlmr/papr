@@ -228,3 +228,47 @@ class TestPvss():
         px = issuer.gen_polynomial(3,42)
         for pi in px:
             assert pi < p
+
+
+
+    def test_X_i_calc(self):
+        Gq = EcGroup()
+        p = Gq.order()
+        g = Gq.generator()
+        G = Gq.hash_to_point(b'G')
+        params = (Gq, p, g, G)
+
+        # Decide on a secret to be distrubuted
+        m = p.from_binary(b'This is a test')
+
+        # Initialize issuer
+        issuer = PVSS.PVSS_issuer(params)
+
+        t = 3
+        n = 4
+
+        participants = [PVSS.PVSS_participant(params) for i in range(n)]
+        pub_keys = [participant.generate_key_pair() for participant in participants]
+
+        #(pub,proof) = issuer.gen_proof(t,n,m,pub_keys)
+
+        secret=m
+        px = issuer.gen_polynomial(t, secret)
+
+        commitments = issuer.get_commitments(g, px)
+        shares_list = issuer.calc_shares(px, t, n)
+      
+
+
+        X_list = cpni.get_X_i_list(commitments, n)
+
+        X_list_verify = [share * g for share in shares_list]
+
+        for (x1,x2) in zip(X_list, X_list_verify):
+            assert x1 == x2
+
+
+
+
+
+
