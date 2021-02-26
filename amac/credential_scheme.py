@@ -1,5 +1,6 @@
 from petlib.ec import EcGroup, EcPt
 from petlib.bn import Bn
+from typing import Optional
 from amac.proofs import make_pi_prepare_obtain, verify_pi_prepare_obtain
 from amac.proofs import make_pi_issue, verify_pi_issue
 from amac.proofs import make_pi_show, verify_pi_show
@@ -29,10 +30,10 @@ def cred_keygen(params: Params) -> tuple[EcPtDict, BnDict]:
     Run by issuer to generate issuer secret key and public issuer parameters iparams.
     """
     (_, p, g, h) = params
-    (i_sk, iparams) = keygen_ggm(params)
-    i_sk['x0_tilde'] = p.random()
-    iparams['Cx0'] = i_sk['x0'] * g + i_sk['x0_tilde'] * h
-    return iparams, i_sk
+    (issuer_sk, iparams) = keygen_ggm(params)
+    issuer_sk['x0_tilde'] = p.random()
+    iparams['Cx0'] = issuer_sk['x0'] * g + issuer_sk['x0_tilde'] * h
+    return iparams, issuer_sk
 
 
 def prepare_blind_obtain(params: Params, m: bytes) -> tuple[BnDict, EcPtDict, EcPtDict, ZKP]:
@@ -54,7 +55,7 @@ def prepare_blind_obtain(params: Params, m: bytes) -> tuple[BnDict, EcPtDict, Ec
 
 def blind_issue(params: Params, iparams: EcPtDict, i_sk: BnDict,
                 gamma: EcPt, ciphertext: EcPtDict,
-                pi_prepare_obtain: ZKP) -> tuple[EcPt, EcPtDict, ZKP, EcPtDict]:
+                pi_prepare_obtain: ZKP) -> Optional[tuple[EcPt, EcPtDict, ZKP, EcPtDict]]:
     """
     Carried out by issuer.
     1. Chooses a random b and computes u = g^b,
@@ -62,31 +63,35 @@ def blind_issue(params: Params, iparams: EcPtDict, i_sk: BnDict,
     3. sends (u, e'_u') and proof of knowledge of x's x_tilde, b and r back to
      the user.
     """
-    assert verify_pi_prepare_obtain(params, gamma, ciphertext, pi_prepare_obtain)
-    (_, p, g, _) = params
-    b = p.random()
-    u = b * g
-    bsk = {'b'+k: (b * v) % p for (k, v) in i_sk.items()}
-    biparams = {'b'+k:  b * v for (k, v) in iparams.items()}
-    r = p.random()
-    e1 = r * g + b * i_sk['x1'] * ciphertext['c1']
-    e2 = r * gamma + b * (i_sk['x0'] * g + i_sk['x1'] * ciphertext['c2'])
-    e_u_prime = {'c1': e1, 'c2': e2}
-    pi_issue = make_pi_issue(params, i_sk, iparams, gamma, ciphertext, b, bsk, r)
-    return u, e_u_prime, pi_issue, biparams
+    if verify_pi_prepare_obtain(params, gamma, ciphertext, pi_prepare_obtain):
+        (_, p, g, _) = params
+        b = p.random()
+        u = b * g
+        bsk = {'b'+k: (b * v) % p for (k, v) in i_sk.items()}
+        biparams = {'b'+k:  b * v for (k, v) in iparams.items()}
+        r = p.random()
+        e1 = r * g + b * i_sk['x1'] * ciphertext['c1']
+        e2 = r * gamma + b * (i_sk['x0'] * g + i_sk['x1'] * ciphertext['c2'])
+        e_u_prime = {'c1': e1, 'c2': e2}
+        pi_issue = make_pi_issue(params, i_sk, iparams, gamma, ciphertext, b, bsk, r)
+        return u, e_u_prime, pi_issue, biparams
+    else:
+        return None
 
 
 def blind_obtain(params: Params, iparams: EcPtDict, u_sk: BnDict, u: EcPt,
                  e_u_prime: EcPtDict, pi_issue: ZKP, biparams: EcPtDict,
-                 gamma: EcPt, ciphertext: EcPtDict) -> tuple[EcPt, Bn]:
+                 gamma: EcPt, ciphertext: EcPtDict) -> Optional[tuple[EcPt, Bn]]:
     """
     Carried out by user.
     1. verifies pi_issue,
     2. user decrypts e_prime to get u_prime. Credential is (u,u_prime).
     """
-    assert verify_pi_issue(params, iparams, u, e_u_prime, pi_issue,
-                           biparams, gamma, ciphertext)
-    return u, decrypt_elgamal(u_sk, e_u_prime)
+    if verify_pi_issue(params, iparams, u, e_u_prime, pi_issue,
+                       biparams, gamma, ciphertext):
+        return u, decrypt_elgamal(u_sk, e_u_prime)
+    else:
+        return None
 
 
 def blind_show(params: Params, iparams: EcPtDict,
@@ -102,7 +107,6 @@ def blind_show(params: Params, iparams: EcPtDict,
     m = p.from_binary(M)
     (r, z, a) = (p.random(), p.random(), p.random())
     (u0, u0_prime) = cred
-    assert u0 and u0_prime
     (u, u_prime) = (a * u0, a * u0_prime)
     Cm = m * u + z * h
     Cu_prime = u_prime + r * g
@@ -115,9 +119,6 @@ def show_verify(params: Params, iparams: EcPtDict, i_sk: BnDict, sigma: Sigma, p
     """
     Verifies a request for a blind_show.
     """
-    assert iparams and sigma and pi_show
     (u, Cm, Cu_prime) = sigma
-    assert u and Cm and Cu_prime
     V = (i_sk['x0'] * u + i_sk['x1'] * Cm) - Cu_prime
-    print(V)
     return verify_pi_show(params, iparams, sigma, pi_show, V)
