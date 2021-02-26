@@ -9,4 +9,7 @@ if __name__ == "__main__":
     (u, e_u_prime, pi_issue, biparams) = blind_issue(params, iparams, i_sk, u_pk['h'], ciphertext, pi_prepare_obtain)
     cred = blind_obtain(params, iparams, u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], ciphertext)
     (sigma, pi_show) = blind_show(params, iparams, cred, m)
-    assert show_verify(params, iparams, i_sk, sigma, pi_show)
+    if show_verify(params, iparams, i_sk, sigma, pi_show):
+        print("verified!")
+    else:
+        print("verification failed!")

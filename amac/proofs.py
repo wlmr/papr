@@ -22,7 +22,7 @@ def to_challenge(elements: list) -> Bn:
 
 def make_pi_prepare_obtain(params: Params, gamma: EcPt,
                            ciphertext: EcPtDict,
-                           r: Bn, m: Bn) -> tuple[Bn, BnDict]:
+                           r: Bn, m: Bn) -> ZKP:
     """ make prepare issuance proof """
     (_, p, g, h) = params
     wr, wm = (p.random(), p.random())
@@ -33,7 +33,7 @@ def make_pi_prepare_obtain(params: Params, gamma: EcPt,
         'r': (wr - c * r) % p,
         'm': (wm - c * m) % p
     }
-    return (c, response)
+    return c, response
 
 
 def verify_pi_prepare_obtain(params: Params, gamma: EcPt,
@@ -50,12 +50,12 @@ def verify_pi_prepare_obtain(params: Params, gamma: EcPt,
 # TODO: make bsk not contain prefix b in key (reduntant and inconsistant)
 def make_pi_issue(params: Params, sk: BnDict, iparams: EcPtDict,
                   gamma: EcPt, ciphertext: EcPtDict, b: Bn,
-                  bsk: BnDict, r: Bn) -> tuple[Bn, BnDict]:
+                  bsk: BnDict, r: Bn) -> ZKP:
     """ make issuance proof """
     (_, p, g, h) = params
     assert iparams and gamma and b and r and ciphertext
     # create the witnesses
-    w = {k: p.random() for k in (sk | bsk | {'b': 1, 'r': 2})}
+    w = ({k: p.random() for k in (sk | bsk)} | {'b': p.random(), 'r': p.random()})
     Aw = w['x0'] * g + w['x0_tilde'] * h
     Bw = w['b'] * g
     Cw = w['bx0'] * g + w['bx0_tilde'] * h
@@ -69,14 +69,14 @@ def make_pi_issue(params: Params, sk: BnDict, iparams: EcPtDict,
     response = {
         'x0': (w['x0'] - c * sk['x0']) % p,
         'x1': (w['x1'] - c * sk['x1']) % p,
-        'b': (w['b'] - c * b) % p,
+        'b':  (w['b'] - c * b) % p,
         'bx0': (w['bx0'] - c * bsk['bx0']) % p,
         'bx1': (w['bx1'] - c * bsk['bx1']) % p,
         'bx0_tilde': (w['bx0_tilde'] - c * bsk['bx0_tilde']) % p,
         'x0_tilde': (w['x0_tilde'] - c * sk['x0_tilde']) % p,
         'r': (w['r'] - c * r) % p
     }
-    return (c, response)
+    return c, response
 
 
 def verify_pi_issue(params: Params, iparams: EcPtDict, u: EcPt, e_u_prime,
@@ -98,7 +98,7 @@ def verify_pi_issue(params: Params, iparams: EcPtDict, u: EcPt, e_u_prime,
 
 
 def make_pi_show(params: Params, iparams: EcPtDict, m: Bn, r: Bn, z: Bn,
-                 sigma: Sigma) -> tuple[Bn, BnDict]:
+                 sigma: Sigma) -> ZKP:
     """ make credentials showing proof """
     (_, p, g, h) = params
     (u, Cm, Cu_prime) = sigma
@@ -106,14 +106,14 @@ def make_pi_show(params: Params, iparams: EcPtDict, m: Bn, r: Bn, z: Bn,
     Cm_tilde = wm * u + wz * h
     V_tilde = wz * iparams['X1'] + wr * g
     c = to_challenge([g, h, Cm, Cu_prime, Cm_tilde, V_tilde])
-    r = {'r': (wr + c*r) % p,
-         'm': (wm - c*m) % p,
-         'z': (wz - c*z) % p}
-    return (c, r)
+    response = {'r': (wr + c*r) % p,
+                'm': (wm - c*m) % p,
+                'z': (wz - c*z) % p}
+    return c, response
 
 
 def verify_pi_show(params: Params, iparams: EcPtDict, sigma: Sigma,
-                   pi_show: ZKP, V: EcPt) -> bool:
+                   pi_show: ZKP, v: EcPt) -> bool:
     """ verify credentials showing proof """
     assert iparams and sigma and pi_show
     (_, _, g, h) = params
@@ -121,5 +121,5 @@ def verify_pi_show(params: Params, iparams: EcPtDict, sigma: Sigma,
     assert u and Cu_prime
     (c, r) = pi_show
     Cm_tilde = r['m'] * u + r['z'] * h + c * Cm
-    V_tilde = r['r'] * g + r['z'] * iparams['X1'] + c * V
+    V_tilde = r['r'] * g + r['z'] * iparams['X1'] + c * v
     return c == to_challenge([g, h, Cm, Cu_prime, Cm_tilde, V_tilde])

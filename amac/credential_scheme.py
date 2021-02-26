@@ -1,11 +1,11 @@
 from petlib.ec import EcGroup, EcPt
 from petlib.bn import Bn
-
 from amac.proofs import make_pi_prepare_obtain, verify_pi_prepare_obtain
 from amac.proofs import make_pi_issue, verify_pi_issue
 from amac.proofs import make_pi_show, verify_pi_show
-from amac.mac_ggm import KeyDict, setup as setup_ggm, keygen as keygen_ggm
+from amac.mac_ggm import setup as setup_ggm, keygen as keygen_ggm
 from amac.elgamal import keygen as keygen_elgamal, encrypt as encrypt_elgamal, decrypt as decrypt_elgamal
+
 
 BnDict = dict[str, Bn]
 EcPtDict = dict[str, EcPt]
@@ -17,7 +17,7 @@ Sigma = tuple[EcPt, EcPt, EcPt]
 
 def setup(k: int) -> Params:
     """
-    TODO: should take a number k that determins the number of bits of the
+    TODO: should take a number k that determines the number of bits of the
     field underlying the EC.
     Returns params := (G,p,g,h)
     """
@@ -32,7 +32,7 @@ def cred_keygen(params: Params, n: int) -> tuple[EcPtDict, BnDict]:
     (i_sk, iparams) = keygen_ggm(params, n)
     i_sk['x0_tilde'] = p.random()
     iparams['Cx0'] = i_sk['x0'] * g + i_sk['x0_tilde'] * h
-    return (iparams, i_sk)
+    return iparams, i_sk
 
 
 def prepare_blind_obtain(params: Params, m: bytes) -> tuple[BnDict, EcPtDict, EcPtDict, ZKP]:
@@ -49,7 +49,7 @@ def prepare_blind_obtain(params: Params, m: bytes) -> tuple[BnDict, EcPtDict, Ec
     M = p.from_binary(m)
     (ciphertext, r) = encrypt_elgamal(user_pk, M)
     pi_prepare_obtain = make_pi_prepare_obtain(params, gamma, ciphertext, r, M)
-    return (user_sk, user_pk, ciphertext, pi_prepare_obtain)
+    return user_sk, user_pk, ciphertext, pi_prepare_obtain
 
 
 def blind_issue(params: Params, iparams: EcPtDict, i_sk: BnDict,
@@ -73,10 +73,10 @@ def blind_issue(params: Params, iparams: EcPtDict, i_sk: BnDict,
     e2 = r * gamma + b * (i_sk['x0'] * g + i_sk['x1'] * ciphertext['c2'])
     e_u_prime = {'c1': e1, 'c2': e2}
     pi_issue = make_pi_issue(params, i_sk, iparams, gamma, ciphertext, b, bsk, r)
-    return (u, e_u_prime, pi_issue, biparams)
+    return u, e_u_prime, pi_issue, biparams
 
 
-def blind_obtain(params: Params, iparams: EcPtDict, u_sk: KeyDict, u: EcPt,
+def blind_obtain(params: Params, iparams: EcPtDict, u_sk: BnDict, u: EcPt,
                  e_u_prime: EcPtDict, pi_issue: ZKP, biparams: EcPtDict,
                  gamma: EcPt, ciphertext: EcPtDict) -> tuple[EcPt, Bn]:
     """
@@ -86,7 +86,7 @@ def blind_obtain(params: Params, iparams: EcPtDict, u_sk: KeyDict, u: EcPt,
     """
     assert verify_pi_issue(params, iparams, u, e_u_prime, pi_issue,
                            biparams, gamma, ciphertext)
-    return (u, decrypt_elgamal(u_sk, e_u_prime))
+    return u, decrypt_elgamal(u_sk, e_u_prime)
 
 
 def blind_show(params: Params, iparams: EcPtDict,
@@ -108,7 +108,7 @@ def blind_show(params: Params, iparams: EcPtDict,
     Cu_prime = u_prime + r * g
     sigma = (u, Cm, Cu_prime)
     pi_show = make_pi_show(params, iparams, m, r, z, sigma)
-    return (sigma, pi_show)
+    return sigma, pi_show
 
 
 def show_verify(params: Params, iparams: EcPtDict, i_sk: BnDict, sigma: Sigma, pi_show: ZKP) -> bool:

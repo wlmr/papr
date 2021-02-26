@@ -36,6 +36,6 @@ if __name__ == "__main__":
 
     m = Bn.from_binary(b'god is dead')
     params = (g, p)
-    (pk, sk) = keygen()
+    (pk, sk) = keygen(params)
     (ciphertext, r) = encrypt(pk, m)
-    print(decrypt(pk, sk, ciphertext))
+    print(decrypt(sk, ciphertext))

@@ -4,7 +4,7 @@ from petlib.bn import Bn
 
 Params = tuple[EcGroup, Bn, EcPt, EcPt]
 BnDict = dict[str, Bn]
-PointDict = dict[str, EcPt]
+EcPtDict = dict[str, EcPt]
 Mac = tuple[EcPt, EcPt]
 
 
@@ -19,13 +19,13 @@ def setup(k: int) -> Params:
     return (G, G.order(), g, h)
 
 
-def keygen(params: Params, n: int) -> tuple[BnDict, PointDict]:
+def keygen(params: Params, n: int) -> tuple[Bn, EcPtDict]:
     assert n > 0
     (_, p, _, h) = params
     sk_names = ['x0', 'x1']
     sk = {name: p.random() for name in sk_names}
     iparams = {name.upper(): sk[name]*h for name in sk_names[1:]}
-    return (sk, iparams)
+    return sk, iparams
 
 
 def mac(params: Params, sk: BnDict, m: bytes) -> Mac:
