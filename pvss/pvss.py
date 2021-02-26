@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
-from petlib.ec import EcGroup, EcPt
+# from petlib.ec import EcGroup, EcPt
 from petlib.bn import Bn
-from hashlib import sha256
-import chaum_pedersen_non_interactive as cpni
+# from hashlib import sha256
+import pvss.cpni as cpni
 
 
 A = tuple[Bn, Bn]
-#Polynomial = list([Bn])
+# Polynomial = list([Bn])
 
 
 class PVSS_issuer():
@@ -37,6 +37,7 @@ class PVSS_issuer():
 
         pub = {'C_list': commitments, 'Y_list': enc_shares, 'X_list': X_i_list}
 
+        params = (Gq, p, g, G)
         proof = cpni.DLEQ_prove_list(params, pub, pub_keys, shares_list)
 
         # Debug:
@@ -98,28 +99,21 @@ class PVSS_issuer():
                 res = res * j/(j-i)
         return int(res)
 
-
     def verify_correct_decryption(self, S_i, Y_i, decrypt_proof, pub_key):
         params = (Gq, p, g, G)
         return cpni.DLEQ_verify_single(params, G, S_i, pub_key, Y_i, decrypt_proof)
-
-
 
     def batch_verify_correct_decryption(self, proved_decryptions, Y_list, pub_keys):
         '''
         Verify all paricipants decryption of shares
         '''
         for ((S_i, decrypt_proof), Y_i, pub_key) in zip(proved_decryptions, Y_list, pub_keys):
-            if self.verify_correct_decryption(S_i, Y_i, decrypt_proof, pub_key) == False:
+            if self.verify_correct_decryption(S_i, Y_i, decrypt_proof, pub_key) is False:
                 return False
         return True
 
 
-
-
-
 class PVSS_participant():
-
     def __init__(self, params):
         global Gq
         global g
@@ -127,7 +121,7 @@ class PVSS_participant():
         global G
         global x_i
         (Gq, p, g, G) = params
-   
+
     def generate_key_pair(self):
         self.x_i = p.random()
         y_i = self.x_i * G
@@ -140,63 +134,8 @@ class PVSS_participant():
         S_i = self.participant_decrypt(Y_i)
 
         y_i = self.x_i * G
+
+        params = (Gq, p, g, G)
         decrypt_proof = cpni.DLEQ_prove(params, G, S_i, y_i, Y_i, self.x_i)
 
         return (S_i, decrypt_proof)
-
-
-
-
-if __name__ == "__main__":
-
-    # Generate parameters (should be same in other parts of program)
-    Gq = EcGroup()
-    p = Gq.order()
-    g = Gq.generator()
-    G = Gq.hash_to_point(b'G')
-    params = (Gq, p, g, G)
-
-    # Decide on a secret to be distrubuted
-    m = p.from_binary(b'This is a test')
-
-    # Initialize issuer
-    issuer = PVSS_issuer(params)
-
-    # Set (t,n)-threshold parameters
-    n = 4
-    t = 3
-
-    # Initiate participants, and generate their key-pairs
-    participants = [PVSS_participant(params) for i in range(n)]
-    pub_keys = [participant.generate_key_pair() for participant in participants]
-
-    # Encrypt secret, create shares and proof
-    (pub, proof) = issuer.gen_proof(t, n, m, pub_keys)
-
-    # Prove generates shares validity
-    print("Test verify")
-    assert cpni.DLEQ_verify_list(params, pub_keys, pub, proof) == True
-
-    # Decryption
-    # Calulate what a correct decryption should be
-    expected_decryption = m * G
-
-    # Let participants decrypt their shares and generate proofs
-    proved_decryptions = [participant.participant_decrypt_and_prove(enc_share) for (participant, enc_share) in zip(participants, pub['Y_list'])]
-
-    # Check participants proofs
-    if issuer.batch_verify_correct_decryption(proved_decryptions, pub['Y_list'], pub_keys) == False:
-        print("Verification of decryption failed")
-
-    # Use participants decrypted shares to recreate secret
-    S_list = [S_i for (S_i, decrypt_proof) in proved_decryptions]
-    actual_decryption = issuer.decode(S_list[0:-1], t)
-
-    # Verify secret
-    print("Test decrypt")
-    assert expected_decryption == actual_decryption
-
-    # TODO:
-    # Solve decryption  - DONE
-    # DLEQ proof on S_i beeing correct decryption of Y_i - DONE
-    # Refactor
