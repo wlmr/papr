@@ -78,36 +78,36 @@ class PVSS_issuer():
                     in zip(pub_keys, range(len(pub_keys)))]
         return Y_i_list
 
-    def decode(self, S_list, t):
+    # def decode(self, S_list, t):
+    #     '''
+    #     Calulates secret from participants decrypted shares
+    #     '''
+    #     assert len(S_list) == t
+    #     ans = self.__lagrange(1, t) * S_list[0]
+
+    #     for (S_i, i) in zip(S_list[1:], range(2, t+1)):
+    #         ans = ans + self.__lagrange(i, t) * S_i
+
+    #     return ans  # G**s
+
+    def decode(self, S_list, t, index_list):
         '''
         Calulates secret from participants decrypted shares
         '''
         assert len(S_list) == t
-        ans = self.__lagrange(1, t) * S_list[0]
-
-        for (S_i, i) in zip(S_list[1:], range(2, t+1)):
-            ans = ans + self.__lagrange(i, t) * S_i
-
-        return ans  # G**s
-
-    def decode_debug(self, S_list, t, index_list):
-        '''
-        Calulates secret from participants decrypted shares
-        '''
-        assert len(S_list) == t
-        ans = self.__lagrange(index_list[0], t) * S_list[0]
+        ans = self.__lagrange(index_list[0], index_list) * S_list[0]
 
         for (S_i, i) in zip(S_list[1:], range(1, t)):
-            ans = ans + self.__lagrange(index_list[i], t) * S_i
+            ans = ans + self.__lagrange(index_list[i], index_list) * S_i
 
         return ans  # G**s
 
-    def __lagrange(self, i, t) -> int:
+    def __lagrange(self, i, index_list) -> int:
         '''
         Calculate lagrange coefficient
         '''
         res = 1
-        for j in range(1, t+1):
+        for j in index_list:
             if j != i:
                 res = res * j/(j-i)
         return int(res)
@@ -141,7 +141,7 @@ class PVSS_participant():
         return y_i
 
     def participant_decrypt(self, Y_i):
-        return self.x_i.mod_inverse(p) % (p-1) * Y_i
+        return self.x_i.mod_inverse(p) * Y_i
 
     def participant_decrypt_and_prove(self, Y_i):
         S_i = self.participant_decrypt(Y_i)
