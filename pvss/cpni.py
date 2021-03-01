@@ -133,7 +133,7 @@ def DLEQ_verify_single(params, g_1, g_2, h_1, h_2, proof):
     if c != c_claimed:
         return False
 
-    #proof = (c, r, a_1, a_2)
+    # proof = (c, r, a_1, a_2)
     return DLEQ_verify(params, g_1, g_2, h_1, h_2, proof)
 
 
