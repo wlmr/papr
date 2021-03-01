@@ -214,7 +214,7 @@ class TestPvss():
         assert expected_decryption == actual_decryption2
 
     def test_1_3_2(self):
-       # Set (t,n)-threshold parameters
+        # Set (t,n)-threshold parameters
         n = 4
         t = 3
         (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t, n)
@@ -226,7 +226,7 @@ class TestPvss():
         assert expected_decryption == actual_decryption2
 
     def test_1_3_4(self):
-       # Set (t,n)-threshold parameters
+        # Set (t,n)-threshold parameters
         n = 4
         t = 3
         (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t, n)
@@ -238,7 +238,7 @@ class TestPvss():
         assert expected_decryption == actual_decryption2
 
     def test_1_4_2(self):
-       # Set (t,n)-threshold parameters
+        # Set (t,n)-threshold parameters
         n = 4
         t = 3
         (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t, n)
@@ -274,7 +274,7 @@ class TestPvss():
         assert expected_decryption == actual_decryption2
 
     def test_2_1_4(self):
-       # Set (t,n)-threshold parameters
+        # Set (t,n)-threshold parameters
         n = 4
         t = 3
         (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t, n)
@@ -486,9 +486,6 @@ class TestPvss():
         G = Gq.hash_to_point(b'G')
         params = (Gq, p, g, G)
 
-        # Decide on a secret to be distrubuted
-        m = p.from_binary(b'This is a test')
-
         # Initialize issuer
         issuer = PVSS.PVSS_issuer(params)
 
@@ -511,11 +508,6 @@ class TestPvss():
 
         t = 3
         n = 4
-
-        participants = [PVSS.PVSS_participant(params) for i in range(n)]
-        pub_keys = [participant.generate_key_pair() for participant in participants]
-
-        #(pub,proof) = issuer.gen_proof(t,n,m,pub_keys)
 
         secret = m
         px = issuer.gen_polynomial(t, secret)
