@@ -51,7 +51,7 @@ class TestPvss():
 
         # Use participants decrypted shares to recreate secret
         S_list = [S_i for (S_i, decrypt_proof) in proved_decryptions]
-        actual_decryption = issuer.decode(S_list[0:-1], t, [1, 2, 3])
+        actual_decryption = issuer.decode(S_list[0:-1], [1, 2, 3])
 
         # Verify secret
         print("Test decrypt")
@@ -104,7 +104,7 @@ class TestPvss():
 
         # Use participants decrypted shares to recreate secret
         S_list = [S_i for (S_i, decrypt_proof) in proved_decryptions]
-        actual_decryption = issuer.decode(S_list[0:-1], t, range(1, 4))
+        actual_decryption = issuer.decode(S_list[0:-1], range(1, 4))
 
         # Verify secret
         print("Test decrypt")
@@ -151,7 +151,7 @@ class TestPvss():
         t = 3
         (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t, n)
 
-        actual_decryption2 = issuer.decode(S_list[1:4], t, [2, 3, 4])
+        actual_decryption2 = issuer.decode(S_list[1:4], [2, 3, 4])
 
         # Verify secret
         print("Test decrypt")
@@ -165,7 +165,7 @@ class TestPvss():
 
         new_S_list = [S_list[3], S_list[2], S_list[1]]
 
-        actual_decryption2 = issuer.decode(new_S_list, t, [4, 3, 2])
+        actual_decryption2 = issuer.decode(new_S_list, [4, 3, 2])
 
         assert expected_decryption == actual_decryption2
 
@@ -176,7 +176,7 @@ class TestPvss():
         (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t, n)
 
         new_S_list = [S_list[2], S_list[1], S_list[0]]
-        actual_decryption2 = issuer.decode(new_S_list, t, [3, 2, 1])
+        actual_decryption2 = issuer.decode(new_S_list, [3, 2, 1])
         assert expected_decryption == actual_decryption2
 
     def test_skipping_one_reconstuction(self):
@@ -186,7 +186,7 @@ class TestPvss():
         (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t, n)
 
         new_S_list = [S_list[0], S_list[2], S_list[3]]
-        actual_decryption2 = issuer.decode(new_S_list, t, [1, 3, 4])
+        actual_decryption2 = issuer.decode(new_S_list, [1, 3, 4])
 
         assert expected_decryption == actual_decryption2
 
@@ -198,7 +198,7 @@ class TestPvss():
 
         index = [1, 2, 3]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
         assert expected_decryption == actual_decryption2
 
     def test_1_2_4(self):
@@ -209,7 +209,7 @@ class TestPvss():
 
         index = [1, 2, 4]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
 
         assert expected_decryption == actual_decryption2
 
@@ -221,7 +221,7 @@ class TestPvss():
 
         index = [1, 3, 2]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
 
         assert expected_decryption == actual_decryption2
 
@@ -233,7 +233,7 @@ class TestPvss():
 
         index = [1, 3, 4]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
 
         assert expected_decryption == actual_decryption2
 
@@ -245,7 +245,7 @@ class TestPvss():
 
         index = [1, 4, 2]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
 
         assert expected_decryption == actual_decryption2
 
@@ -257,7 +257,7 @@ class TestPvss():
 
         index = [1, 4, 3]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
 
         assert expected_decryption == actual_decryption2
 
@@ -269,7 +269,7 @@ class TestPvss():
 
         index = [2, 1, 3]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
 
         assert expected_decryption == actual_decryption2
 
@@ -281,7 +281,7 @@ class TestPvss():
 
         index = [2, 1, 4]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
 
         assert expected_decryption == actual_decryption2
 
@@ -293,7 +293,7 @@ class TestPvss():
 
         index = [2, 3, 1]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
         assert expected_decryption == actual_decryption2
 
     def test_2_3_4(self):
@@ -304,7 +304,7 @@ class TestPvss():
 
         index = [2, 3, 4]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
         assert expected_decryption == actual_decryption2
 
     def test_2_4_1(self):
@@ -315,7 +315,7 @@ class TestPvss():
 
         index = [2, 4, 1]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
         assert expected_decryption == actual_decryption2
 
     def test_2_4_3(self):
@@ -326,7 +326,7 @@ class TestPvss():
 
         index = [2, 4, 3]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
         assert expected_decryption == actual_decryption2
 
     def test_3_1_2(self):
@@ -337,7 +337,7 @@ class TestPvss():
 
         index = [3, 1, 2]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
         assert expected_decryption == actual_decryption2
 
     def test_3_1_4(self):
@@ -348,7 +348,7 @@ class TestPvss():
 
         index = [3, 1, 4]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
         assert expected_decryption == actual_decryption2
 
     def test_3_2_1(self):
@@ -359,7 +359,7 @@ class TestPvss():
 
         index = [3, 2, 1]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
         assert expected_decryption == actual_decryption2
 
     def test_3_2_4(self):
@@ -370,7 +370,7 @@ class TestPvss():
 
         index = [3, 2, 4]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
         assert expected_decryption == actual_decryption2
 
     def test_3_4_1(self):
@@ -381,7 +381,7 @@ class TestPvss():
 
         index = [3, 4, 1]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
         assert expected_decryption == actual_decryption2
 
     def test_3_4_2(self):
@@ -392,7 +392,7 @@ class TestPvss():
 
         index = [3, 4, 2]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
         assert expected_decryption == actual_decryption2
 
     def test_4_1_2(self):
@@ -403,7 +403,7 @@ class TestPvss():
 
         index = [4, 1, 2]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
         assert expected_decryption == actual_decryption2
 
     def test_4_1_3(self):
@@ -414,7 +414,7 @@ class TestPvss():
 
         index = [4, 1, 3]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
         assert expected_decryption == actual_decryption2
 
     def test_4_2_1(self):
@@ -425,7 +425,7 @@ class TestPvss():
 
         index = [4, 2, 1]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
         assert expected_decryption == actual_decryption2
 
     def test_4_2_3(self):
@@ -436,7 +436,7 @@ class TestPvss():
 
         index = [4, 2, 3]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
         assert expected_decryption == actual_decryption2
 
     def test_4_3_1(self):
@@ -447,7 +447,7 @@ class TestPvss():
 
         index = [4, 3, 1]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
         assert expected_decryption == actual_decryption2
 
     def test_4_3_2(self):
@@ -458,7 +458,7 @@ class TestPvss():
 
         index = [4, 3, 2]
         new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
-        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        actual_decryption2 = issuer.decode(new_S_list, index)
         assert expected_decryption == actual_decryption2
 
     def test_all_reconstuctions(self):
@@ -470,14 +470,24 @@ class TestPvss():
         possible_indexes = range(n)
         permutaions = itertools.permutations(possible_indexes, t)
 
-        print(permutaions)
+        ok_counter = 0
+        tot_counter = 0
 
         for permutaion in permutaions:
             S_list_local = [S_list[i] for i in permutaion]
             index_list = [i+1 for i in permutaion]
-            actual_decryption = issuer.decode(S_list_local, t, index_list)
-            print(index_list)
-            assert expected_decryption == actual_decryption
+            actual_decryption = issuer.decode(S_list_local, index_list)
+
+            if expected_decryption == actual_decryption:
+                print(str(index_list) + ": OK")
+                ok_counter = ok_counter + 1
+            else:
+                print(str(index_list) + ": ERR")
+            tot_counter = 1 + tot_counter
+            # assert expected_decryption == actual_decryption
+
+        print("Successrate: " + str(ok_counter) + "/" + str(tot_counter))
+        assert False
 
     def test_gen_polynomial(self):
         Gq = EcGroup()

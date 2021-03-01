@@ -90,14 +90,14 @@ class PVSS_issuer():
 
     #     return ans  # G**s
 
-    def decode(self, S_list, t, index_list):
+    def decode(self, S_list, index_list):
         '''
         Calulates secret from participants decrypted shares
         '''
-        assert len(S_list) == t
+        assert len(S_list) == len(index_list)
         ans = self.__lagrange(index_list[0], index_list) * S_list[0]
 
-        for (S_i, i) in zip(S_list[1:], range(1, t)):
+        for (S_i, i) in zip(S_list[1:], range(1, len(S_list))):
             ans = ans + self.__lagrange(index_list[i], index_list) * S_i
 
         return ans  # G**s
