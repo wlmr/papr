@@ -74,7 +74,7 @@ class PVSS_issuer():
     def __get_encrypted_shares(self, pub_keys, shares):
         assert len(pub_keys) == len(shares)
         # FIXME: Should we have mod p
-        Y_i_list = [shares[i] * y_i for (y_i, i)
+        Y_i_list = [(shares[i]) * y_i for (y_i, i)
                     in zip(pub_keys, range(len(pub_keys)))]
         return Y_i_list
 

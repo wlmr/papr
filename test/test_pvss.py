@@ -111,8 +111,7 @@ class TestPvss():
         assert expected_decryption == actual_decryption
 
 
-    def test_another_reconstuction(self):
-        # Generate parameters (should be same in other parts of program)
+    def helper_function_reconstuct(self, t,n):
         Gq = EcGroup()
         p = Gq.order()
         g = Gq.generator()
@@ -126,8 +125,8 @@ class TestPvss():
         issuer = PVSS.PVSS_issuer(params)
 
         # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
+        # n = 4
+        # t = 3
 
         # Initiate participants, and generate their key-pairs
         participants = [PVSS.PVSS_participant(params) for i in range(n)]
@@ -142,13 +141,16 @@ class TestPvss():
 
         # Let participants decrypt their shares and generate proofs
         proved_decryptions = [participant.participant_decrypt_and_prove(enc_share) for (participant, enc_share) in zip(participants, pub['Y_list'])]
-
-        # Check participants proofs
         if issuer.batch_verify_correct_decryption(proved_decryptions, pub['Y_list'], pub_keys) is False:
             print("Verification of decryption failed")
-
-        # Use participants decrypted shares to recreate secret
         S_list = [S_i for (S_i, decrypt_proof) in proved_decryptions]
+        return (expected_decryption, issuer, S_list)
+
+    def test_another_reconstuction(self):
+        # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
 
         actual_decryption2 = issuer.decode(S_list[1:4], t, [2,3,4])
 
@@ -156,289 +158,63 @@ class TestPvss():
         print("Test decrypt")
         assert expected_decryption == actual_decryption2
 
-        # import itertools
-
-        # perm = itertools.permutations(zip(S_list, range(t)), t)
-
-        # for permutaion in perm:
-        #     (S, i) = permutaion
-        #     actual_decryption = issuer.decode_debug(S, i, t)
-        #     assert expected_decryption == actual_decryption
 
 
     def test_out_of_order_reconstuction(self):
-        # Generate parameters (should be same in other parts of program)
-        Gq = EcGroup()
-        p = Gq.order()
-        g = Gq.generator()
-        G = Gq.hash_to_point(b'G')
-        params = (Gq, p, g, G)
-
-        # Decide on a secret to be distrubuted
-        m = p.from_binary(b'This is a test')
-
-        # Initialize issuer
-        issuer = PVSS.PVSS_issuer(params)
-
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
-
-        # Initiate participants, and generate their key-pairs
-        participants = [PVSS.PVSS_participant(params) for i in range(n)]
-        pub_keys = [participant.generate_key_pair() for participant in participants]
-
-        # Encrypt secret, create shares and proof
-        (pub, proof) = issuer.gen_proof(t, n, m, pub_keys)
-
-        # Decryption
-        # Calulate what a correct decryption should be
-        expected_decryption = m * G
-
-        # Let participants decrypt their shares and generate proofs
-        proved_decryptions = [participant.participant_decrypt_and_prove(enc_share) for (participant, enc_share) in zip(participants, pub['Y_list'])]
-
-        # Check participants proofs
-        if issuer.batch_verify_correct_decryption(proved_decryptions, pub['Y_list'], pub_keys) is False:
-            print("Verification of decryption failed")
-
-        # Use participants decrypted shares to recreate secret
-        S_list = [S_i for (S_i, decrypt_proof) in proved_decryptions]
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
 
         new_S_list = [S_list[3], S_list[2], S_list[1]]
 
         actual_decryption2 = issuer.decode(new_S_list, t, [4,3,2])
 
-        # Verify secret
-        print("Test decrypt")
         assert expected_decryption == actual_decryption2
 
-        # import itertools
-
-        # perm = itertools.permutations(zip(S_list, range(t)), t)
-
-        # for permutaion in perm:
-        #     (S, i) = permutaion
-        #     actual_decryption = issuer.decode_debug(S, i, t)
-        #     assert expected_decryption == actual_decryption
-
+       
 
     def test_another_out_of_order_reconstuction(self):
-        # Generate parameters (should be same in other parts of program)
-        Gq = EcGroup()
-        p = Gq.order()
-        g = Gq.generator()
-        G = Gq.hash_to_point(b'G')
-        params = (Gq, p, g, G)
-
-        # Decide on a secret to be distrubuted
-        m = p.from_binary(b'This is a test')
-
-        # Initialize issuer
-        issuer = PVSS.PVSS_issuer(params)
-
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
-
-        # Initiate participants, and generate their key-pairs
-        participants = [PVSS.PVSS_participant(params) for i in range(n)]
-        pub_keys = [participant.generate_key_pair() for participant in participants]
-
-        # Encrypt secret, create shares and proof
-        (pub, proof) = issuer.gen_proof(t, n, m, pub_keys)
-
-        # Decryption
-        # Calulate what a correct decryption should be
-        expected_decryption = m * G
-
-        # Let participants decrypt their shares and generate proofs
-        proved_decryptions = [participant.participant_decrypt_and_prove(enc_share) for (participant, enc_share) in zip(participants, pub['Y_list'])]
-
-        # Check participants proofs
-        if issuer.batch_verify_correct_decryption(proved_decryptions, pub['Y_list'], pub_keys) is False:
-            print("Verification of decryption failed")
-
-        # Use participants decrypted shares to recreate secret
-        S_list = [S_i for (S_i, decrypt_proof) in proved_decryptions]
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
 
         new_S_list = [S_list[2], S_list[1], S_list[0]]
-
         actual_decryption2 = issuer.decode(new_S_list, t, [3,2,1])
-
-        # Verify secret
-        print("Test decrypt")
         assert expected_decryption == actual_decryption2
-
-        # import itertools
-
-        # perm = itertools.permutations(zip(S_list, range(t)), t)
-
-        # for permutaion in perm:
-        #     (S, i) = permutaion
-        #     actual_decryption = issuer.decode_debug(S, i, t)
-        #     assert expected_decryption == actual_decryption
 
     def test_skipping_one_reconstuction(self):
-        # Generate parameters (should be same in other parts of program)
-        Gq = EcGroup()
-        p = Gq.order()
-        g = Gq.generator()
-        G = Gq.hash_to_point(b'G')
-        params = (Gq, p, g, G)
-
-        # Decide on a secret to be distrubuted
-        m = p.from_binary(b'This is a test')
-
-        # Initialize issuer
-        issuer = PVSS.PVSS_issuer(params)
-
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
-
-        # Initiate participants, and generate their key-pairs
-        participants = [PVSS.PVSS_participant(params) for i in range(n)]
-        pub_keys = [participant.generate_key_pair() for participant in participants]
-
-        # Encrypt secret, create shares and proof
-        (pub, proof) = issuer.gen_proof(t, n, m, pub_keys)
-
-        # Decryption
-        # Calulate what a correct decryption should be
-        expected_decryption = m * G
-
-        # Let participants decrypt their shares and generate proofs
-        proved_decryptions = [participant.participant_decrypt_and_prove(enc_share) for (participant, enc_share) in zip(participants, pub['Y_list'])]
-
-        # Check participants proofs
-        if issuer.batch_verify_correct_decryption(proved_decryptions, pub['Y_list'], pub_keys) is False:
-            print("Verification of decryption failed")
-
-        # Use participants decrypted shares to recreate secret
-        S_list = [S_i for (S_i, decrypt_proof) in proved_decryptions]
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
 
         new_S_list = [S_list[0], S_list[2], S_list[3]]
-
         actual_decryption2 = issuer.decode(new_S_list, t, [1,3,4])
 
-        # Verify secret
-        print("Test decrypt")
         assert expected_decryption == actual_decryption2
-
-        # import itertools
-
-        # perm = itertools.permutations(zip(S_list, range(t)), t)
-
-        # for permutaion in perm:
-        #     (S, i) = permutaion
-        #     actual_decryption = issuer.decode_debug(S, i, t)
-        #     assert expected_decryption == actual_decryption
 
     def test_another_skipping_one_reconstuction(self):
-        # Generate parameters (should be same in other parts of program)
-        Gq = EcGroup()
-        p = Gq.order()
-        g = Gq.generator()
-        G = Gq.hash_to_point(b'G')
-        params = (Gq, p, g, G)
-
-        # Decide on a secret to be distrubuted
-        m = p.from_binary(b'This is a test')
-
-        # Initialize issuer
-        issuer = PVSS.PVSS_issuer(params)
-
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
-
-        # Initiate participants, and generate their key-pairs
-        participants = [PVSS.PVSS_participant(params) for i in range(n)]
-        pub_keys = [participant.generate_key_pair() for participant in participants]
-
-        # Encrypt secret, create shares and proof
-        (pub, proof) = issuer.gen_proof(t, n, m, pub_keys)
-
-        # Decryption
-        # Calulate what a correct decryption should be
-        expected_decryption = m * G
-
-        # Let participants decrypt their shares and generate proofs
-        proved_decryptions = [participant.participant_decrypt_and_prove(enc_share) for (participant, enc_share) in zip(participants, pub['Y_list'])]
-
-        # Check participants proofs
-        if issuer.batch_verify_correct_decryption(proved_decryptions, pub['Y_list'], pub_keys) is False:
-            print("Verification of decryption failed")
-
-        # Use participants decrypted shares to recreate secret
-        S_list = [S_i for (S_i, decrypt_proof) in proved_decryptions]
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
 
         new_S_list = [S_list[0], S_list[1], S_list[3]]
-
         actual_decryption2 = issuer.decode(new_S_list, t, [1,2,4])
 
-        # Verify secret
-        print("Test decrypt")
         assert expected_decryption == actual_decryption2
 
-        # import itertools
-
-        # perm = itertools.permutations(zip(S_list, range(t)), t)
-
-        # for permutaion in perm:
-        #     (S, i) = permutaion
-        #     actual_decryption = issuer.decode_debug(S, i, t)
-        #     assert expected_decryption == actual_decryption
-
+        
     def test_all_reconstuctions(self):
-        # Generate parameters (should be same in other parts of program)
-        Gq = EcGroup()
-        p = Gq.order()
-        g = Gq.generator()
-        G = Gq.hash_to_point(b'G')
-        params = (Gq, p, g, G)
-
-        # Decide on a secret to be distrubuted
-        m = p.from_binary(b'This is a test')
-
-        # Initialize issuer
-        issuer = PVSS.PVSS_issuer(params)
-
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
-
-        # Initiate participants, and generate their key-pairs
-        participants = [PVSS.PVSS_participant(params) for i in range(n)]
-        pub_keys = [participant.generate_key_pair() for participant in participants]
-
-        # Encrypt secret, create shares and proof
-        (pub, proof) = issuer.gen_proof(t, n, m, pub_keys)
-
-        # Decryption
-        # Calulate what a correct decryption should be
-        expected_decryption = m * G
-
-        # Let participants decrypt their shares and generate proofs
-        proved_decryptions = [participant.participant_decrypt_and_prove(enc_share) for (participant, enc_share) in zip(participants, pub['Y_list'])]
-
-        # Check participants proofs
-        if issuer.batch_verify_correct_decryption(proved_decryptions, pub['Y_list'], pub_keys) is False:
-            print("Verification of decryption failed")
-
-        # Use participants decrypted shares to recreate secret
-        S_list = [S_i for (S_i, decrypt_proof) in proved_decryptions]
-
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
 
         possible_indexes = range(n)
         permutaions = itertools.permutations(possible_indexes, t)
-
-
-        #perm = itertools.permutations(S_list, t)
-
-
-
 
         for permutaion in permutaions:
             S_list_local = [S_list[i] for i in permutaion]
