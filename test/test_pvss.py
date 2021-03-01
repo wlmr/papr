@@ -195,18 +195,290 @@ class TestPvss():
 
         assert expected_decryption == actual_decryption2
 
-    def test_another_skipping_one_reconstuction(self):
+    
+    def test_1_2_3(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
 
-        new_S_list = [S_list[0], S_list[1], S_list[3]]
-        actual_decryption2 = issuer.decode(new_S_list, t, [1,2,4])
+        index = [1,2,3] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        assert expected_decryption == actual_decryption2
+
+    def test_1_2_4(self):
+        # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+        
+        index = [1,2,4] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
 
         assert expected_decryption == actual_decryption2
 
+    def test_1_3_2(self):
+       # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
         
+        index = [1,3,2] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+
+        assert expected_decryption == actual_decryption2
+
+    def test_1_3_4(self):
+       # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+        
+        index = [1,3,4] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+
+        assert expected_decryption == actual_decryption2
+
+    def test_1_4_2(self):
+       # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+        
+        index = [1,4,2] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+
+        assert expected_decryption == actual_decryption2
+
+    def test_1_4_3(self):
+        # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+        
+        index = [1,4,3] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+
+        assert expected_decryption == actual_decryption2
+
+
+    def test_2_1_3(self):
+        # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+        
+        index = [2,1,3] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+
+        assert expected_decryption == actual_decryption2
+
+    def test_2_1_4(self):
+       # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+        
+        index = [2,1,4] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+
+        assert expected_decryption == actual_decryption2
+
+
+
+       
+    def test_2_3_1(self):
+        # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+
+        index = [2,3,1] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        assert expected_decryption == actual_decryption2
+    
+
+
+    def test_2_3_4(self):
+        # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+
+        index = [2,3,4] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        assert expected_decryption == actual_decryption2
+
+    def test_2_4_1(self):
+        # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+
+        index = [2,4,1] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        assert expected_decryption == actual_decryption2
+
+    def test_2_4_3(self):
+        # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+
+        index = [2,4,3] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        assert expected_decryption == actual_decryption2
+
+
+    def test_3_1_2(self):
+        # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+
+        index = [3,1,2] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        assert expected_decryption == actual_decryption2
+
+    def test_3_1_4(self):
+        # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+
+        index = [3,1,4] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        assert expected_decryption == actual_decryption2
+
+    def test_3_2_1(self):
+        # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+
+        index = [3,2,1] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        assert expected_decryption == actual_decryption2
+
+
+    def test_3_2_4(self):
+        # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+
+        index = [3,2,4] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        assert expected_decryption == actual_decryption2
+
+
+    def test_3_4_1(self):
+        # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+
+        index = [3,4,1] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        assert expected_decryption == actual_decryption2
+
+    def test_3_4_2(self):
+        # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+
+        index = [3,4,2] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        assert expected_decryption == actual_decryption2
+
+
+    def test_4_1_2(self):
+        # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+
+        index = [4,1,2] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        assert expected_decryption == actual_decryption2
+
+
+    def test_4_1_3(self):
+        # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+
+        index = [4,1,3] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        assert expected_decryption == actual_decryption2
+
+
+    def test_4_2_1(self):
+        # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+
+        index = [4,2,1] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        assert expected_decryption == actual_decryption2
+
+    def test_4_2_3(self):
+        # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+
+        index = [4,2,3] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        assert expected_decryption == actual_decryption2
+
+    def test_4_3_1(self):
+        # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+
+        index = [4,3,1] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        assert expected_decryption == actual_decryption2
+    
+    def test_4_3_2(self):
+        # Set (t,n)-threshold parameters
+        n = 4
+        t = 3
+        (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t,n)
+
+        index = [4,3,2] 
+        new_S_list = [S_list[index[0]-1], S_list[index[1]-1], S_list[index[2]-1]]
+        actual_decryption2 = issuer.decode(new_S_list, t, index)
+        assert expected_decryption == actual_decryption2
+
     def test_all_reconstuctions(self):
         # Set (t,n)-threshold parameters
         n = 4
@@ -215,6 +487,8 @@ class TestPvss():
 
         possible_indexes = range(n)
         permutaions = itertools.permutations(possible_indexes, t)
+
+        print(permutaions)
 
         for permutaion in permutaions:
             S_list_local = [S_list[i] for i in permutaion]
