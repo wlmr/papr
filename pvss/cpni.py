@@ -42,12 +42,18 @@ def DLEQ_prove(params, g_1, g_2, h_1, h_2, x_i):
 
 
 def __DLEQ_prover_calc_a(g_1, g_2, w):
+    '''
+    Calulates a_1, a_2 as used by prover in proof.
+    '''
     a_1 = w * g_1
     a_2 = w * g_2
     return (a_1, a_2)
 
 
 def DLEQ_verifyer_calc_a(r, c, g_1, h_1, g_2, h_2):
+    '''
+    Calculates a_1, a_2 as used by verifyer in verification of correct proof
+    '''
     a_1 = r * g_1 + c * h_1
     a_2 = r * g_2 + c * h_2
     return (a_1, a_2)
@@ -81,6 +87,9 @@ def DLEQ_prove_list(params, pub, y_list, shares_list):
 
 
 def hash(params, h_1, h_2, a_1, a_2) -> Bn:
+    '''
+    Calculates a cryptograpic hash for use in proof. Does work both for DLEQ of single objects and lists.
+    '''
     (_, p, _, _) = params
     state = str([h_1, h_2, a_1, a_2])
     H = sha256()
@@ -91,18 +100,27 @@ def hash(params, h_1, h_2, a_1, a_2) -> Bn:
 
 
 def __DLEQ_calc_all_r(params, shares_list, w_list, c):
+    '''
+    Calculates the r values used in list version of DLEQ proof.
+    '''
     r_list = [__DLEQ_calc_r(params, w, alpha, c)
               for (alpha, w) in zip(shares_list, w_list)]
     return r_list
 
 
 def __DLEQ_calc_r(params, w, alpha, c):
+    '''
+    Calulates a r value for use in both DLEQ single object and list versions.
+    '''
     (_, p, _, _) = params
     r = (w - c * alpha) % p
     return r
 
 
 def DLEQ_verify_list(params, y_list, pub, proof):
+    '''
+    Verify that a DLEQ_list proof is correct
+    '''
     (_, _, g, _) = params
     r_list = proof['r_list']
     c_claimed = proof['c']
@@ -129,18 +147,19 @@ def DLEQ_verify_list(params, y_list, pub, proof):
 
 
 def DLEQ_verify_single(params, g_1, g_2, h_1, h_2, proof):
+    '''
+    Verify that a DLEQ_single proof is correct.
+    '''
     (c_claimed, r, a_1, a_2) = proof
     c = hash(params, h_1, h_2, a_1, a_2)
     if c != c_claimed:
         return False
-
-    # proof = (c, r, a_1, a_2)
     return DLEQ_verify(params, g_1, g_2, h_1, h_2, proof)
 
 
 def DLEQ_verify(params, g_1, g_2, h_1, h_2, proof):
     '''
-    Verify that a participants proof of correct decryption of their share
+    Verify that a participants proof of correct decryption of their share. Assumes c is verified beforehand!
     '''
     (c, r, a_1, a_2) = proof
     (a_1_new, a_2_new) = DLEQ_verifyer_calc_a(r, c, g_1, h_1, g_2, h_2)
