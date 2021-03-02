@@ -57,10 +57,7 @@ class TestPvss():
         print("Test decrypt")
         assert expected_decryption == actual_decryption
 
-        # TODO:
-        # Solve decryption  - DONE
-        # DLEQ proof on S_i beeing correct decryption of Y_i - DONE
-        # Refactor
+
 
     def test_edge_case(self):
         # Generate parameters (should be same in other parts of program)
@@ -463,31 +460,31 @@ class TestPvss():
 
     def test_all_reconstuctions(self):
         # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
+        n = 8
+        t = 6
         (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t, n)
 
         possible_indexes = range(n)
         permutaions = itertools.permutations(possible_indexes, t)
 
-        ok_counter = 0
-        tot_counter = 0
+        # ok_counter = 0
+        # tot_counter = 0
 
         for permutaion in permutaions:
             S_list_local = [S_list[i] for i in permutaion]
             index_list = [i+1 for i in permutaion]
             actual_decryption = issuer.decode(S_list_local, index_list)
 
-            if expected_decryption == actual_decryption:
-                print(str(index_list) + ": OK")
-                ok_counter = ok_counter + 1
-            else:
-                print(str(index_list) + ": ERR")
-            tot_counter = 1 + tot_counter
-            # assert expected_decryption == actual_decryption
+            # if expected_decryption == actual_decryption:
+            #     print(str(index_list) + ": OK")
+            #     ok_counter = ok_counter + 1
+            # else:
+            #     print(str(index_list) + ": ERR")
+            # tot_counter = 1 + tot_counter 
+            assert expected_decryption == actual_decryption
 
-        print("Successrate: " + str(ok_counter) + "/" + str(tot_counter))
-        assert False
+        # print("Successrate: " + str(ok_counter) + "/" + str(tot_counter))
+        # assert False
 
     def test_gen_polynomial(self):
         Gq = EcGroup()

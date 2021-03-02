@@ -17,6 +17,7 @@ def __get_X_i(C_list, i):
     '''
     Calculates one X_i given commitments and index
     '''
+    i = Bn(i)
     elements = [(i**j) * C_j for (C_j, j)
                 in zip(C_list, range(len(C_list)))]
     ans = elements[0]
