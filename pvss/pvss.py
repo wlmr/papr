@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 
-# from petlib.ec import EcGroup, EcPt
 from petlib.bn import Bn
-# from hashlib import sha256
 import pvss.cpni as cpni
 
-
 A = tuple[Bn, Bn]
-# Polynomial = list([Bn])
 
 
 class PVSS_issuer():
@@ -31,7 +27,7 @@ class PVSS_issuer():
         shares_list = self.calc_shares(px, t, n)
         enc_shares = self.__get_encrypted_shares(pub_keys, shares_list)
         X_i_list = cpni.get_X_i_list(commitments, n)
-       
+
         pub = {'C_list': commitments, 'Y_list': enc_shares, 'X_list': X_i_list}
 
         params = (Gq, p, g, G)
@@ -155,7 +151,7 @@ class PVSS_participant():
         Decrypts a encrypted share with stored private key, and generates proof of it being done correctly.
         '''
         S_i = self.participant_decrypt(Y_i)
-        
+
         y_i = self.x_i * G
         params = (Gq, p, g, G)
         decrypt_proof = cpni.DLEQ_prove(params, G, S_i, y_i, Y_i, self.x_i)

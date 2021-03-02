@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-
-from petlib.ec import EcGroup  # , EcPt
-# from petlib.bn import Bn
-# from hashlib import sha256
+from petlib.ec import EcGroup
 import pvss.pvss as PVSS
 import pvss.cpni as cpni
 import itertools
@@ -117,10 +114,6 @@ class TestPvss():
 
         # Initialize issuer
         issuer = PVSS.PVSS_issuer(params)
-
-        # Set (t,n)-threshold parameters
-        # n = 4
-        # t = 3
 
         # Initiate participants, and generate their key-pairs
         participants = [PVSS.PVSS_participant(params) for i in range(n)]
@@ -458,31 +451,19 @@ class TestPvss():
 
     def test_all_reconstuctions(self):
         # Set (t,n)-threshold parameters
-        n = 8
-        t = 6
+        n = 6
+        t = 5
         (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t, n)
 
         possible_indexes = range(n)
         permutaions = itertools.permutations(possible_indexes, t)
-
-        # ok_counter = 0
-        # tot_counter = 0
 
         for permutaion in permutaions:
             S_list_local = [S_list[i] for i in permutaion]
             index_list = [i+1 for i in permutaion]
             actual_decryption = issuer.decode(S_list_local, index_list)
 
-            # if expected_decryption == actual_decryption:
-            #     print(str(index_list) + ": OK")
-            #     ok_counter = ok_counter + 1
-            # else:
-            #     print(str(index_list) + ": ERR")
-            # tot_counter = 1 + tot_counter
             assert expected_decryption == actual_decryption
-
-        # print("Successrate: " + str(ok_counter) + "/" + str(tot_counter))
-        # assert False
 
     def test_gen_polynomial(self):
         Gq = EcGroup()

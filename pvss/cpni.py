@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-
-# from petlib.ec import EcGroup, EcPt
 from petlib.bn import Bn
 from hashlib import sha256
 
@@ -27,8 +25,6 @@ def __get_X_i(C_list, i):
 
 
 # Chaum-Pedersen non interactive. Both for single value and list of values.
-
-
 def DLEQ_prove(params, g_1, g_2, h_1, h_2, x_i):
     '''
     Generate Chaum-Pedersen non interactive proof for one value
@@ -77,7 +73,6 @@ def DLEQ_prove_list(params, pub, y_list, shares_list):
 
     # Calculates one hash for the entire list
     c = hash(params, X_list, Y_list, a_1_list, a_2_list)
-
     r_list = __DLEQ_calc_all_r(params, shares_list, w_list, c)
 
     proof = {'c': c, 'r_list': r_list,
@@ -127,22 +122,18 @@ def DLEQ_verify_list(params, y_list, pub, proof):
     a_1_orig_list = proof['a_1_list']
     a_2_orig_list = proof['a_2_list']
 
+    Y_list = pub['Y_list']
     n = len(r_list)
 
-    Y_list = pub['Y_list']
-
     X_list = get_X_i_list(pub['C_list'], n)
-
     c = hash(params, X_list, Y_list, a_1_orig_list, a_2_orig_list)
-
     # If prover lied about c
     if c_claimed != c:
         return False
 
     for (g_2, h_1, h_2, r_i, a_1, a_2) in zip(y_list, X_list, Y_list, r_list, a_1_orig_list, a_2_orig_list):
-        if not DLEQ_verify(params, g, g_2, h_1, h_2, (c, r_i, a_1, a_2)):
+        if not DLEQ_verify(g, g_2, h_1, h_2, (c, r_i, a_1, a_2)):
             return False
-
     return True
 
 
@@ -154,10 +145,10 @@ def DLEQ_verify_single(params, g_1, g_2, h_1, h_2, proof):
     c = hash(params, h_1, h_2, a_1, a_2)
     if c != c_claimed:
         return False
-    return DLEQ_verify(params, g_1, g_2, h_1, h_2, proof)
+    return DLEQ_verify(g_1, g_2, h_1, h_2, proof)
 
 
-def DLEQ_verify(params, g_1, g_2, h_1, h_2, proof):
+def DLEQ_verify(g_1, g_2, h_1, h_2, proof):
     '''
     Verify that a participants proof of correct decryption of their share. Assumes c is verified beforehand!
     '''
