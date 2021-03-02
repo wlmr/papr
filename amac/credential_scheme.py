@@ -36,7 +36,7 @@ def cred_keygen(params: Params) -> tuple[EcPtDict, BnDict]:
     return iparams, issuer_sk
 
 
-def prepare_blind_obtain(params: Params, m: bytes) -> tuple[BnDict, EcPtDict, EcPtDict, ZKP]:
+def prepare_blind_obtain(params: Params, m: Bn) -> tuple[BnDict, EcPtDict, EcPtDict, ZKP]:
     """
     User asks for credential.
     1. Generate elgamal keypair,
@@ -47,9 +47,8 @@ def prepare_blind_obtain(params: Params, m: bytes) -> tuple[BnDict, EcPtDict, Ec
     (_, p, g, _) = params
     (user_pk, user_sk) = keygen_elgamal((g, p))
     gamma = user_pk['h']
-    M = p.from_binary(m)
-    (ciphertext, r) = encrypt_elgamal(user_pk, M)
-    pi_prepare_obtain = make_pi_prepare_obtain(params, gamma, ciphertext, r, M)
+    (ciphertext, r) = encrypt_elgamal(user_pk, m)
+    pi_prepare_obtain = make_pi_prepare_obtain(params, gamma, ciphertext, r, m)
     return user_sk, user_pk, ciphertext, pi_prepare_obtain
 
 
@@ -95,7 +94,7 @@ def blind_obtain(params: Params, iparams: EcPtDict, u_sk: BnDict, u: EcPt,
 
 
 def blind_show(params: Params, iparams: EcPtDict,
-               cred: Credential, M: bytes) -> tuple[Sigma, ZKP]:
+               cred: Credential, m: Bn) -> tuple[Sigma, ZKP]:
     """
     Carried out by user who wants to prove possession of a credential by:
     1. generate three random values: r, z, a,
@@ -104,7 +103,6 @@ def blind_show(params: Params, iparams: EcPtDict,
     and a proof of the signature's correctness.
     """
     (_, p, g, h) = params
-    m = p.from_binary(M)
     (r, z, a) = (p.random(), p.random(), p.random())
     (u0, u0_prime) = cred
     (u, u_prime) = (a * u0, a * u0_prime)

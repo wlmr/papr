@@ -27,31 +27,29 @@ def keygen(params: Params) -> tuple[Bn, EcPtDict]:
     return sk, iparams
 
 
-def mac(params: Params, sk: BnDict, m: bytes) -> Mac:
+def mac(params: Params, sk: BnDict, m: Bn) -> Mac:
     """ compute mac GGM """
     # assert len(sk) > 0 and m
     (G, _, _, _) = params
     u = G.hash_to_point(b"u")
-    em = Bn.from_binary(m)
-    hx = sk['x0'] + sk['x1'] * em
+    hx = sk['x0'] + sk['x1'] * m
     u_prime = hx * u
     sigma = (u, u_prime)
     return sigma
 
 
-def verify(params: Params, sk: BnDict, m: bytes, sigma: Mac) -> bool:
+def verify(params: Params, sk: BnDict, m: Bn, sigma: Mac) -> bool:
     """ verify mac DDH """
     assert len(sk) > 0 and m
     (G, _, _, _) = params
     (u, u_prime) = sigma
-    em = Bn.from_binary(m)
-    hx = sk['x0'] + sk['x1'] * em
+    hx = sk['x0'] + sk['x1'] * m
     return u != G.infinite() and u_prime == hx * u
 
 
 if __name__ == "__main__":
     params = setup(500)
-    m = b'my secret identity'
+    m = Bn.from_binary(b'my secret identity')
     n = len(m)
     (sk, _) = keygen(params, 1)
     sigma = mac(params, sk, m)
