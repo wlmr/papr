@@ -26,12 +26,11 @@ class PVSS_issuer():
         commitments = self.get_commitments(g, px)
         shares_list = self.calc_shares(px, k, n)
         enc_shares = self.__get_encrypted_shares(pub_keys, shares_list)
-        X_i_list = cpni.get_X_i_list(commitments, n)
 
-        pub = {'C_list': commitments, 'Y_list': enc_shares, 'X_list': X_i_list}
+        pub = {'C_list': commitments, 'Y_list': enc_shares}
 
         params = (Gq, p, g, G)
-        proof = cpni.DLEQ_prove_list(params, pub, pub_keys, shares_list)
+        proof = cpni.DLEQ_prove_list(params, commitments, enc_shares, pub_keys, shares_list)
 
         # Debug:
         assert len(px) == k
@@ -39,9 +38,31 @@ class PVSS_issuer():
         assert len(shares_list) == n
         assert shares_list[0] != secret  # I think this is correct
         assert len(enc_shares) == n
-        assert len(X_i_list) == n  # Should be n, but we use k in the creation
 
         return (pub, proof)
+
+    def distribute_secret(self, pub_keys, secret, params, k, n, h):
+        assert len(pub_keys) == n
+
+        px = self.gen_polynomial(k, secret)
+        commitments = self.get_commitments(h, px)
+        shares_list = self.calc_shares(px, k, n)
+        enc_shares = self.__get_encrypted_shares(pub_keys, shares_list)
+        proof = cpni.DLEQ_prove_list(params, commitments, enc_shares, pub_keys, shares_list)
+
+        return (enc_shares, commitments, proof)
+        # -> encrypted_shares, commitments, proof of shares being the same in commitment and enc.
+
+    def verify_encrypted_shares(self, encrypted_shares, commitments, proof, h):
+        pass
+
+    def reconstruct(self, decrypted_list):
+        pass
+
+    def verify_decryption_proof(self, proof_of_decryption):
+        pass
+
+
 
     def gen_polynomial(self, k, secret):
         '''

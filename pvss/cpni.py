@@ -55,13 +55,13 @@ def DLEQ_verifyer_calc_a(r, c, g_1, h_1, g_2, h_2):
     return (a_1, a_2)
 
 
-def DLEQ_prove_list(params, pub, y_list, shares_list):
+def DLEQ_prove_list(params, C_list, Y_list, y_list, shares_list):
     '''
     Generate Chaum-Pedersen non interactive proof for a list
     '''
     (_, p, g, _) = params
-    X_list = pub['X_list']
-    Y_list = pub['Y_list']
+    n = len(Y_list)
+    X_list = get_X_i_list(C_list, n)
 
     assert len(X_list) == len(y_list)
     assert len(Y_list) == len(y_list)
