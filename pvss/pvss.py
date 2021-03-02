@@ -15,16 +15,16 @@ class PVSS_issuer():
         global G
         (Gq, p, g, G) = params
 
-    def gen_proof(self, t, n, secret, pub_keys):
+    def gen_proof(self, k, n, secret, pub_keys):
         '''
         Generate polynomial and proof
         '''
-        assert n > t
+        assert n > k
         assert len(pub_keys) == n
 
-        px = self.gen_polynomial(t, secret)
+        px = self.gen_polynomial(k, secret)
         commitments = self.get_commitments(g, px)
-        shares_list = self.calc_shares(px, t, n)
+        shares_list = self.calc_shares(px, k, n)
         enc_shares = self.__get_encrypted_shares(pub_keys, shares_list)
         X_i_list = cpni.get_X_i_list(commitments, n)
 
@@ -34,42 +34,42 @@ class PVSS_issuer():
         proof = cpni.DLEQ_prove_list(params, pub, pub_keys, shares_list)
 
         # Debug:
-        assert len(px) == t
-        assert len(commitments) == t
+        assert len(px) == k
+        assert len(commitments) == k
         assert len(shares_list) == n
         assert shares_list[0] != secret  # I think this is correct
         assert len(enc_shares) == n
-        assert len(X_i_list) == n  # Should be n, but we use t in the creation
+        assert len(X_i_list) == n  # Should be n, but we use k in the creation
 
         return (pub, proof)
 
-    def gen_polynomial(self, t, secret):
+    def gen_polynomial(self, k, secret):
         '''
         Generate polynomial
         '''
-        px_rand = [p.random() for i in range(t-1)]
+        px_rand = [p.random() for i in range(k-1)]
         px = [secret] + px_rand
         return px
 
-    def calc_shares(self, px, t, n):
+    def calc_shares(self, px, k, n):
         '''
         Calculates p(j) for all j (0,n)
         '''
-        return [self.__calc_share(px, t, Bn(i)) for i in range(1, n+1)]
+        return [self.__calc_share(px, k, Bn(i)) for i in range(1, n+1)]
 
-    def __calc_share(self, px, t, x):
+    def __calc_share(self, px, k, x):
         '''
         Calculates p(x)
         '''
-        assert len(px) == t
+        assert len(px) == k
         result = 0
-        for (alpha, j) in zip(px, range(t)):
+        for (alpha, j) in zip(px, range(k)):
             result = (result + alpha * (x**j)) % p
         return result
 
     def get_commitments(self, g, px):
         '''
-        Calculates all commitments C_j for j =[0,t)
+        Calculates all commitments C_j for j =[0,k)
         '''
         return [p_i * g for p_i in px]
 

@@ -451,12 +451,12 @@ class TestPvss():
 
     def test_all_reconstuctions(self):
         # Set (t,n)-threshold parameters
-        n = 6
+        n = 20
         t = 5
         (expected_decryption, issuer, S_list) = self.helper_function_reconstuct(t, n)
 
         possible_indexes = range(n)
-        permutaions = itertools.permutations(possible_indexes, t)
+        permutaions = itertools.combinations(possible_indexes, t)
 
         for permutaion in permutaions:
             S_list_local = [S_list[i] for i in permutaion]
