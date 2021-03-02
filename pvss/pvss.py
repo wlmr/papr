@@ -95,22 +95,57 @@ class PVSS_issuer():
         Calulates secret from participants decrypted shares
         '''
         assert len(S_list) == len(index_list)
-        ans = self.__lagrange(index_list[0], index_list) * S_list[0]
+        #(top_1, bottom_1) = self.__lagrange(index_list[0], index_list)
+
+        #ans = top_1 * S_list[0] + (p-bottom_1) * S_list[0]
+        # ans = (top_1  * (p+bottom_1))%p * S_list[0] 
+
+        ans =  self.__lagrange(index_list[0], index_list) * S_list[0]
+
+        #ans  = self.__lagrange(index_list[0], index_list) * S_list[0]
 
         for (S_i, i) in zip(S_list[1:], range(1, len(S_list))):
+            #
+            #(top, bottom) = self.__lagrange(index_list[i], index_list)
+           # ans = ans + top * S_i + (p-bottom) * S_i
+
+            #ans = ans + (top  * (p+bottom))%p * S_i 
+
             ans = ans + self.__lagrange(index_list[i], index_list) * S_i
+
+            #ans = ans + self.__lagrange(index_list[i], index_list) * S_i
+
+            #ans_old = ans_old + self.__lagrange_old(index_list[i], 3) * S_i
 
         return ans  # G**s
 
-    def __lagrange(self, i, index_list) -> int:
+
+    def __lagrange_old(self, i, nbr):
         '''
         Calculate lagrange coefficient
         '''
         res = 1
+        # top = 1
+        # bottom = 1
+        for j in range(1, nbr):
+            if j != i:
+                # top = top * j
+                # bottom = bottom * (j-i)
+                res = res + j/(j-i)
+        return int(res) # (int(top),int(bottom))
+
+    def __lagrange(self, i, index_list):
+        '''
+        Calculate lagrange coefficient
+        '''
+        # res = 1
+        top = 1
+        bottom = 1
         for j in index_list:
             if j != i:
-                res = res * j/(j-i)
-        return int(res)
+                top = top * j
+                bottom = bottom * (j-i)
+        return Bn(top) * Bn(bottom).mod_inverse(p) #(int(top),int(bottom))
 
     def verify_correct_decryption(self, S_i, Y_i, decrypt_proof, pub_key):
         params = (Gq, p, g, G)
