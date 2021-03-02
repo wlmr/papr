@@ -102,7 +102,6 @@ class PVSS_issuer():
 
         return ans  # G**s
 
-
     def __lagrange(self, i, index_list):
         '''
         Calculate lagrange coefficient
@@ -114,7 +113,7 @@ class PVSS_issuer():
             if j != i:
                 top = (top * j)
                 bottom = (bottom * (j-i))
-        #return Bn(top) * Bn(bottom).mod_inverse(p)
+        # return Bn(top) * Bn(bottom).mod_inverse(p)
         return top.mod_mul(bottom.mod_inverse(p), p)
 
     def verify_correct_decryption(self, S_i, Y_i, decrypt_proof, pub_key):

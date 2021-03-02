@@ -57,8 +57,6 @@ class TestPvss():
         print("Test decrypt")
         assert expected_decryption == actual_decryption
 
-
-
     def test_edge_case(self):
         # Generate parameters (should be same in other parts of program)
         Gq = EcGroup()
@@ -480,7 +478,7 @@ class TestPvss():
             #     ok_counter = ok_counter + 1
             # else:
             #     print(str(index_list) + ": ERR")
-            # tot_counter = 1 + tot_counter 
+            # tot_counter = 1 + tot_counter
             assert expected_decryption == actual_decryption
 
         # print("Successrate: " + str(ok_counter) + "/" + str(tot_counter))
