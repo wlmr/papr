@@ -107,7 +107,9 @@ class TestPvss():
 
         # Prove generates shares validity
         print("Test verify")
-        assert cpni.DLEQ_verify_list(params, pub_keys, pub, proof) is True
+        Y_list = pub['Y_list']
+        C_list = pub['C_list']
+        assert cpni.DLEQ_verify_list(p,g, pub_keys, C_list, Y_list, proof) is True
 
         # Decryption
         # Calulate what a correct decryption should be
@@ -155,7 +157,9 @@ class TestPvss():
 
         # Prove generates shares validity
         print("Test verify")
-        assert cpni.DLEQ_verify_list(params, pub_keys, pub, proof) is True
+        Y_list = pub['Y_list']
+        C_list = pub['C_list']
+        assert cpni.DLEQ_verify_list(p,g, pub_keys, C_list, Y_list, proof) is True
 
         # Decryption
         # Calulate what a correct decryption should be

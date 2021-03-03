@@ -111,20 +111,21 @@ def __DLEQ_calc_r(params, w, alpha, c):
     return r
 
 
-def DLEQ_verify_list(params, y_list, pub, proof):
+def DLEQ_verify_list(p, g, y_list, C_list, Y_list, proof):
     '''
     Verify that a DLEQ_list proof is correct
     '''
-    (_, p, g, _) = params
+    # (_, p, g, _) = params
     r_list = proof['r_list']
     c_claimed = proof['c']
     a_1_orig_list = proof['a_1_list']
     a_2_orig_list = proof['a_2_list']
 
-    Y_list = pub['Y_list']
+    #Y_list = pub['Y_list']
+    #C_list = pub['C_list']
     n = len(r_list)
 
-    X_list = get_X_i_list(pub['C_list'], n)
+    X_list = get_X_i_list(C_list, n)
     c = hash(p, X_list, Y_list, a_1_orig_list, a_2_orig_list)
     # If prover lied about c
     if c_claimed != c:
