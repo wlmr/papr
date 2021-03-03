@@ -32,7 +32,7 @@ def DLEQ_prove(params, g_1, g_2, h_1, h_2, x_i):
     (_, p, _, _) = params
     w = p.random()
     (a_1, a_2) = __DLEQ_prover_calc_a(g_1, g_2, w)
-    c = hash(params, h_1, h_2, a_1, a_2)
+    c = hash(p, h_1, h_2, a_1, a_2)
     r = __DLEQ_calc_r(params, w, x_i, c)
     return (c, r, a_1, a_2)
 
@@ -72,7 +72,7 @@ def DLEQ_prove_list(params, C_list, Y_list, y_list, shares_list):
     a_2_list = [w_list[i] * y_list[i] for i in range(n)]
 
     # Calculates one hash for the entire list
-    c = hash(params, X_list, Y_list, a_1_list, a_2_list)
+    c = hash(p, X_list, Y_list, a_1_list, a_2_list)
     r_list = __DLEQ_calc_all_r(params, shares_list, w_list, c)
 
     proof = {'c': c, 'r_list': r_list,
@@ -81,11 +81,10 @@ def DLEQ_prove_list(params, C_list, Y_list, y_list, shares_list):
     return proof
 
 
-def hash(params, h_1, h_2, a_1, a_2) -> Bn:
+def hash(p, h_1, h_2, a_1, a_2) -> Bn:
     '''
     Calculates a cryptograpic hash for use in proof. Does work both for DLEQ of single objects and lists.
     '''
-    (_, p, _, _) = params
     state = str([h_1, h_2, a_1, a_2])
     H = sha256()
     H.update(state.encode("utf8"))
@@ -116,7 +115,7 @@ def DLEQ_verify_list(params, y_list, pub, proof):
     '''
     Verify that a DLEQ_list proof is correct
     '''
-    (_, _, g, _) = params
+    (_, p, g, _) = params
     r_list = proof['r_list']
     c_claimed = proof['c']
     a_1_orig_list = proof['a_1_list']
@@ -126,7 +125,7 @@ def DLEQ_verify_list(params, y_list, pub, proof):
     n = len(r_list)
 
     X_list = get_X_i_list(pub['C_list'], n)
-    c = hash(params, X_list, Y_list, a_1_orig_list, a_2_orig_list)
+    c = hash(p, X_list, Y_list, a_1_orig_list, a_2_orig_list)
     # If prover lied about c
     if c_claimed != c:
         return False
@@ -141,8 +140,9 @@ def DLEQ_verify_single(params, g_1, g_2, h_1, h_2, proof):
     '''
     Verify that a DLEQ_single proof is correct.
     '''
+    (_,p,_,_) = params
     (c_claimed, r, a_1, a_2) = proof
-    c = hash(params, h_1, h_2, a_1, a_2)
+    c = hash(p, h_1, h_2, a_1, a_2)
     if c != c_claimed:
         return False
     return DLEQ_verify(g_1, g_2, h_1, h_2, proof)
