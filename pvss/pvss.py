@@ -30,9 +30,8 @@ class PVSS():
     def verify_decryption_proof(self, proof_of_decryption, decrypted_share, encrypted_share, pub_key):
         return self.verify_correct_decryption(decrypted_share, encrypted_share, proof_of_decryption, pub_key, p)
 
-
-
     # Helper or older functions
+
     def gen_proof(self, k, n, secret, pub_keys):
         '''
         Generate polynomial and proof
@@ -58,7 +57,6 @@ class PVSS():
         assert len(enc_shares) == n
 
         return (pub, proof)
-
 
     def gen_polynomial(self, k, secret):
         '''
