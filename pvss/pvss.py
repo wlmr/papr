@@ -24,13 +24,13 @@ class PVSS_issuer():
 
         px = self.gen_polynomial(k, secret)
         commitments = self.get_commitments(g, px)
-        shares_list = self.calc_shares(px, k, n)
+        shares_list = self.calc_shares(px, k, n, p)
         enc_shares = self.__get_encrypted_shares(pub_keys, shares_list)
 
         pub = {'C_list': commitments, 'Y_list': enc_shares}
 
-        params = (Gq, p, g, G)
-        proof = cpni.DLEQ_prove_list(params, commitments, enc_shares, pub_keys, shares_list)
+        #params = (Gq, p, g, G)
+        proof = cpni.DLEQ_prove_list(p, g, commitments, enc_shares, pub_keys, shares_list)
 
         # Debug:
         assert len(px) == k
@@ -43,26 +43,26 @@ class PVSS_issuer():
 
     def distribute_secret(self, pub_keys, secret, params, k, n, h):
         assert len(pub_keys) == n
-
+        (_, p, _, _) = params
         px = self.gen_polynomial(k, secret)
         commitments = self.get_commitments(h, px)
-        shares_list = self.calc_shares(px, k, n)
+        shares_list = self.calc_shares(px, k, n, p)
         enc_shares = self.__get_encrypted_shares(pub_keys, shares_list)
-        proof = cpni.DLEQ_prove_list(params, commitments, enc_shares, pub_keys, shares_list)
+        #(_,p,g,_) = params
+        proof = cpni.DLEQ_prove_list(p, h, commitments, enc_shares, pub_keys, shares_list)
 
         return (enc_shares, commitments, proof)
         # -> encrypted_shares, commitments, proof of shares being the same in commitment and enc.
 
-    def verify_encrypted_shares(self, encrypted_shares, commitments, proof, h):
-        pass
+    def verify_encrypted_shares(self, encrypted_shares, commitments, pub_keys, proof, h):
+        return cpni.DLEQ_verify_list(p=p, g=h, y_list=pub_keys, C_list=commitments, Y_list=encrypted_shares, proof=proof)
 
     def reconstruct(self, decrypted_list):
+
         pass
 
     def verify_decryption_proof(self, proof_of_decryption):
         pass
-
-
 
     def gen_polynomial(self, k, secret):
         '''
@@ -72,13 +72,13 @@ class PVSS_issuer():
         px = [secret] + px_rand
         return px
 
-    def calc_shares(self, px, k, n):
+    def calc_shares(self, px, k, n, p):
         '''
         Calculates p(j) for all j (0,n)
         '''
-        return [self.__calc_share(px, k, Bn(i)) for i in range(1, n+1)]
+        return [self.__calc_share(px, k, Bn(i), p) for i in range(1, n+1)]
 
-    def __calc_share(self, px, k, x):
+    def __calc_share(self, px, k, x, p):
         '''
         Calculates p(x)
         '''

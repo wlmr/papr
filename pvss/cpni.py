@@ -33,7 +33,7 @@ def DLEQ_prove(params, g_1, g_2, h_1, h_2, x_i):
     w = p.random()
     (a_1, a_2) = __DLEQ_prover_calc_a(g_1, g_2, w)
     c = hash(p, h_1, h_2, a_1, a_2)
-    r = __DLEQ_calc_r(params, w, x_i, c)
+    r = __DLEQ_calc_r(p, w, x_i, c)
     return (c, r, a_1, a_2)
 
 
@@ -55,11 +55,11 @@ def DLEQ_verifyer_calc_a(r, c, g_1, h_1, g_2, h_2):
     return (a_1, a_2)
 
 
-def DLEQ_prove_list(params, C_list, Y_list, y_list, shares_list):
+def DLEQ_prove_list(p, g, C_list, Y_list, y_list, shares_list):
     '''
     Generate Chaum-Pedersen non interactive proof for a list
     '''
-    (_, p, g, _) = params
+    #(_, p, g, _) = params
     n = len(Y_list)
     X_list = get_X_i_list(C_list, n)
 
@@ -73,7 +73,7 @@ def DLEQ_prove_list(params, C_list, Y_list, y_list, shares_list):
 
     # Calculates one hash for the entire list
     c = hash(p, X_list, Y_list, a_1_list, a_2_list)
-    r_list = __DLEQ_calc_all_r(params, shares_list, w_list, c)
+    r_list = __DLEQ_calc_all_r(p, shares_list, w_list, c)
 
     proof = {'c': c, 'r_list': r_list,
              'a_1_list': a_1_list, 'a_2_list': a_2_list}
@@ -93,20 +93,20 @@ def hash(p, h_1, h_2, a_1, a_2) -> Bn:
     return c
 
 
-def __DLEQ_calc_all_r(params, shares_list, w_list, c):
+def __DLEQ_calc_all_r(p, shares_list, w_list, c):
     '''
     Calculates the r values used in list version of DLEQ proof.
     '''
-    r_list = [__DLEQ_calc_r(params, w, alpha, c)
+    r_list = [__DLEQ_calc_r(p, w, alpha, c)
               for (alpha, w) in zip(shares_list, w_list)]
     return r_list
 
 
-def __DLEQ_calc_r(params, w, alpha, c):
+def __DLEQ_calc_r(p, w, alpha, c):
     '''
     Calulates a r value for use in both DLEQ single object and list versions.
     '''
-    (_, p, _, _) = params
+    #(_, p, _, _) = params
     r = (w - c * alpha) % p
     return r
 
@@ -141,7 +141,7 @@ def DLEQ_verify_single(params, g_1, g_2, h_1, h_2, proof):
     '''
     Verify that a DLEQ_single proof is correct.
     '''
-    (_,p,_,_) = params
+    (_, p, _, _) = params
     (c_claimed, r, a_1, a_2) = proof
     c = hash(p, h_1, h_2, a_1, a_2)
     if c != c_claimed:

@@ -13,7 +13,7 @@ class TestPvss():
         G = Gq.hash_to_point(b'G')
         params = (Gq, p, g, G)
 
-        (k,n) = (3,4)
+        (k, n) = (3, 4)
 
         pvss = PVSS.PVSS_issuer(params)
 
@@ -23,8 +23,7 @@ class TestPvss():
         pub_keys = [participant.generate_key_pair() for participant in participants]
         secret = p.from_binary(b'This is a test')
         (encrypted_shares, commitments, proof) = pvss.distribute_secret(pub_keys, secret, params, k, n, h)
-        assert pvss.verify_encrypted_shares(encrypted_shares, commitments, proof, h)
-
+        assert pvss.verify_encrypted_shares(encrypted_shares, commitments, pub_keys, proof, h)
 
     def test_decrypt_shares(self):
         Gq = EcGroup()
@@ -33,21 +32,20 @@ class TestPvss():
         G = Gq.hash_to_point(b'G')
         params = (Gq, p, g, G)
 
-        (k,n) = (3,4)
+        (k, n) = (3, 4)
         pvss = PVSS.PVSS_issuer(params)
 
         h = Gq.hash_to_point(b'h')
         participants = [PVSS.PVSS_participant(params) for i in range(n)]
         pub_keys = [participant.generate_key_pair() for participant in participants]
         secret = p.from_binary(b'This is a test')
-        
+
         (encrypted_shares, commitments, proof) = pvss.distribute_secret(pub_keys, secret, params, k, n, h)
         #assert verify_encrypted_shares(encrypted_shares, commitments, proof)
 
         for (participant, encrypted_share) in zip(participants, encrypted_shares):
             (decrypted_share, proof_of_decryption) = participant.participant_decrypt(encrypted_share)
             assert pvss.verify_decryption_proof(proof_of_decryption)
-
 
     def test_reconstruct(self):
         Gq = EcGroup()
@@ -59,12 +57,12 @@ class TestPvss():
         h = Gq.hash_to_point(b'h')
         pvss = PVSS.PVSS_issuer(params)
 
-        (k,n) = (3,4)
+        (k, n) = (3, 4)
 
         participants = [PVSS.PVSS_participant(params) for i in range(n)]
         pub_keys = [participant.generate_key_pair() for participant in participants]
         secret = p.from_binary(b'This is a test')
-        
+
         (encrypted_shares, commitments, proof) = pvss.distribute_secret(pub_keys, secret, params, k, n, h)
         #assert verify_encrypted_shares(encrypted_shares, commitments, proof)
 
@@ -74,11 +72,6 @@ class TestPvss():
             decrypted_list.append(decrypted_share)
             #assert verify_decryption_proof(proof_of_decryption)
         assert pvss.reconstruct(decrypted_list) == secret * G
-
-
-
-
-
 
     def test_full(self):
         # Generate parameters (should be same in other parts of program)
@@ -109,7 +102,7 @@ class TestPvss():
         print("Test verify")
         Y_list = pub['Y_list']
         C_list = pub['C_list']
-        assert cpni.DLEQ_verify_list(p,g, pub_keys, C_list, Y_list, proof) is True
+        assert cpni.DLEQ_verify_list(p, g, pub_keys, C_list, Y_list, proof) is True
 
         # Decryption
         # Calulate what a correct decryption should be
@@ -159,7 +152,7 @@ class TestPvss():
         print("Test verify")
         Y_list = pub['Y_list']
         C_list = pub['C_list']
-        assert cpni.DLEQ_verify_list(p,g, pub_keys, C_list, Y_list, proof) is True
+        assert cpni.DLEQ_verify_list(p, g, pub_keys, C_list, Y_list, proof) is True
 
         # Decryption
         # Calulate what a correct decryption should be
@@ -577,7 +570,7 @@ class TestPvss():
         px = issuer.gen_polynomial(t, secret)
 
         commitments = issuer.get_commitments(g, px)
-        shares_list = issuer.calc_shares(px, t, n)
+        shares_list = issuer.calc_shares(px, t, n, p)
 
         X_list = cpni.get_X_i_list(commitments, n)
 
