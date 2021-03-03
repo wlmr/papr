@@ -2,8 +2,9 @@ from amac.credential_scheme import setup as setup_cmz, cred_keygen as cred_keyge
 from amac.credential_scheme import prepare_blind_obtain as prepare_blind_obtain_cmz
 from amac.credential_scheme import blind_issue as blind_issue_cmz
 from amac.credential_scheme import blind_obtain as blind_obtain_cmz
-from amac.credential_scheme import blind_show as blind_show_cmz
-from amac.credential_scheme import show_verify as show_verify
+""" from amac.credential_scheme import blind_show as blind_show_cmz
+from amac.credential_scheme import show_verify as show_verify """
+from papr.ecdsa import sign
 
 
 def setup(k, n):
@@ -19,7 +20,7 @@ def setup(k, n):
     (y_sign, y_encr) = (x_sign * g0, x_encr * g0)
     (iparams, i_sk) = cred_keygen_cmz(params)
     # crs = ",".join([p.repr(), g0, g1, n, k, iparams['Cx0']])
-    return params, (x_sign, x_encr), (y_sign, y_encr), (iparams, i_sk)#, crs
+    return params, (x_sign, x_encr), (y_sign, y_encr), (iparams, i_sk)  # , crs
 
 
 def req_enroll_1(params, id):
@@ -39,7 +40,9 @@ def iss_enroll_1(params, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain, id
     Returns the elgamal-encrypted credential T(ID) that only the user can
     decrypt and use, as well as a signature on the pub_id
     """
-    sigma_pub_id = x_sign * pub_id
+    (G, _, _, _) = params
+    pub_id_x, _ = pub_id.get_affine()
+    sigma_pub_id = sign(params, x_sign, pub_id_x)
     return sigma_pub_id, blind_issue_cmz(params, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain)
 
 
@@ -59,4 +62,4 @@ def enroll(params, id, iparams, i_sk, x_sign):
     gamma = u_pk['h']
     sigma_pub_id, (u, e_u_prime, pi_issue, biparams) = iss_enroll_1(params, iparams, i_sk, gamma, c, pi_prepare_obtain, id, pub_id, x_sign)
     t_id = req_enroll_2(params, iparams, u_sk, u, e_u_prime, pi_issue, biparams, gamma, c)
-    return t_id, sigma_pub_id
+    return t_id, sigma_pub_id, pub_id

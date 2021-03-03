@@ -1,5 +1,4 @@
 from petlib.ec import EcGroup
-from petlib.bn import Bn
 
 
 def keygen(params):
@@ -34,7 +33,7 @@ if __name__ == "__main__":
     p = G.order()
     g = G.generator()
 
-    m = Bn.from_binary(b'god is dead')
+    m = p.from_binary(b'god is dead')
     params = (g, p)
     (pk, sk) = keygen(params)
     (ciphertext, r) = encrypt(pk, m)
