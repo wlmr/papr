@@ -17,8 +17,6 @@ class TestPvss():
 
         pvss = PVSS.PVSS()
 
-        #h = Gq.hash_to_point(b'h')
-
         participants = [PVSS.PVSS_participant(params) for i in range(n)]
         pub_keys = [participant.generate_key_pair() for participant in participants]
         secret = p.from_binary(b'This is a test')
@@ -35,7 +33,6 @@ class TestPvss():
         (k, n) = (3, 4)
         pvss = PVSS.PVSS()
 
-        #h = Gq.hash_to_point(b'h')
         participants = [PVSS.PVSS_participant(params) for i in range(n)]
         pub_keys = [participant.generate_key_pair() for participant in participants]
         secret = p.from_binary(b'This is a test')
@@ -54,7 +51,6 @@ class TestPvss():
         G = Gq.hash_to_point(b'G')
         params = (Gq, p, g, G)
 
-        #h = Gq.hash_to_point(b'h')
         pvss = PVSS.PVSS()
 
         (k, n) = (3, 4)
