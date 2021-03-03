@@ -14,7 +14,8 @@ pvss.verify_encrypted_shares(self, encrypted_shares, commitments, pub_keys, proo
 
 ## Decrypt
 ```
-pvss_participant = PVSS.PVSS_participant(params) 
+PVSS.PVSS_participant(params): ->
+    pvss_participant
 pvss_participant.participant.generate_key_pair(): -> 
     public_key
 
