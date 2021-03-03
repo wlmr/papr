@@ -137,12 +137,12 @@ def DLEQ_verify_list(p, g, y_list, C_list, Y_list, proof):
     return True
 
 
-def DLEQ_verify_single(params, g_1, g_2, h_1, h_2, proof):
+def DLEQ_verify_single(p, g_1, g_2, h_1, h_2, proof):
     '''
     Verify that a DLEQ_single proof is correct.
     '''
-    (_, p, _, _) = params
-    (c_claimed, r, a_1, a_2) = proof
+    # (_, p, _, _) = params
+    (c_claimed, _, a_1, a_2) = proof
     c = hash(p, h_1, h_2, a_1, a_2)
     if c != c_claimed:
         return False

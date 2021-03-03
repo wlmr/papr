@@ -61,8 +61,9 @@ class PVSS_issuer():
 
         pass
 
-    def verify_decryption_proof(self, proof_of_decryption):
-        pass
+    def verify_decryption_proof(self, proof_of_decryption, decrypted_share, encrypted_share, pub_key):
+        return self.verify_correct_decryption(decrypted_share, encrypted_share, proof_of_decryption, pub_key, p)
+        # pass
 
     def gen_polynomial(self, k, secret):
         '''
@@ -127,19 +128,19 @@ class PVSS_issuer():
                 bottom = (bottom * (j-i))
         return top.mod_mul(bottom.mod_inverse(p), p)
 
-    def verify_correct_decryption(self, S_i, Y_i, decrypt_proof, pub_key):
+    def verify_correct_decryption(self, S_i, Y_i, decrypt_proof, pub_key, p):
         '''
         Verifies the participants proof of correct decryption of their share
         '''
-        params = (Gq, p, g, G)
-        return cpni.DLEQ_verify_single(params, G, S_i, pub_key, Y_i, decrypt_proof)
+        #params = (Gq, p, g, G)
+        return cpni.DLEQ_verify_single(p, G, S_i, pub_key, Y_i, decrypt_proof)
 
     def batch_verify_correct_decryption(self, proved_decryptions, Y_list, pub_keys):
         '''
         Verify all paricipants decryption of shares
         '''
         for ((S_i, decrypt_proof), Y_i, pub_key) in zip(proved_decryptions, Y_list, pub_keys):
-            if self.verify_correct_decryption(S_i, Y_i, decrypt_proof, pub_key) is False:
+            if self.verify_correct_decryption(S_i, Y_i, decrypt_proof, pub_key, p) is False:
                 return False
         return True
 
@@ -177,3 +178,7 @@ class PVSS_participant():
         params = (Gq, p, g, G)
         decrypt_proof = cpni.DLEQ_prove(params, G, S_i, y_i, Y_i, self.x_i)
         return (S_i, decrypt_proof)
+
+    def get_pub_key(self):
+        y_i = self.x_i * G
+        return y_i

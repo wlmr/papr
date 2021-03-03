@@ -44,8 +44,8 @@ class TestPvss():
         #assert verify_encrypted_shares(encrypted_shares, commitments, proof)
 
         for (participant, encrypted_share) in zip(participants, encrypted_shares):
-            (decrypted_share, proof_of_decryption) = participant.participant_decrypt(encrypted_share)
-            assert pvss.verify_decryption_proof(proof_of_decryption)
+            (decrypted_share, proof_of_decryption) = participant.participant_decrypt_and_prove(encrypted_share)
+            assert pvss.verify_decryption_proof(proof_of_decryption, decrypted_share, encrypted_share, participant.get_pub_key())
 
     def test_reconstruct(self):
         Gq = EcGroup()
