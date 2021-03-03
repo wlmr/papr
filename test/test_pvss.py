@@ -68,10 +68,10 @@ class TestPvss():
 
         decrypted_list = []
         for (participant, encrypted_share) in zip(participants, encrypted_shares):
-            (decrypted_share, proof_of_decryption) = participant.participant_decrypt(encrypted_share)
+            (decrypted_share, proof_of_decryption) = participant.participant_decrypt_and_prove(encrypted_share)
             decrypted_list.append(decrypted_share)
             #assert verify_decryption_proof(proof_of_decryption)
-        assert pvss.reconstruct(decrypted_list) == secret * G
+        assert pvss.reconstruct(decrypted_list, [1, 2, 3, 4]) == secret * G
 
     def test_full(self):
         # Generate parameters (should be same in other parts of program)

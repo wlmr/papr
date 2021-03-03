@@ -57,9 +57,8 @@ class PVSS_issuer():
     def verify_encrypted_shares(self, encrypted_shares, commitments, pub_keys, proof, h):
         return cpni.DLEQ_verify_list(p=p, g=h, y_list=pub_keys, C_list=commitments, Y_list=encrypted_shares, proof=proof)
 
-    def reconstruct(self, decrypted_list):
-
-        pass
+    def reconstruct(self, decrypted_list, index_list):
+        return self.decode(decrypted_list, index_list)
 
     def verify_decryption_proof(self, proof_of_decryption, decrypted_share, encrypted_share, pub_key):
         return self.verify_correct_decryption(decrypted_share, encrypted_share, proof_of_decryption, pub_key, p)
