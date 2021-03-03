@@ -41,9 +41,11 @@ class PVSS_issuer():
 
         return (pub, proof)
 
-    def distribute_secret(self, pub_keys, secret, params, k, n, h):
+    def distribute_secret(self, pub_keys, secret, p, k, n, Gq):
         assert len(pub_keys) == n
-        (_, p, _, _) = params
+        # (_, p, _, _) = params
+        h = p.random() * Gq.hash_to_point(b'h')
+
         px = self.gen_polynomial(k, secret)
         commitments = self.get_commitments(h, px)
         shares_list = self.calc_shares(px, k, n, p)
@@ -51,7 +53,7 @@ class PVSS_issuer():
         #(_,p,g,_) = params
         proof = cpni.DLEQ_prove_list(p, h, commitments, enc_shares, pub_keys, shares_list)
 
-        return (enc_shares, commitments, proof)
+        return (enc_shares, commitments, proof, h)
         # -> encrypted_shares, commitments, proof of shares being the same in commitment and enc.
 
     def verify_encrypted_shares(self, encrypted_shares, commitments, pub_keys, proof, h):
