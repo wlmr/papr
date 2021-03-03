@@ -6,15 +6,38 @@ import pvss.cpni as cpni
 A = tuple[Bn, Bn]
 
 
-class PVSS_issuer():
+class PVSS():
 
-    def __init__(self, params):
-        global Gq
-        global g
-        global p
-        global G
-        (Gq, p, g, G) = params
+    def __init__(self):
+        pass
 
+    def distribute_secret(self, pub_keys, secret, p, k, n, Gq):
+        assert len(pub_keys) == n
+        # (_, p, _, _) = params
+        h = p.random() * Gq.hash_to_point(b'h')
+
+        px = self.gen_polynomial(k, secret)
+        commitments = self.get_commitments(h, px)
+        shares_list = self.calc_shares(px, k, n, p)
+        enc_shares = self.__get_encrypted_shares(pub_keys, shares_list)
+        #(_,p,g,_) = params
+        proof = cpni.DLEQ_prove_list(p, h, commitments, enc_shares, pub_keys, shares_list)
+
+        return (enc_shares, commitments, proof, h)
+        # -> encrypted_shares, commitments, proof of shares being the same in commitment and enc.
+
+    def verify_encrypted_shares(self, encrypted_shares, commitments, pub_keys, proof, h):
+        return cpni.DLEQ_verify_list(p=p, g=h, y_list=pub_keys, C_list=commitments, Y_list=encrypted_shares, proof=proof)
+
+    def reconstruct(self, decrypted_list, index_list):
+        return self.decode(decrypted_list, index_list)
+
+    def verify_decryption_proof(self, proof_of_decryption, decrypted_share, encrypted_share, pub_key):
+        return self.verify_correct_decryption(decrypted_share, encrypted_share, proof_of_decryption, pub_key, p)
+
+
+
+    # Helper or older functions
     def gen_proof(self, k, n, secret, pub_keys):
         '''
         Generate polynomial and proof
@@ -41,30 +64,6 @@ class PVSS_issuer():
 
         return (pub, proof)
 
-    def distribute_secret(self, pub_keys, secret, p, k, n, Gq):
-        assert len(pub_keys) == n
-        # (_, p, _, _) = params
-        h = p.random() * Gq.hash_to_point(b'h')
-
-        px = self.gen_polynomial(k, secret)
-        commitments = self.get_commitments(h, px)
-        shares_list = self.calc_shares(px, k, n, p)
-        enc_shares = self.__get_encrypted_shares(pub_keys, shares_list)
-        #(_,p,g,_) = params
-        proof = cpni.DLEQ_prove_list(p, h, commitments, enc_shares, pub_keys, shares_list)
-
-        return (enc_shares, commitments, proof, h)
-        # -> encrypted_shares, commitments, proof of shares being the same in commitment and enc.
-
-    def verify_encrypted_shares(self, encrypted_shares, commitments, pub_keys, proof, h):
-        return cpni.DLEQ_verify_list(p=p, g=h, y_list=pub_keys, C_list=commitments, Y_list=encrypted_shares, proof=proof)
-
-    def reconstruct(self, decrypted_list, index_list):
-        return self.decode(decrypted_list, index_list)
-
-    def verify_decryption_proof(self, proof_of_decryption, decrypted_share, encrypted_share, pub_key):
-        return self.verify_correct_decryption(decrypted_share, encrypted_share, proof_of_decryption, pub_key, p)
-        # pass
 
     def gen_polynomial(self, k, secret):
         '''

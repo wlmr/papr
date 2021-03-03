@@ -15,7 +15,7 @@ class TestPvss():
 
         (k, n) = (3, 4)
 
-        pvss = PVSS.PVSS_issuer(params)
+        pvss = PVSS.PVSS()
 
         #h = Gq.hash_to_point(b'h')
 
@@ -33,7 +33,7 @@ class TestPvss():
         params = (Gq, p, g, G)
 
         (k, n) = (3, 4)
-        pvss = PVSS.PVSS_issuer(params)
+        pvss = PVSS.PVSS()
 
         #h = Gq.hash_to_point(b'h')
         participants = [PVSS.PVSS_participant(params) for i in range(n)]
@@ -55,7 +55,7 @@ class TestPvss():
         params = (Gq, p, g, G)
 
         #h = Gq.hash_to_point(b'h')
-        pvss = PVSS.PVSS_issuer(params)
+        pvss = PVSS.PVSS()
 
         (k, n) = (3, 4)
 
@@ -85,7 +85,7 @@ class TestPvss():
         m = p.from_binary(b'This is a test')
 
         # Initialize issuer
-        issuer = PVSS.PVSS_issuer(params)
+        issuer = PVSS.PVSS()
 
         # Set (t,n)-threshold parameters
         n = 4
@@ -135,7 +135,7 @@ class TestPvss():
         m = p-1
 
         # Initialize issuer
-        issuer = PVSS.PVSS_issuer(params)
+        issuer = PVSS.PVSS()
 
         # Set (t,n)-threshold parameters
         n = 4
@@ -184,7 +184,7 @@ class TestPvss():
         m = p.from_binary(b'This is a test')
 
         # Initialize issuer
-        issuer = PVSS.PVSS_issuer(params)
+        issuer = PVSS.PVSS()
 
         # Initiate participants, and generate their key-pairs
         participants = [PVSS.PVSS_participant(params) for i in range(n)]
@@ -544,7 +544,7 @@ class TestPvss():
         params = (Gq, p, g, G)
 
         # Initialize issuer
-        issuer = PVSS.PVSS_issuer(params)
+        issuer = PVSS.PVSS()
 
         px = issuer.gen_polynomial(3, 42)
         for pi in px:
@@ -561,7 +561,7 @@ class TestPvss():
         m = p.from_binary(b'This is a test')
 
         # Initialize issuer
-        issuer = PVSS.PVSS_issuer(params)
+        issuer = PVSS.PVSS()
 
         t = 3
         n = 4
