@@ -3,7 +3,7 @@
 from petlib.bn import Bn
 import pvss.cpni as cpni
 
-A = tuple[Bn, Bn]
+#A = tuple[Bn, Bn]
 
 
 class PVSS():
@@ -12,6 +12,11 @@ class PVSS():
         pass
 
     def distribute_secret(self, pub_keys, secret, p, k, n, Gq):
+        '''
+        Generates encrypted shares, commitments, proof and a random generator of Gq. Given secret, n public keys of participants who will hold the secret. 
+        k participants (out of n) can then later recreate (secret * G). 
+        Lists of encrypted shares and commitments will be returned in same order the public keys was sent in.     
+        '''
         assert len(pub_keys) == n
         h = p.random() * Gq.hash_to_point(b'h')
         px = self.gen_polynomial(k, secret)
@@ -22,12 +27,21 @@ class PVSS():
         return (enc_shares, commitments, proof, h)
 
     def verify_encrypted_shares(self, encrypted_shares, commitments, pub_keys, proof, h):
+        '''
+        Verifies that encrypted shares and commitments represents the same data using proof. Note: encrypted shares, commitments and pub_keys must be original order.
+        '''
         return cpni.DLEQ_verify_list(p=p, g=h, y_list=pub_keys, C_list=commitments, Y_list=encrypted_shares, proof=proof)
 
     def reconstruct(self, decrypted_list, index_list):
+        '''
+        Recontructs (secret * G) given at least k decrypted shares, along with their indexes (starting from 1!) as the respective public keys was originaly sent into distrubute_secret.
+        ''' 
         return self.decode(decrypted_list, index_list)
 
     def verify_decryption_proof(self, proof_of_decryption, decrypted_share, encrypted_share, pub_key):
+        '''
+        Verifyes that a participant has correctly decrypted their share
+        '''
         return self.verify_correct_decryption(decrypted_share, encrypted_share, proof_of_decryption, pub_key, p)
 
     # Helper or older functions
