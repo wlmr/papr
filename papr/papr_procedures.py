@@ -5,6 +5,7 @@ from amac.credential_scheme import blind_obtain as blind_obtain_cmz
 """ from amac.credential_scheme import blind_show as blind_show_cmz
 from amac.credential_scheme import show_verify as show_verify """
 from papr.ecdsa import sign
+from papr.user_list import User_list
 
 
 def setup(k, n):
@@ -20,7 +21,8 @@ def setup(k, n):
     (y_sign, y_encr) = (x_sign * g0, x_encr * g0)
     (iparams, i_sk) = cred_keygen_cmz(params)
     # crs = ",".join([p.repr(), g0, g1, n, k, iparams['Cx0']])
-    return params, (x_sign, x_encr), (y_sign, y_encr), (iparams, i_sk)  # , crs
+    user_list = User_list(y_sign)
+    return params, (x_sign, x_encr), (y_sign, y_encr), (iparams, i_sk), user_list
 
 
 def req_enroll_1(params, id):
@@ -29,21 +31,24 @@ def req_enroll_1(params, id):
     l and r (r is used in elgamal-encryption).
     Returns the tuple (id, l, g0^l, ElGamal-SK, ElGamal-PK, ElGamal-ciphertext, ZKP)
     """
-    (G, p, g0, g1) = params
+    (_, p, g0, _) = params
     priv_id = p.random()  # a.k.a. l
     pub_id = priv_id * g0
     return id, priv_id, pub_id, prepare_blind_obtain_cmz(params, priv_id)
 
 
-def iss_enroll_1(params, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain, id, pub_id, x_sign):
+def iss_enroll(params, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain, id, pub_id, x_sign, user_list):
     """
     Returns the elgamal-encrypted credential T(ID) that only the user can
     decrypt and use, as well as a signature on the pub_id
     """
-    (G, _, _, _) = params
-    pub_id_x, _ = pub_id.get_affine()
-    sigma_pub_id = sign(params, x_sign, pub_id_x)
-    return sigma_pub_id, blind_issue_cmz(params, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain)
+    if not user_list.has(id):
+        pub_id_x, _ = pub_id.get_affine()
+        sigma_pub_id = sign(params, x_sign, pub_id_x)
+        user_list.add(params, pub_id, id, sigma_pub_id)
+        return sigma_pub_id, blind_issue_cmz(params, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain), user_list
+    else:
+        return None
 
 
 def req_enroll_2(params, iparams, u_sk, u, e_u_prime, pi_issue, biparams, gamma, ciphertext):
@@ -54,12 +59,17 @@ def req_enroll_2(params, iparams, u_sk, u, e_u_prime, pi_issue, biparams, gamma,
                             gamma, ciphertext)
 
 
-def enroll(params, id, iparams, i_sk, x_sign):
+def enroll(params, id, iparams, i_sk, x_sign, user_list):
     """
-    Complete Enrollment procedure
+    Complete Enrollment procedure. Inputs:
+    id: real identity, i_sk: issuer's secret key for CMZ,
+    x_sign: issuer's secret signature key, user_list: the list of users (ID: pub_ID) as described in PAPR.
     """
     id, priv_id, pub_id, (u_sk, u_pk, c, pi_prepare_obtain) = req_enroll_1(params, id)
-    gamma = u_pk['h']
-    sigma_pub_id, (u, e_u_prime, pi_issue, biparams) = iss_enroll_1(params, iparams, i_sk, gamma, c, pi_prepare_obtain, id, pub_id, x_sign)
-    t_id = req_enroll_2(params, iparams, u_sk, u, e_u_prime, pi_issue, biparams, gamma, c)
-    return t_id, sigma_pub_id, pub_id
+    ret = iss_enroll(params, iparams, i_sk, u_pk['h'], c, pi_prepare_obtain, id, pub_id, x_sign, user_list)
+    if ret is not None:
+        s_pub_id, (u, e_u_prime, pi_issue, biparams), user_list = ret
+        t_id = req_enroll_2(params, iparams, u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], c)
+        return t_id, s_pub_id, priv_id, pub_id, user_list
+    print("user already exists")
+    return None
