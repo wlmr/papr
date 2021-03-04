@@ -34,7 +34,7 @@ def DLEQ_prove(params, g_1, g_2, h_1, h_2, x_i):
     (a_1, a_2) = __DLEQ_prover_calc_a(g_1, g_2, w)
     c = hash(p, h_1, h_2, a_1, a_2)
     r = __DLEQ_calc_r(p, w, x_i, c)
-    return (c, r, a_1, a_2)
+    return c, r, a_1, a_2
 
 
 def __DLEQ_prover_calc_a(g_1, g_2, w):
@@ -43,7 +43,7 @@ def __DLEQ_prover_calc_a(g_1, g_2, w):
     '''
     a_1 = w * g_1
     a_2 = w * g_2
-    return (a_1, a_2)
+    return a_1, a_2
 
 
 def DLEQ_verifyer_calc_a(r, c, g_1, h_1, g_2, h_2):
@@ -52,7 +52,7 @@ def DLEQ_verifyer_calc_a(r, c, g_1, h_1, g_2, h_2):
     '''
     a_1 = r * g_1 + c * h_1
     a_2 = r * g_2 + c * h_2
-    return (a_1, a_2)
+    return a_1, a_2
 
 
 def DLEQ_prove_list(p, g, C_list, Y_list, y_list, shares_list):

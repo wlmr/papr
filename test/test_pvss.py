@@ -77,7 +77,7 @@ class TestPvss():
         G = Gq.hash_to_point(b'G')
         params = (Gq, p, g, G)
 
-        # Decide on a secret to be distrubuted
+        # Decide on a secret to be distributed
         m = p.from_binary(b'This is a test')
 
         # Initialize issuer
@@ -101,7 +101,7 @@ class TestPvss():
         assert cpni.DLEQ_verify_list(p, g, pub_keys, C_list, Y_list, proof) is True
 
         # Decryption
-        # Calulate what a correct decryption should be
+        # Calculate what a correct decryption should be
         expected_decryption = m * G
 
         # Let participants decrypt their shares and generate proofs
@@ -151,7 +151,7 @@ class TestPvss():
         assert cpni.DLEQ_verify_list(p, g, pub_keys, C_list, Y_list, proof) is True
 
         # Decryption
-        # Calulate what a correct decryption should be
+        # Calculate what a correct decryption should be
         expected_decryption = m * G
 
         # Let participants decrypt their shares and generate proofs
@@ -176,7 +176,7 @@ class TestPvss():
         G = Gq.hash_to_point(b'G')
         params = (Gq, p, g, G)
 
-        # Decide on a secret to be distrubuted
+        # Decide on a secret to be distributed
         m = p.from_binary(b'This is a test')
 
         # Initialize issuer
@@ -190,7 +190,7 @@ class TestPvss():
         (pub, proof) = issuer.gen_proof(t, n, m, pub_keys)
 
         # Decryption
-        # Calulate what a correct decryption should be
+        # Calculate what a correct decryption should be
         expected_decryption = m * G
 
         # Let participants decrypt their shares and generate proofs
@@ -212,7 +212,7 @@ class TestPvss():
         print("Test decrypt")
         assert expected_decryption == actual_decryption2
 
-    def test_out_of_order_reconstuction(self):
+    def test_out_of_order_reconstruction(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
@@ -224,7 +224,7 @@ class TestPvss():
 
         assert expected_decryption == actual_decryption2
 
-    def test_another_out_of_order_reconstuction(self):
+    def test_another_out_of_order_reconstruction(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
@@ -234,7 +234,7 @@ class TestPvss():
         actual_decryption2 = issuer.decode(new_S_list, [3, 2, 1])
         assert expected_decryption == actual_decryption2
 
-    def test_skipping_one_reconstuction(self):
+    def test_skipping_one_reconstruction(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3

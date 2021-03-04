@@ -26,8 +26,8 @@ class PVSS():
     def __init__(self):
         pass
 
-    def distribute_secret(self, pub_keys: pub_keys_type, secret: Bn, p: Bn, k: int, n: int, Gq: EcGroup) -> (encrypted_shares_type, commitments_type,
-                                                                                                             proof_type, generator_type):
+    def distribute_secret(self, pub_keys: pub_keys_type, secret: Bn, p: Bn, k: int, n: int, Gq: EcGroup) -> tuple[encrypted_shares_type, commitments_type,
+                                                                                                                  proof_type, generator_type]:
         '''
         Generates encrypted shares, commitments, proof and a random generator of Gq. Given secret, n public keys of participants who will hold the secret. 
         k participants (out of n) can then later recreate (secret * G).
@@ -40,7 +40,7 @@ class PVSS():
         shares_list = self.calc_shares(px, k, n, p)
         enc_shares = self.__get_encrypted_shares(pub_keys, shares_list)
         proof = cpni.DLEQ_prove_list(p, h, commitments, enc_shares, pub_keys, shares_list)
-        return (enc_shares, commitments, proof, h)
+        return enc_shares, commitments, proof, h
 
     def verify_encrypted_shares(self, encrypted_shares: encrypted_shares_type, commitments: commitments_type, pub_keys: pub_keys_type, proof: proof_type,
                                 h: generator_type) -> bool:
@@ -92,9 +92,9 @@ class PVSS():
         assert shares_list[0] != secret  # I think this is correct
         assert len(enc_shares) == n
 
-        return (pub, proof)
+        return pub, proof
 
-    def gen_polynomial(self, k, secret):
+    def gen_polynomial(self, k: int, secret: Bn) -> list[Bn]:
         '''
         Generate polynomial
         '''
@@ -102,13 +102,13 @@ class PVSS():
         px = [secret] + px_rand
         return px
 
-    def calc_shares(self, px, k, n, p):
+    def calc_shares(self, px: list[Bn], k: int, n: int, p: Bn):
         '''
         Calculates p(j) for all j (0,n)
         '''
         return [self.__calc_share(px, k, Bn(i), p) for i in range(1, n+1)]
 
-    def __calc_share(self, px, k, x, p):
+    def __calc_share(self, px: list[Bn], k: int, x: Bn, p: Bn):
         '''
         Calculates p(x)
         '''
@@ -206,7 +206,7 @@ class PVSS_participant():
         y_i = self.x_i * G
         params = (Gq, p, g, G)
         decrypt_proof = cpni.DLEQ_prove(params, G, S_i, y_i, Y_i, self.x_i)
-        return (S_i, decrypt_proof)
+        return S_i, decrypt_proof
 
     def get_pub_key(self):
         y_i = self.x_i * G
