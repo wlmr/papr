@@ -1,0 +1,17 @@
+{
+  "exclude": [
+   
+  ],
+  "ignore_all_errors": [
+   
+  ],
+  "search_path": [
+    
+  ],
+  "source_directories": [
+    ".",
+    "pvss"
+  ],
+  "strict": true,
+  "version": "0.0.1"
+}
