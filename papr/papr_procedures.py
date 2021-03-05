@@ -2,10 +2,12 @@ from amac.credential_scheme import setup as setup_cmz, cred_keygen as cred_keyge
 from amac.credential_scheme import prepare_blind_obtain as prepare_blind_obtain_cmz
 from amac.credential_scheme import blind_issue as blind_issue_cmz
 from amac.credential_scheme import blind_obtain as blind_obtain_cmz
+from amac.proofs import to_challenge
 """ from amac.credential_scheme import blind_show as blind_show_cmz
 from amac.credential_scheme import show_verify as show_verify """
 from papr.ecdsa import sign
 from papr.user_list import User_list
+import pvss.pvss as PVSS
 
 
 def setup(k, n):
@@ -73,3 +75,41 @@ def enroll(params, id, iparams, i_sk, x_sign, user_list):
         return t_id, s_pub_id, priv_id, pub_id, user_list
     print("user already exists")
     return None
+
+
+def data_distrubution_U_1(params):
+    (_, p, _, _) = params
+    return p.random()
+
+
+def data_distrubution_I_1(params):
+    (_, p, _, _) = params
+    return p.random()
+
+
+def data_distrubution_select(public_credentials, u_random, i_random, n):
+    selected_data_custodians = []
+    for i in range(n):
+        selected_data_custodians.append(public_credentials[prng(u_random, i_random, i) % len(public_credentials)])
+    return selected_data_custodians
+
+
+def data_distrubution_U(PrivID, data_custodians_public_credentials, k, n, params):
+    (G, p, g0, g1) = params
+    E_list, C_list, proof, group_generator = pvss.distribute_secret(data_custodians_public_credentials, PrivID, p, k, n, G)
+    # Send to I
+    return E_list, C_list, proof, group_generator
+
+
+def data_distrubution_I(E_list, C_list, proof, group_generator):
+    result = pvss.verify_encrypted_shares(E_list, C_list, proof, group_generator)
+    if result:
+        # Save
+        pass
+    else:
+        # Discard
+        return None
+
+
+def prng(random_u, random_i, counter, p):
+    return to_challenge([random_u, random_i, counter]) % p
