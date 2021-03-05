@@ -1,56 +1,56 @@
 from petlib.ec import EcGroup, EcPt
 from petlib.bn import Bn
 
-from typing import Tuple
 
-Params = Tuple[EcGroup, Bn, EcPt, EcPt]
-KeyDict = dict[str,Bn]
-PointDict = dict[str,EcPt]
-Mac = Tuple[EcPt, EcPt]
+Params = tuple[EcGroup, Bn, EcPt, EcPt]
+BnDict = dict[str, Bn]
+EcPtDict = dict[str, EcPt]
+Mac = tuple[EcPt, EcPt]
+
+
+# TODO: make k control which group is generated
+
 
 def setup(k: int) -> Params:
     """ generate all public parameters """
     G = EcGroup()
-    g = G.hash_to_point(b"g")
-    h = G.hash_to_point(b"h")
+    g = G.hash_to_point(b'g')
+    h = G.hash_to_point(b'h')
     return (G, G.order(), g, h)
 
 
-def keygen(params: Params, n: int) -> Tuple[KeyDict,PointDict]:
-    assert n > 0
+def keygen(params: Params) -> tuple[Bn, EcPtDict]:
     (_, p, _, h) = params
-    sk_names = ['x0','x1']
-    sk = {name:p.random() for name in sk_names}
-    iparams = {name.upper():sk[name]*h for name in sk_names[1:]}
-    return (sk, iparams)
+    sk_names = ['x0', 'x1']
+    sk = {name: p.random() for name in sk_names}
+    iparams = {name.upper(): sk[name]*h for name in sk_names[1:]}
+    return sk, iparams
 
 
-def mac(params: Params, sk: KeyDict, m: bytes) -> Mac:
+def mac(params: Params, sk: BnDict, m: Bn) -> Mac:
     """ compute mac GGM """
-    assert len(sk) > 0 and m
-    (G, p, g, _) = params
+    # assert len(sk) > 0 and m
+    (G, _, _, _) = params
     u = G.hash_to_point(b"u")
-    em = Bn.from_binary(m)
-    hx = sk['x0'] + sk['x1'] * em
+    hx = sk['x0'] + sk['x1'] * m
     u_prime = hx * u
     sigma = (u, u_prime)
     return sigma
 
 
-def verify(params: Params, sk: KeyDict, m: bytes, sigma: Mac) -> bool:
+def verify(params: Params, sk: BnDict, m: Bn, sigma: Mac) -> bool:
     """ verify mac DDH """
     assert len(sk) > 0 and m
-    (G,_,_,_) = params
+    (G, _, _, _) = params
     (u, u_prime) = sigma
-    em = Bn.from_binary(m)
-    hx = sk['x0'] + sk['x1'] * em
+    hx = sk['x0'] + sk['x1'] * m
     return u != G.infinite() and u_prime == hx * u
 
 
 if __name__ == "__main__":
     params = setup(500)
-    m = b'my secret identity'
+    m = Bn.from_binary(b'my secret identity')
     n = len(m)
-    (sk,_) = keygen(params, 1)
+    (sk, _) = keygen(params, 1)
     sigma = mac(params, sk, m)
     assert verify(params, sk, m, sigma)

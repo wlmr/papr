@@ -1,0 +1,16 @@
+from amac.credential_scheme import setup, cred_keygen, prepare_blind_obtain
+from amac.credential_scheme import blind_issue, blind_obtain, blind_show, show_verify
+
+if __name__ == "__main__":
+    params = setup(1)
+    (G, p, g, h) = params
+    (iparams, i_sk) = cred_keygen(params)
+    m = p.from_binary(b"DreadPirateRoberts")
+    (u_sk, u_pk, ciphertext, pi_prepare_obtain) = prepare_blind_obtain(params, m)
+    (u, e_u_prime, pi_issue, biparams) = blind_issue(params, iparams, i_sk, u_pk['h'], ciphertext, pi_prepare_obtain)
+    cred = blind_obtain(params, iparams, u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], ciphertext)
+    (sigma, pi_show) = blind_show(params, iparams, cred, m)
+    if show_verify(params, iparams, i_sk, sigma, pi_show):
+        print("verified!")
+    else:
+        print("verification failed!")
