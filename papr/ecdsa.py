@@ -1,7 +1,8 @@
 from petlib.ec import EcGroup, Bn
+from papr.utils import hash
 
 
-def sign(params, priv_key, m):
+def sign(params, priv_key, m: list):
     (_, p, g, _) = params
     r = 0
     s = 0
@@ -9,14 +10,14 @@ def sign(params, priv_key, m):
         k = p.random()
         x, _ = (k * g).get_affine()
         r = x % p
-        s = (k.mod_inverse(p) * (m + r * priv_key)) % p
+        s = (k.mod_inverse(p) * (hash(m) + r * priv_key)) % p
     return r, s
 
 
 def verify(params, r, s, pub_key, m):
     (G, p, g, _) = params
     if pub_key != G.infinite() and G.check_point(pub_key) and (p * pub_key) == G.infinite():
-        u1 = (m * s.mod_inverse(p)) % p
+        u1 = (hash(m) * s.mod_inverse(p)) % p
         u2 = (r * s.mod_inverse(p)) % p
         try:
             x, _ = (u1 * g + u2 * pub_key).get_affine()

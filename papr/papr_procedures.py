@@ -5,7 +5,7 @@ from amac.credential_scheme import blind_obtain as blind_obtain_cmz
 """ from amac.credential_scheme import blind_show as blind_show_cmz
 from amac.credential_scheme import show_verify as show_verify """
 from papr.ecdsa import sign
-from papr.user_list import User_list
+from papr.papr_list import Papr_list
 
 
 def setup(k, n):
@@ -16,13 +16,16 @@ def setup(k, n):
     TODO: [ ] publish return value to Lsys.
     """
     params = setup_cmz(1)
-    (_, p, g0, _) = params
+    (_, p, g0, g1) = params
     (x_sign, x_encr) = (p.random(), p.random())
     (y_sign, y_encr) = (x_sign * g0, x_encr * g0)
     (iparams, i_sk) = cred_keygen_cmz(params)
-    # crs = ",".join([p.repr(), g0, g1, n, k, iparams['Cx0']])
-    user_list = User_list(y_sign)
-    return params, (x_sign, x_encr), (y_sign, y_encr), (iparams, i_sk), user_list
+    crs = ",".join([str(elem) for elem in [p.repr(), g0, g1, n, k, iparams['Cx0']]])
+    i_pk = ",".join([str(x) for x in [y_sign, y_encr]])
+    user_list, sys_list = Papr_list(y_sign), Papr_list(y_sign)
+    sys_list.add(params, crs, sign(params, x_sign, [crs]))
+    sys_list.add(params, i_pk, sign(params, x_sign, [i_pk]))
+    return params, (x_sign, x_encr), (y_sign, y_encr), (iparams, i_sk), sys_list, user_list
 
 
 def req_enroll_1(params, id):
@@ -42,13 +45,11 @@ def iss_enroll(params, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain, id, 
     Returns the elgamal-encrypted credential T(ID) that only the user can
     decrypt and use, as well as a signature on the pub_id
     """
-    if not user_list.has(id):
-        pub_id_x, _ = pub_id.get_affine()
-        sigma_pub_id = sign(params, x_sign, pub_id_x)
-        user_list.add(params, pub_id, id, sigma_pub_id)
-        return sigma_pub_id, blind_issue_cmz(params, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain), user_list
-    else:
-        return None
+    if not user_list.has(id, 0):
+        sigma_pub_id = sign(params, x_sign, [id, pub_id])
+        if user_list.add(params, (id, pub_id), sigma_pub_id):
+            return sigma_pub_id, blind_issue_cmz(params, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain), user_list
+    return None
 
 
 def req_enroll_2(params, iparams, u_sk, u, e_u_prime, pi_issue, biparams, gamma, ciphertext):
