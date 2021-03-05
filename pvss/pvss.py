@@ -21,193 +21,161 @@ decrypted_shares_list_type = list[decrypted_share_type]
 index_list_type = list[Bn]
 
 
-class PVSS():
-
-    def __init__(self):
-        pass
-
-    def distribute_secret(self, pub_keys: pub_keys_type, secret: Bn, p: Bn, k: int, n: int, Gq: EcGroup) -> tuple[encrypted_shares_type, commitments_type,
-                                                                                                                  proof_type, generator_type]:
-        '''
-        Generates encrypted shares, commitments, proof and a random generator of Gq. Given secret, n public keys of participants who will hold the secret.
-        k participants (out of n) can then later recreate (secret * G).
-        Lists of encrypted shares and commitments will be returned in same order the public keys was sent in.
-        '''
-        assert len(pub_keys) == n
-        h = p.random() * Gq.hash_to_point(b'h')
-        px = self.gen_polynomial(k, secret)
-        commitments = self.get_commitments(h, px)
-        shares_list = self.calc_shares(px, k, n, p)
-        enc_shares = self.__get_encrypted_shares(pub_keys, shares_list)
-        proof = cpni.DLEQ_prove_list(p, h, commitments, enc_shares, pub_keys, shares_list)
-        return enc_shares, commitments, proof, h
-
-    def verify_encrypted_shares(self, encrypted_shares: encrypted_shares_type, commitments: commitments_type, pub_keys: pub_keys_type, proof: proof_type,
-                                h: generator_type) -> bool:
-        '''
-        Verifies that encrypted shares and commitments represents the same data using proof. Note: encrypted shares, commitments and pub_keys must
-            be original order.
-        '''
-        assert len(encrypted_shares) == len(pub_keys)
-        return cpni.DLEQ_verify_list(p=p, g=h, y_list=pub_keys, C_list=commitments, Y_list=encrypted_shares, proof=proof)
-
-    def reconstruct(self, decrypted_list: decrypted_shares_list_type, index_list: index_list_type) -> Bn:
-        '''
-        Recontructs (secret * G) given at least k decrypted shares, along with their indexes (starting from 1!) as the respective public keys was originaly
-            sent into distrubute_secret.
-        '''
-        assert len(decrypted_list) == len(index_list)
-        return self.decode(decrypted_list, index_list)
-
-    def verify_decryption_proof(self, proof_of_decryption: single_proof_type, decrypted_share: decrypted_share_type, encrypted_share: encrypted_share_type,
-                                pub_key: pub_keys_type) -> bool:
-        '''
-        Verifyes that a participant has correctly decrypted their share
-        '''
-        return self.verify_correct_decryption(decrypted_share, encrypted_share, proof_of_decryption, pub_key, p)
-
-    # Helper or older functions
-
-    def gen_proof(self, k, n, secret, pub_keys):
-        '''
-        Generate polynomial and proof
-        '''
-        assert n > k
-        assert len(pub_keys) == n
-
-        px = self.gen_polynomial(k, secret)
-        commitments = self.get_commitments(g, px)
-        shares_list = self.calc_shares(px, k, n, p)
-        enc_shares = self.__get_encrypted_shares(pub_keys, shares_list)
-
-        pub = {'C_list': commitments, 'Y_list': enc_shares}
-
-        # params = (Gq, p, g, G)
-        proof = cpni.DLEQ_prove_list(p, g, commitments, enc_shares, pub_keys, shares_list)
-
-        # Debug:
-        assert len(px) == k
-        assert len(commitments) == k
-        assert len(shares_list) == n
-        assert shares_list[0] != secret  # I think this is correct
-        assert len(enc_shares) == n
-
-        return pub, proof
-
-    def gen_polynomial(self, k: int, secret: Bn) -> list[Bn]:
-        '''
-        Generate polynomial
-        '''
-        px_rand = [p.random() for i in range(k-1)]
-        px = [secret] + px_rand
-        return px
-
-    def calc_shares(self, px: list[Bn], k: int, n: int, p: Bn):
-        '''
-        Calculates p(j) for all j (0,n)
-        '''
-        return [self.__calc_share(px, k, Bn(i), p) for i in range(1, n+1)]
-
-    def __calc_share(self, px: list[Bn], k: int, x: Bn, p: Bn):
-        '''
-        Calculates p(x)
-        '''
-        assert len(px) == k
-        result = 0
-        for (alpha, j) in zip(px, range(k)):
-            result = (result + alpha * (x**j)) % p
-        return result
-
-    def get_commitments(self, g, px):
-        '''
-        Calculates all commitments C_j for j =[0,k)
-        '''
-        return [p_i * g for p_i in px]
-
-    def __get_encrypted_shares(self, pub_keys: pub_keys_type, shares: list[share_type]) -> encrypted_shares_type:
-        '''
-        Calculates the encrypted shares Y_i for all i in (1,n)
-        '''
-        assert len(pub_keys) == len(shares)
-        # FIXME: Should we have mod p
-        Y_i_list = [(shares[i]) * y_i for (y_i, i)
-                    in zip(pub_keys, range(len(pub_keys)))]
-        return Y_i_list
-
-    def decode(self, S_list, index_list):
-        '''
-        Calulates secret from participants decrypted shares
-        '''
-        assert len(S_list) == len(index_list)
-
-        ans = self.__lagrange(index_list[0], index_list) * S_list[0]
-        for (S_i, i) in zip(S_list[1:], range(1, len(S_list))):
-            ans = ans + self.__lagrange(index_list[i], index_list) * S_i
-        return ans  # G**s
-
-    def __lagrange(self, i, index_list):
-        '''
-        Calculate lagrange coefficient
-        '''
-        top = Bn(1)
-        bottom = Bn(1)
-        for j in index_list:
-            if j != i:
-                top = (top * j)
-                bottom = (bottom * (j-i))
-        return top.mod_mul(bottom.mod_inverse(p), p)
-
-    def verify_correct_decryption(self, S_i, Y_i, decrypt_proof, pub_key, p):
-        '''
-        Verifies the participants proof of correct decryption of their share
-        '''
-        # params = (Gq, p, g, G)
-        return cpni.DLEQ_verify_single(p, G, S_i, pub_key, Y_i, decrypt_proof)
-
-    def batch_verify_correct_decryption(self, proved_decryptions, Y_list, pub_keys):
-        '''
-        Verify all paricipants decryption of shares
-        '''
-        for ((S_i, decrypt_proof), Y_i, pub_key) in zip(proved_decryptions, Y_list, pub_keys):
-            if self.verify_correct_decryption(S_i, Y_i, decrypt_proof, pub_key, p) is False:
-                return False
-        return True
+def distribute_secret(pub_keys: pub_keys_type, secret: Bn, p: Bn, k: int, n: int, Gq: EcGroup) -> tuple[encrypted_shares_type, commitments_type,
+                                                                                                        proof_type, generator_type]:
+    '''
+    Generates encrypted shares, commitments, proof and a random generator of Gq. Given secret, n public keys of participants who will hold the secret.
+    k participants (out of n) can then later recreate (secret * G).
+    Lists of encrypted shares and commitments will be returned in same order the public keys was sent in.
+    '''
+    assert len(pub_keys) == n
+    h = p.random() * Gq.hash_to_point(b'h')
+    px = gen_polynomial(k, secret, p)
+    commitments = get_commitments(h, px)
+    shares_list = calc_shares(px, k, n, p)
+    enc_shares = __get_encrypted_shares(pub_keys, shares_list)
+    proof = cpni.DLEQ_prove_list(p, h, commitments, enc_shares, pub_keys, shares_list)
+    return enc_shares, commitments, proof, h
 
 
-class PVSS_participant():
-    def __init__(self, params):
-        global Gq
-        global g
-        global p
-        global G
-        global x_i
-        (Gq, p, g, G) = params
+def verify_encrypted_shares(encrypted_shares: encrypted_shares_type, commitments: commitments_type, pub_keys: pub_keys_type, proof: proof_type,
+                            h: generator_type, p) -> bool:
+    '''
+    Verifies that encrypted shares and commitments represents the same data using proof. Note: encrypted shares, commitments and pub_keys must
+        be original order.
+    '''
+    assert len(encrypted_shares) == len(pub_keys)
+    return cpni.DLEQ_verify_list(p=p, g=h, y_list=pub_keys, C_list=commitments, Y_list=encrypted_shares, proof=proof)
 
-    def generate_key_pair(self):
-        '''
-        Generates a key-pair, stores the private key in this object and returns the public key
-        '''
-        self.x_i = p.random()
-        y_i = self.x_i * G
-        return y_i
 
-    def participant_decrypt(self, Y_i):
-        '''
-        Decrypt a encrypted share with stored private key
-        '''
-        return self.x_i.mod_inverse(p) * Y_i
+def reconstruct(decrypted_list: decrypted_shares_list_type, index_list: index_list_type, p) -> Bn:
+    '''
+    Recontructs (secret * G) given at least k decrypted shares, along with their indexes (starting from 1!) as the respective public keys was originaly
+        sent into distrubute_secret.
+    '''
+    assert len(decrypted_list) == len(index_list)
+    return decode(decrypted_list, index_list, p)
 
-    def participant_decrypt_and_prove(self, Y_i) -> tuple[decrypted_share_type, single_proof_type]:
-        '''
-        Decrypts a encrypted share with stored private key, and generates proof of it being done correctly.
-        '''
-        S_i = self.participant_decrypt(Y_i)
 
-        y_i = self.x_i * G
-        params = (Gq, p, g, G)
-        decrypt_proof = cpni.DLEQ_prove(params, G, S_i, y_i, Y_i, self.x_i)
-        return S_i, decrypt_proof
+def verify_decryption_proof(proof_of_decryption: single_proof_type, decrypted_share: decrypted_share_type, encrypted_share: encrypted_share_type,
+                            pub_key: pub_keys_type, p, G) -> bool:
+    '''
+    Verifyes that a participant has correctly decrypted their share
+    '''
+    return verify_correct_decryption(decrypted_share, encrypted_share, proof_of_decryption, pub_key, p, G)
 
-    def get_pub_key(self):
-        y_i = self.x_i * G
-        return y_i
+
+def gen_proof(params, k, n, secret, pub_keys):
+    '''
+    Generate polynomial and proof
+    '''
+    assert n > k
+    assert len(pub_keys) == n
+    (Gq, p, g, G) = params
+
+    px = gen_polynomial(k, secret, p)
+    commitments = get_commitments(g, px)
+    shares_list = calc_shares(px, k, n, p)
+    enc_shares = __get_encrypted_shares(pub_keys, shares_list)
+
+    pub = {'C_list': commitments, 'Y_list': enc_shares}
+
+    # params = (Gq, p, g, G)
+    proof = cpni.DLEQ_prove_list(p, g, commitments, enc_shares, pub_keys, shares_list)
+
+    # Debug:
+    assert len(px) == k
+    assert len(commitments) == k
+    assert len(shares_list) == n
+    assert shares_list[0] != secret  # I think this is correct
+    assert len(enc_shares) == n
+
+    return pub, proof
+
+
+def gen_polynomial(k: int, secret: Bn, p) -> list[Bn]:
+    '''
+    Generate polynomial
+    '''
+    px_rand = [p.random() for i in range(k-1)]
+    px = [secret] + px_rand
+    return px
+
+
+def calc_shares(px: list[Bn], k: int, n: int, p: Bn):
+    '''
+    Calculates p(j) for all j (0,n)
+    '''
+    return [__calc_share(px, k, Bn(i), p) for i in range(1, n + 1)]
+
+
+def __calc_share(px: list[Bn], k: int, x: Bn, p: Bn):
+    '''
+    Calculates p(x)
+    '''
+    assert len(px) == k
+    result = 0
+    for (alpha, j) in zip(px, range(k)):
+        result = (result + alpha * (x**j)) % p
+    return result
+
+
+def get_commitments(g, px):
+    '''
+    Calculates all commitments C_j for j =[0,k)
+    '''
+    return [p_i * g for p_i in px]
+
+
+def __get_encrypted_shares(pub_keys: pub_keys_type, shares: list[share_type]) -> encrypted_shares_type:
+    '''
+    Calculates the encrypted shares Y_i for all i in (1,n)
+    '''
+    assert len(pub_keys) == len(shares)
+    # FIXME: Should we have mod p
+    Y_i_list = [(shares[i]) * y_i for (y_i, i)
+                in zip(pub_keys, range(len(pub_keys)))]
+    return Y_i_list
+
+
+def decode(S_list, index_list, p):
+    '''
+    Calulates secret from participants decrypted shares
+    '''
+    assert len(S_list) == len(index_list)
+
+    ans = __lagrange(index_list[0], index_list, p) * S_list[0]
+    for (S_i, i) in zip(S_list[1:], range(1, len(S_list))):
+        ans = ans + __lagrange(index_list[i], index_list, p) * S_i
+    return ans  # G**s
+
+
+def __lagrange(i, index_list, p):
+    '''
+    Calculate lagrange coefficient
+    '''
+    top = Bn(1)
+    bottom = Bn(1)
+    for j in index_list:
+        if j != i:
+            top = (top * j)
+            bottom = (bottom * (j-i))
+    return top.mod_mul(bottom.mod_inverse(p), p)
+
+
+def verify_correct_decryption(S_i, Y_i, decrypt_proof, pub_key, p, G):
+    '''
+    Verifies the participants proof of correct decryption of their share
+    '''
+    # params = (Gq, p, g, G)
+    return cpni.DLEQ_verify_single(p, G, S_i, pub_key, Y_i, decrypt_proof)
+
+
+def batch_verify_correct_decryption(proved_decryptions, Y_list, pub_keys, p, G):
+    '''
+    Verify all paricipants decryption of shares
+    '''
+    for ((S_i, decrypt_proof), Y_i, pub_key) in zip(proved_decryptions, Y_list, pub_keys):
+        if verify_correct_decryption(S_i, Y_i, decrypt_proof, pub_key, p, G) is False:
+            return False
+    return True
