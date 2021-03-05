@@ -10,7 +10,7 @@ encrypted_share_type = Bn
 encrypted_shares_type = list[encrypted_share_type]
 commitments_type = list[Bn]
 pub_keys_type = list[Bn]
-#proof_type = dict[{'c': Bn}, {'r_list': list[Bn]}, {'a_1_list': list[Bn]}, {'a_2_list': list[Bn]}]
+# proof_type = dict[{'c': Bn}, {'r_list': list[Bn]}, {'a_1_list': list[Bn]}, {'a_2_list': list[Bn]}]
 proof_type = dict[str, Any]
 share_type = Bn
 single_proof_type = dict[str, Bn]
@@ -29,9 +29,9 @@ class PVSS():
     def distribute_secret(self, pub_keys: pub_keys_type, secret: Bn, p: Bn, k: int, n: int, Gq: EcGroup) -> tuple[encrypted_shares_type, commitments_type,
                                                                                                                   proof_type, generator_type]:
         '''
-        Generates encrypted shares, commitments, proof and a random generator of Gq. Given secret, n public keys of participants who will hold the secret. 
+        Generates encrypted shares, commitments, proof and a random generator of Gq. Given secret, n public keys of participants who will hold the secret.
         k participants (out of n) can then later recreate (secret * G).
-        Lists of encrypted shares and commitments will be returned in same order the public keys was sent in.     
+        Lists of encrypted shares and commitments will be returned in same order the public keys was sent in.
         '''
         assert len(pub_keys) == n
         h = p.random() * Gq.hash_to_point(b'h')
@@ -45,7 +45,7 @@ class PVSS():
     def verify_encrypted_shares(self, encrypted_shares: encrypted_shares_type, commitments: commitments_type, pub_keys: pub_keys_type, proof: proof_type,
                                 h: generator_type) -> bool:
         '''
-        Verifies that encrypted shares and commitments represents the same data using proof. Note: encrypted shares, commitments and pub_keys must 
+        Verifies that encrypted shares and commitments represents the same data using proof. Note: encrypted shares, commitments and pub_keys must
             be original order.
         '''
         assert len(encrypted_shares) == len(pub_keys)
@@ -82,7 +82,7 @@ class PVSS():
 
         pub = {'C_list': commitments, 'Y_list': enc_shares}
 
-        #params = (Gq, p, g, G)
+        # params = (Gq, p, g, G)
         proof = cpni.DLEQ_prove_list(p, g, commitments, enc_shares, pub_keys, shares_list)
 
         # Debug:
@@ -161,7 +161,7 @@ class PVSS():
         '''
         Verifies the participants proof of correct decryption of their share
         '''
-        #params = (Gq, p, g, G)
+        # params = (Gq, p, g, G)
         return cpni.DLEQ_verify_single(p, G, S_i, pub_key, Y_i, decrypt_proof)
 
     def batch_verify_correct_decryption(self, proved_decryptions, Y_list, pub_keys):
@@ -197,7 +197,7 @@ class PVSS_participant():
         '''
         return self.x_i.mod_inverse(p) * Y_i
 
-    def participant_decrypt_and_prove(self, Y_i) -> (decrypted_share_type, single_proof_type):
+    def participant_decrypt_and_prove(self, Y_i) -> tuple[decrypted_share_type, single_proof_type]:
         '''
         Decrypts a encrypted share with stored private key, and generates proof of it being done correctly.
         '''
