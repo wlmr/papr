@@ -16,7 +16,7 @@ def setup(k, n):
     TODO: [ ] publish return value to Lsys.
     """
     params = setup_cmz(1)
-    (G, p, g0, g1) = params
+    (_, p, g0, _) = params
     (x_sign, x_encr) = (p.random(), p.random())
     (y_sign, y_encr) = (x_sign * g0, x_encr * g0)
     (iparams, i_sk) = cred_keygen_cmz(params)

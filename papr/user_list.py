@@ -8,7 +8,7 @@ class User_list():
         self.issuer_y_sign = y_sign
 
     def peek(self):
-        return self.user_list[len(self.user_list)-1]
+        return self.user_list[-1]
 
     def read(self, index: int):
         if not index:

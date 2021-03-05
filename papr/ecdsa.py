@@ -2,7 +2,7 @@ from petlib.ec import EcGroup, Bn
 
 
 def sign(params, priv_key, m):
-    (_, p, g, h) = params
+    (_, p, g, _) = params
     r = 0
     s = 0
     while (r == 0 or s == 0):
@@ -14,7 +14,7 @@ def sign(params, priv_key, m):
 
 
 def verify(params, r, s, pub_key, m):
-    (G, p, g, h) = params
+    (G, p, g, _) = params
     if pub_key != G.infinite() and G.check_point(pub_key) and (p * pub_key) == G.infinite():
         u1 = (m * s.mod_inverse(p)) % p
         u2 = (r * s.mod_inverse(p)) % p
