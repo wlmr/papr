@@ -38,7 +38,7 @@ class TestPvss():
         secret = p.from_binary(b'This is a test')
 
         (encrypted_shares, commitments, proof, h) = pvss.distribute_secret(pub_keys, secret, p, k, n, Gq)
-        #assert verify_encrypted_shares(encrypted_shares, commitments, proof)
+        # assert verify_encrypted_shares(encrypted_shares, commitments, proof)
 
         for (participant, encrypted_share) in zip(participants, encrypted_shares):
             (decrypted_share, proof_of_decryption) = participant.participant_decrypt_and_prove(encrypted_share)
@@ -60,13 +60,13 @@ class TestPvss():
         secret = p.from_binary(b'This is a test')
 
         (encrypted_shares, commitments, proof, h) = pvss.distribute_secret(pub_keys, secret, p, k, n, Gq)
-        #assert verify_encrypted_shares(encrypted_shares, commitments, proof)
+        # assert verify_encrypted_shares(encrypted_shares, commitments, proof)
 
         decrypted_list = []
         for (participant, encrypted_share) in zip(participants, encrypted_shares):
             (decrypted_share, proof_of_decryption) = participant.participant_decrypt_and_prove(encrypted_share)
             decrypted_list.append(decrypted_share)
-            #assert verify_decryption_proof(proof_of_decryption)
+            # assert verify_decryption_proof(proof_of_decryption)
         assert pvss.reconstruct(decrypted_list, [1, 2, 3, 4]) == secret * G
 
     def test_full(self):
@@ -535,9 +535,9 @@ class TestPvss():
     def test_gen_polynomial(self):
         Gq = EcGroup()
         p = Gq.order()
-        g = Gq.generator()
-        G = Gq.hash_to_point(b'G')
-        params = (Gq, p, g, G)
+        # g = Gq.generator()
+        # G = Gq.hash_to_point(b'G')
+        # params = (Gq, p, g, G)
 
         # Initialize issuer
         issuer = PVSS.PVSS()
@@ -550,8 +550,8 @@ class TestPvss():
         Gq = EcGroup()
         p = Gq.order()
         g = Gq.generator()
-        G = Gq.hash_to_point(b'G')
-        params = (Gq, p, g, G)
+        # G = Gq.hash_to_point(b'G')
+        # params = (Gq, p, g, G)
 
         # Decide on a secret to be distrubuted
         m = p.from_binary(b'This is a test')
