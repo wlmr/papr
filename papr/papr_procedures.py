@@ -8,6 +8,7 @@ from amac.credential_scheme import show_verify as show_verify """
 from papr.ecdsa import sign
 from papr.papr_list import Papr_list
 import pvss.pvss as pvss
+from papr.utils import hash
 
 
 def setup(k, n):
@@ -113,4 +114,4 @@ def data_distrubution_I(E_list, C_list, proof, group_generator):
 
 
 def prng(random_u, random_i, counter, p):
-    return to_challenge([random_u, random_i, counter]) % p
+    return hash([random_u, random_i, counter]) % p
