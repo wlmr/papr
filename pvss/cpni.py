@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from petlib.bn import Bn
 from hashlib import sha256
+import papr.utils as utils
 
 
 # Common methods in pvss
@@ -85,12 +86,7 @@ def hash(p, h_1, h_2, a_1, a_2) -> Bn:
     '''
     Calculates a cryptograpic hash for use in proof. Does work both for DLEQ of single objects and lists.
     '''
-    state = str([h_1, h_2, a_1, a_2])
-    H = sha256()
-    H.update(state.encode("utf8"))
-    hash_c = H.digest()
-    c = p.from_binary(hash_c)
-    return c
+    return utils.hash([h_1, h_2, a_1, a_2]) % p
 
 
 def __DLEQ_calc_all_r(p, shares_list, w_list, c):
