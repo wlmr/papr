@@ -179,3 +179,39 @@ def batch_verify_correct_decryption(proved_decryptions, Y_list, pub_keys, p, G):
         if verify_correct_decryption(S_i, Y_i, decrypt_proof, pub_key, p, G) is False:
             return False
     return True
+
+
+def generate_key_pair(params):
+    '''
+    Generates a key-pair, returns both the private key and the public key
+    '''
+    (_, p, _, G) = params
+    x_i = p.random()
+    y_i = x_i * G
+    return (x_i, y_i)
+
+
+def participant_decrypt(params, x_i, Y_i):
+    '''
+    Decrypt a encrypted share with stored private key
+    '''
+    (_, p, _, _) = params
+    return x_i.mod_inverse(p) * Y_i
+
+
+def participant_decrypt_and_prove(params, x_i, Y_i) -> tuple[decrypted_share_type, single_proof_type]:
+    '''
+    Decrypts a encrypted share with stored private key, and generates proof of it being done correctly.
+    '''
+    (_, p, g, G) = params
+    S_i = participant_decrypt(params, x_i, Y_i)
+
+    y_i = x_i * G
+    
+    decrypt_proof = cpni.DLEQ_prove(params, G, S_i, y_i, Y_i, x_i)
+    return S_i, decrypt_proof
+
+def get_pub_key(params, x_i):
+    (_, _, _, G) = params
+    y_i = x_i * G
+    return y_i
