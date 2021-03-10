@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from pvss import pvss_participant
+# from pvss import pvss_participant
 from petlib.ec import EcGroup
 # import pvss.pvss as PVSS
 # from pvss import PVSS_participant
