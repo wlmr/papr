@@ -1,6 +1,7 @@
 
 from papr.papr_procedures import data_distrubution_I_2, \
-    data_distrubution_U_2, data_distrubution_random_commit, data_distrubution_select, data_distrubution_verify_commit, iss_cred_data_dist_1, iss_cred_data_dist_2, iss_cred_data_dist_3, req_cred_data_dist_1, req_cred_data_dist_2, req_cred_data_dist_3, setup, enroll
+    data_distrubution_U_2, data_distrubution_random_commit, data_distrubution_select, data_distrubution_verify_commit, \
+    iss_cred_data_dist_1, iss_cred_data_dist_2, iss_cred_data_dist_3, req_cred_data_dist_1, req_cred_data_dist_2, req_cred_data_dist_3, setup, enroll
 from papr.ecdsa import verify
 import pvss.pvss as pvss
 
