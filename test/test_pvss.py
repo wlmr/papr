@@ -7,6 +7,7 @@ import pvss.pvss as pvss
 # from pvss.pvss_participant import PVSS_participant
 import pvss.cpni as cpni
 import itertools
+import pytest
 
 
 class TestPvss():
@@ -246,6 +247,7 @@ class TestPvss():
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [2, 3, 4])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_1_2_3(self):
         # Set (t,n)-threshold parameters
         # Set (t,n)-threshold parameters
@@ -253,18 +255,21 @@ class TestPvss():
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [1, 2, 3])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_1_2_4(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [1, 2, 4])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_1_3_2(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [1, 3, 2])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_1_3_4(self):
         # Set (t,n)-threshold parameters
         n = 4
@@ -277,120 +282,140 @@ class TestPvss():
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [1, 4, 2])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_1_4_3(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [1, 4, 3])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_2_1_3(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [2, 1, 3])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_2_1_4(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [2, 1, 4])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_2_3_1(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [2, 3, 1])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_2_3_4(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [2, 3, 4])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_2_4_1(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [2, 4, 1])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_2_4_3(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [2, 4, 3])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_3_1_2(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [3, 1, 2])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_3_1_4(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [3, 1, 4])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_3_2_1(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [3, 2, 1])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_3_2_4(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [3, 2, 4])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_3_4_1(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [3, 4, 1])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_3_4_2(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [3, 4, 1])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_4_1_2(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [4, 1, 2])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_4_1_3(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [4, 1, 3])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_4_2_1(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [4, 2, 1])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_4_2_3(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [4, 2, 3])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_4_3_1(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [4, 3, 1])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_4_3_2(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [4, 3, 2])
 
+    @pytest.mark.skip(reason="Disable for performance reasons")
     def test_all_reconstuctions(self):
         # Set (t,n)-threshold parameters
         n = 20
