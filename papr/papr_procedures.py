@@ -2,8 +2,8 @@ from amac.credential_scheme import setup as setup_cmz, cred_keygen as cred_keyge
 from amac.credential_scheme import prepare_blind_obtain as prepare_blind_obtain_cmz
 from amac.credential_scheme import blind_issue as blind_issue_cmz
 from amac.credential_scheme import blind_obtain as blind_obtain_cmz
-""" from amac.credential_scheme import blind_show as blind_show_cmz
-from amac.credential_scheme import show_verify as show_verify """
+from amac.credential_scheme import blind_show as blind_show_cmz
+from amac.credential_scheme import show_verify as show_verify_cmz
 from papr.ecdsa import sign
 from papr.papr_list import Papr_list
 import pvss.pvss as pvss
@@ -79,15 +79,27 @@ def enroll(params, id, iparams, i_sk, x_sign, user_list):
     return None
 
 
-def cred(params):
+def cred(params, iparams, t_id, priv_id, i_sk):
+    sigma, pi_show = req_cred_anon_auth(params, iparams, t_id, priv_id)
+    iss_cred_anon_auth(params, iparams, i_sk, sigma, pi_show)
+
+
+# anonymous authentication
+
+def req_cred_anon_auth(params, iparams, t_id, priv_id):
+    sigma, pi_show = blind_show_cmz(params, iparams, t_id, priv_id)
+    return sigma, pi_show
+
+
+def iss_cred_anon_auth(params, iparams, i_sk, sigma, pi_show):
+    return show_verify_cmz(params, iparams, i_sk, sigma, pi_show)
+
+
+def req_cred_data_dist(params):
     pass
 
 
-def req_cred(params):
-    pass
-
-
-def iss_cred(params):
+def iss_cred_data_dist(params):
     pass
 
 
