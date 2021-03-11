@@ -6,6 +6,8 @@ from amac.credential_scheme import blind_obtain as blind_obtain_cmz
 from amac.credential_scheme import show_verify as show_verify """
 from papr.ecdsa import sign
 from papr.papr_list import Papr_list
+import pvss.pvss as pvss
+from papr.utils import hash
 
 
 def setup(k, n):
@@ -22,10 +24,11 @@ def setup(k, n):
     (iparams, i_sk) = cred_keygen_cmz(params)
     crs = ",".join([str(elem) for elem in [p.repr(), g0, g1, n, k, iparams['Cx0']]])
     i_pk = ",".join([str(x) for x in [y_sign, y_encr]])
-    user_list, sys_list = Papr_list(y_sign), Papr_list(y_sign)
+    [sys_list, user_list, cred_list, rev_list, res_list] = [Papr_list(y_sign) for _ in range(5)]
+
     sys_list.add(params, crs, sign(params, x_sign, [crs]))
     sys_list.add(params, i_pk, sign(params, x_sign, [i_pk]))
-    return params, (x_sign, x_encr), (y_sign, y_encr), (iparams, i_sk), sys_list, user_list
+    return params, (x_sign, x_encr), (y_sign, y_encr), (iparams, i_sk), sys_list, user_list, cred_list, rev_list, res_list
 
 
 def req_enroll_1(params, id):
@@ -74,3 +77,64 @@ def enroll(params, id, iparams, i_sk, x_sign, user_list):
         return t_id, s_pub_id, priv_id, pub_id, user_list
     print("user already exists")
     return None
+
+
+def cred(params):
+    pass
+
+
+def req_cred(params):
+    pass
+
+
+def iss_cred(params):
+    pass
+
+
+# ----
+
+def data_distrubution_U_1(params):
+    (_, p, _, _) = params
+    return p.random()
+
+
+def data_distrubution_I_1(params):
+    (_, p, _, _) = params
+    return p.random()
+
+
+def data_distrubution_random_commit(params):
+    (_, p, _, G) = params
+    r = p.random()
+    c = r * G  # Is it ok to use G here?
+    return (c, r)
+
+
+def data_distrubution_select(public_credentials, u_random, i_random, n, p):
+    selected_data_custodians = []
+    for i in range(n):
+        selected_data_custodians.append(public_credentials[prng(u_random, i_random, i, p) % len(public_credentials)])
+    return selected_data_custodians
+
+
+def data_distrubution_U_2(PrivID, data_custodians_public_credentials, k, n, params):
+    (G, p, g0, g1) = params
+    E_list, C_list, proof, group_generator = pvss.distribute_secret(data_custodians_public_credentials, PrivID, p, k, n, G)
+    # Send to I
+    return E_list, C_list, proof, group_generator
+
+
+def data_distrubution_I_2(E_list, C_list, proof, pub_keys, group_generator, p):
+    result = pvss.verify_encrypted_shares(E_list, C_list, pub_keys, proof, group_generator, p)
+    if result:
+        # Save
+        # Contrinue to "Proof of equal identity"
+        return True
+        # pass
+    else:
+        # Discard
+        return None
+
+
+def prng(random_u, random_i, counter, p):
+    return int(hash([random_u, random_i, counter]) % p)
