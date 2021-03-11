@@ -126,11 +126,11 @@ def iss_cred_data_dist_3(params, E_list, C_list, proof, custodian_list, group_ge
     return data_distrubution_I_2(E_list, C_list, proof, custodian_list, group_generator, p)
 
 # r1 U generates a random number and commitment req_cred_data_dist_1 and sends the commitment to I.
-# i1 I stores the commitment, generates a random value with commitment and sends commitment to U. 
-# r2 U sends the commited to random value to I, 
+# i1 I stores the commitment, generates a random value with commitment and sends commitment to U.
+# r2 U sends the commited to random value to I.
 # i2 I responds with their random value. **??** And calculates which custodians to use and stores it.
-# r3 U recives the random value and calulates the custodians, and generates a encrypted shares to the custodians, commitments and proof 
-# i3 I verifies proof. If valid. Proof of identity is initaited.  
+# r3 U recives the random value and calulates the custodians, and generates a encrypted shares to the custodians, commitments and proof
+# i3 I verifies proof. If valid. Proof of identity is initaited.
 
 
 # ----

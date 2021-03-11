@@ -47,8 +47,6 @@ class TestPapr:
 
         assert data_distrubution_I_2(E_list, C_list, proof, selected_pub_keys, group_generator, p)
 
-
-
     def test_data_distrubution_2(self):
         (k, n) = (3, 10)
 
