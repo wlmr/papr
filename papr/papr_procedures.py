@@ -122,9 +122,9 @@ def iss_cred_eq_id(params, u, h, y, c, gamma, cl, c0):
     (G, _, _, g1) = params
     g2 = u + h
     a = [g2, g1]
-    check_1 = c == to_challenge(a + gamma)
-    check_2 = reduce(add, [y * a for y, a in zip(y, a)], G.infinite()) == reduce(add, gamma, G.infinite()) + (c * (cl + c0))
-    return check_1 and check_2
+    lhs = reduce(add, [y * a for y, a in zip(y, a)], G.infinite())
+    rhs = reduce(add, gamma, G.infinite()) + (c * (cl + c0))
+    return c == to_challenge(a + gamma) and lhs == rhs
 
 # ----
 
