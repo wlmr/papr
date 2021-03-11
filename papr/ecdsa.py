@@ -14,7 +14,7 @@ def sign(params, priv_key, m: list):
     return r, s
 
 
-def verify(params, r, s, pub_key, m):
+def verify(params, r, s, pub_key, m: list):
     (G, p, g, _) = params
     if pub_key != G.infinite() and G.check_point(pub_key) and (p * pub_key) == G.infinite():
         u1 = (hash(m) * s.mod_inverse(p)) % p
