@@ -49,6 +49,13 @@ class TestPapr:
         assert data_distrubution_I_2(E_list, C_list, proof, selected_pub_keys, group_generator, p)
 
     def test_data_distrubution_2(self):
+
+        # r1 U generates a random number and commitment req_cred_data_dist_1 and sends the commitment to I.
+        # i1 I stores the commitment, generates a random value with commitment and sends commitment to U.
+        # r2 U sends the commited to random value to I.
+        # i2 I responds with their random value. **??** And calculates which custodians to use and stores it.
+        # r3 U recives the random value and calulates the custodians, and generates a encrypted shares to the custodians, commitments and proof
+        # i3 I verifies proof. If valid. Proof of identity is initaited.
         (k, n) = (3, 10)
 
         params, (x_sign, x_encr), (y_sign, y_encr), (iparams, i_sk), sys_list, user_list, cred_list, rev_list, res_list = setup(k, n)
