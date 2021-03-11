@@ -1,6 +1,6 @@
 
-from papr.papr_procedures import data_distrubution_I_2, \
-    data_distrubution_U_2, data_distrubution_random_commit, data_distrubution_select, data_distrubution_verify_commit, \
+from papr.papr_procedures import data_distrubution_issuer_verify, \
+    data_distrubution_commit_encrypt_prove, data_distrubution_random_commit, data_distrubution_select, data_distrubution_verify_commit, \
     iss_cred_data_dist_1, iss_cred_data_dist_2, iss_cred_data_dist_3, req_cred_data_dist_1, req_cred_data_dist_2, req_cred_data_dist_3, setup, enroll
 from papr.ecdsa import verify
 import pvss.pvss as pvss
@@ -44,9 +44,9 @@ class TestPapr:
         assert data_distrubution_verify_commit(params, c2, r2)
 
         selected_pub_keys = data_distrubution_select(pub_keys, r1, r2, n, p)
-        E_list, C_list, proof, group_generator = data_distrubution_U_2(params, my_priv_key, selected_pub_keys, k, n)
+        E_list, C_list, proof, group_generator = data_distrubution_commit_encrypt_prove(params, my_priv_key, selected_pub_keys, k, n)
 
-        assert data_distrubution_I_2(E_list, C_list, proof, selected_pub_keys, group_generator, p)
+        assert data_distrubution_issuer_verify(E_list, C_list, proof, selected_pub_keys, group_generator, p)
 
     def test_data_distrubution_2(self):
 

@@ -1,4 +1,4 @@
-from papr.papr_cred_iss_data_dist import data_distrubution_I_2, data_distrubution_U_2, data_distrubution_random_commit, \
+from papr.papr_cred_iss_data_dist import data_distrubution_issuer_verify, data_distrubution_commit_encrypt_prove, data_distrubution_random_commit, \
      data_distrubution_select, data_distrubution_verify_commit
 from amac.credential_scheme import setup as setup_cmz, cred_keygen as cred_keygen_cmz
 from amac.credential_scheme import prepare_blind_obtain as prepare_blind_obtain_cmz
@@ -118,9 +118,9 @@ def iss_cred_data_dist_2(params, requester_commit, requester_random, issuer_rand
 def req_cred_data_dist_3(params, requester_random, issuer_random, PrivID, pub_keys, k, n):
     (_, p, _, _) = params
     selected_pub_keys = data_distrubution_select(pub_keys, requester_random, issuer_random, n, p)
-    return data_distrubution_U_2(params, PrivID, selected_pub_keys, k, n)
+    return data_distrubution_commit_encrypt_prove(params, PrivID, selected_pub_keys, k, n)
 
 
 def iss_cred_data_dist_3(params, E_list, C_list, proof, custodian_list, group_generator):
     (_, p, _, _) = params
-    return data_distrubution_I_2(E_list, C_list, proof, custodian_list, group_generator, p)
+    return data_distrubution_issuer_verify(E_list, C_list, proof, custodian_list, group_generator, p)

@@ -22,14 +22,14 @@ def data_distrubution_select(public_credentials, u_random, i_random, n, p):
     return selected_data_custodians
 
 
-def data_distrubution_U_2(params, PrivID, data_custodians_public_credentials, k, n):
+def data_distrubution_commit_encrypt_prove(params, PrivID, data_custodians_public_credentials, k, n):
     (Gq, p, _, _) = params
     E_list, C_list, proof, group_generator = pvss.distribute_secret(data_custodians_public_credentials, PrivID, p, k, n, Gq)
     # Send to I
     return E_list, C_list, proof, group_generator
 
 
-def data_distrubution_I_2(E_list, C_list, proof, pub_keys, group_generator, p):
+def data_distrubution_issuer_verify(E_list, C_list, proof, pub_keys, group_generator, p):
     result = pvss.verify_encrypted_shares(E_list, C_list, pub_keys, proof, group_generator, p)
     if result:
         # Contrinue to "Proof of equal identity"
