@@ -93,14 +93,14 @@ def iss_cred(params):
 
 # ----
 
-def data_distrubution_U_1(params):
-    (_, p, _, _) = params
-    return p.random()
+# def data_distrubution_U_1(params):
+#     (_, p, _, _) = params
+#     return p.random()
 
 
-def data_distrubution_I_1(params):
-    (_, p, _, _) = params
-    return p.random()
+# def data_distrubution_I_1(params):
+#     (_, p, _, _) = params
+#     return p.random()
 
 
 def data_distrubution_random_commit(params):
@@ -108,6 +108,12 @@ def data_distrubution_random_commit(params):
     r = p.random()
     c = r * G  # Is it ok to use G here?
     return (c, r)
+
+
+def data_distrubution_verify_commit(params, c, r):
+    (_, p, _, G) = params
+    commit = r * G  # Is it ok to use G here?
+    return commit == c
 
 
 def data_distrubution_select(public_credentials, u_random, i_random, n, p):
