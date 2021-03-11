@@ -1,4 +1,5 @@
-from papr.papr_cred_iss_data_dist import data_distrubution_I_2, data_distrubution_U_2, data_distrubution_random_commit, data_distrubution_select, data_distrubution_verify_commit
+from papr.papr_cred_iss_data_dist import data_distrubution_I_2, data_distrubution_U_2, data_distrubution_random_commit, \
+     data_distrubution_select, data_distrubution_verify_commit
 from amac.credential_scheme import setup as setup_cmz, cred_keygen as cred_keygen_cmz
 from amac.credential_scheme import prepare_blind_obtain as prepare_blind_obtain_cmz
 from amac.credential_scheme import blind_issue as blind_issue_cmz
@@ -7,7 +8,6 @@ from amac.credential_scheme import blind_show as blind_show_cmz
 from amac.credential_scheme import show_verify as show_verify_cmz
 from papr.ecdsa import sign
 from papr.papr_list import Papr_list
-
 
 
 def setup(k, n):
@@ -124,5 +124,3 @@ def req_cred_data_dist_3(params, requester_random, issuer_random, PrivID, pub_ke
 def iss_cred_data_dist_3(params, E_list, C_list, proof, custodian_list, group_generator):
     (_, p, _, _) = params
     return data_distrubution_I_2(E_list, C_list, proof, custodian_list, group_generator, p)
-
-
