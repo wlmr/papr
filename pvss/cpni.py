@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from petlib.bn import Bn
-from hashlib import sha256
+# from hashlib import sha256
 import papr.utils as utils
 
 
@@ -60,7 +60,7 @@ def DLEQ_prove_list(p, g, C_list, Y_list, y_list, shares_list):
     '''
     Generate Chaum-Pedersen non interactive proof for a list
     '''
-    #(_, p, g, _) = params
+    # (_, p, g, _) = params
     n = len(Y_list)
     X_list = get_X_i_list(C_list, n)
 
@@ -102,7 +102,7 @@ def __DLEQ_calc_r(p, w, alpha, c):
     '''
     Calulates a r value for use in both DLEQ single object and list versions.
     '''
-    #(_, p, _, _) = params
+    # (_, p, _, _) = params
     r = (w - c * alpha) % p
     return r
 
@@ -117,8 +117,8 @@ def DLEQ_verify_list(p, g, y_list, C_list, Y_list, proof):
     a_1_orig_list = proof['a_1_list']
     a_2_orig_list = proof['a_2_list']
 
-    #Y_list = pub['Y_list']
-    #C_list = pub['C_list']
+    # Y_list = pub['Y_list']
+    # C_list = pub['C_list']
     n = len(r_list)
 
     X_list = get_X_i_list(C_list, n)

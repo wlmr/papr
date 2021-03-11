@@ -52,7 +52,7 @@ class TestPvss():
             (x_i, y_i) = pvss.generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
-        
+
         secret = p.from_binary(b'This is a test')
 
         (encrypted_shares, commitments, proof, h) = pvss.distribute_secret(pub_keys, secret, p, k, n, Gq)
@@ -79,7 +79,6 @@ class TestPvss():
             (x_i, y_i) = pvss.generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
-
 
         secret = p.from_binary(b'This is a test')
 
@@ -109,8 +108,8 @@ class TestPvss():
         t = 3
 
         # Initiate participants, and generate their key-pairs
-        #participants = [pvss_participant.PVSS_participant(params) for i in range(n)]
-        #pub_keys = [participant.generate_key_pair() for participant in participants]
+        # participants = [pvss_participant.PVSS_participant(params) for i in range(n)]
+        # pub_keys = [participant.generate_key_pair() for participant in participants]
         priv_keys = []
         pub_keys = []
         for i in range(n):
