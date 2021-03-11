@@ -10,3 +10,5 @@ with the previously used secret key, i.e. γ=l^d, and then use d again so as to 
 [ ] make ecdsa use hash that can hash any object 
 [ ] make parent_list that all others inherit from
 [ ] fix testfiles
+[ ] investigate if to remove z from return values of blind_show. 
+    It is only there for eq_id. Not even sure it is supposed to use that z tho

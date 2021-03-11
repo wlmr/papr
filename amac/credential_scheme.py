@@ -110,7 +110,7 @@ def blind_show(params: Params, iparams: EcPtDict,
     Cu_prime = u_prime + r * g
     sigma = (u, Cm, Cu_prime)
     pi_show = make_pi_show(params, iparams, m, r, z, sigma)
-    return sigma, pi_show
+    return sigma, pi_show, z
 
 
 def show_verify(params: Params, iparams: EcPtDict, i_sk: BnDict, sigma: Sigma, pi_show: ZKP) -> bool:

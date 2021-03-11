@@ -1,9 +1,12 @@
+from operator import add
+from functools import reduce
 from amac.credential_scheme import setup as setup_cmz, cred_keygen as cred_keygen_cmz
 from amac.credential_scheme import prepare_blind_obtain as prepare_blind_obtain_cmz
 from amac.credential_scheme import blind_issue as blind_issue_cmz
 from amac.credential_scheme import blind_obtain as blind_obtain_cmz
 from amac.credential_scheme import blind_show as blind_show_cmz
 from amac.credential_scheme import show_verify as show_verify_cmz
+from amac.proofs import to_challenge
 from papr.ecdsa import sign
 from papr.papr_list import Papr_list
 import pvss.pvss as pvss
@@ -87,8 +90,8 @@ def cred(params, iparams, t_id, priv_id, i_sk):
 # anonymous authentication
 
 def req_cred_anon_auth(params, iparams, t_id, priv_id):
-    sigma, pi_show = blind_show_cmz(params, iparams, t_id, priv_id)
-    return sigma, pi_show
+    sigma, pi_show, z = blind_show_cmz(params, iparams, t_id, priv_id)
+    return sigma, pi_show, z
 
 
 def iss_cred_anon_auth(params, iparams, i_sk, sigma, pi_show):
@@ -102,6 +105,26 @@ def req_cred_data_dist(params):
 def iss_cred_data_dist(params):
     pass
 
+
+def req_cred_eq_id(params, u, h, priv_id, z, cl, c0):
+    (_, p, _, g1) = params
+    g2 = u + h
+    dl = [priv_id, z]
+    a = [g2, g1]
+    r = [p.random(), p.random()]
+    gamma = [r * a for r, a in zip(r, a)]
+    c = to_challenge(a + gamma)
+    y = [(r + c * dl) % p for r, dl in zip(r, dl)]
+    return y, c, gamma, cl, c0
+
+
+def iss_cred_eq_id(params, u, h, y, c, gamma, cl, c0):
+    (G, _, _, g1) = params
+    g2 = u + h
+    a = [g2, g1]
+    check_1 = c == to_challenge(a + gamma)
+    check_2 = reduce(add, [y * a for y, a in zip(y, a)], G.infinite()) == reduce(add, gamma, G.infinite()) + (c * (cl + c0))
+    return check_1 and check_2
 
 # ----
 
