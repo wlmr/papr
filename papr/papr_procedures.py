@@ -95,12 +95,42 @@ def iss_cred_anon_auth(params, iparams, i_sk, sigma, pi_show):
     return show_verify_cmz(params, iparams, i_sk, sigma, pi_show)
 
 
-def req_cred_data_dist(params):
-    pass
+def req_cred_data_dist_1(params):
+    return data_distrubution_random_commit(params)
 
 
-def iss_cred_data_dist(params):
-    pass
+def iss_cred_data_dist_1(params):
+    return data_distrubution_random_commit(params)
+
+
+def req_cred_data_dist_2(params, issuer_commit, issuer_random):
+    return data_distrubution_verify_commit(params, issuer_commit, issuer_random)
+
+
+def iss_cred_data_dist_2(params, requester_commit, requester_random, issuer_random, pub_keys, n):
+    (_, p, _, _) = params
+    if data_distrubution_verify_commit(params, requester_commit, requester_random):
+        return data_distrubution_select(pub_keys, requester_random, issuer_random, n, p)
+    else:
+        return None
+
+
+def req_cred_data_dist_3(params, requester_random, issuer_random, PrivID, pub_keys, k, n):
+    (_, p, _, _) = params
+    selected_pub_keys = data_distrubution_select(pub_keys, requester_random, issuer_random, n, p)
+    return data_distrubution_U_2(params, PrivID, selected_pub_keys, k, n)
+
+
+def iss_cred_data_dist_3(params, E_list, C_list, proof, custodian_list, group_generator):
+    (_, p, _, _) = params
+    return data_distrubution_I_2(E_list, C_list, proof, custodian_list, group_generator, p)
+
+# r1 U generates a random number and commitment req_cred_data_dist_1 and sends the commitment to I.
+# i1 I stores the commitment, generates a random value with commitment and sends commitment to U. 
+# r2 U sends the commited to random value to I, 
+# i2 I responds with their random value. **??** And calculates which custodians to use and stores it.
+# r3 U recives the random value and calulates the custodians, and generates a encrypted shares to the custodians, commitments and proof 
+# i3 I verifies proof. If valid. Proof of identity is initaited.  
 
 
 # ----
@@ -135,9 +165,9 @@ def data_distrubution_select(public_credentials, u_random, i_random, n, p):
     return selected_data_custodians
 
 
-def data_distrubution_U_2(PrivID, data_custodians_public_credentials, k, n, params):
-    (G, p, g0, g1) = params
-    E_list, C_list, proof, group_generator = pvss.distribute_secret(data_custodians_public_credentials, PrivID, p, k, n, G)
+def data_distrubution_U_2(params, PrivID, data_custodians_public_credentials, k, n):
+    (Gq, p, _, _) = params
+    E_list, C_list, proof, group_generator = pvss.distribute_secret(data_custodians_public_credentials, PrivID, p, k, n, Gq)
     # Send to I
     return E_list, C_list, proof, group_generator
 
@@ -145,13 +175,11 @@ def data_distrubution_U_2(PrivID, data_custodians_public_credentials, k, n, para
 def data_distrubution_I_2(E_list, C_list, proof, pub_keys, group_generator, p):
     result = pvss.verify_encrypted_shares(E_list, C_list, pub_keys, proof, group_generator, p)
     if result:
-        # Save
         # Contrinue to "Proof of equal identity"
         return True
-        # pass
     else:
         # Discard
-        return None
+        return False
 
 
 def prng(random_u, random_i, counter, p):
