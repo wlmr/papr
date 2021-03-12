@@ -7,7 +7,7 @@ from amac.credential_scheme import blind_obtain as blind_obtain_cmz
 from amac.credential_scheme import blind_show as blind_show_cmz
 from amac.credential_scheme import show_verify as show_verify_cmz
 from amac.proofs import to_challenge
-from papr.ecdsa import sign
+from papr.ecdsa import sign, verify
 from papr.papr_list import Papr_list
 
 
@@ -161,3 +161,13 @@ def req_cred_data_dist_3(params, requester_random, issuer_random, PrivID, pub_ke
 def iss_cred_data_dist_3(params, E_list, C_list, proof, custodian_list, group_generator):
     (_, p, _, _) = params
     return data_distrubution_issuer_verify(E_list, C_list, proof, custodian_list, group_generator, p)
+
+
+def show_cred_1(params, privCred, sigma_i_pub_cred, m):
+    (x_encr, x_sign) = privCred
+    return sign(params, x_sign, [m])
+
+
+def ver_cred_1(params, r, s, pub_cred, m):
+    (y_encr, y_sign) = pub_cred
+    return verify(params, r, s, y_sign, [m])
