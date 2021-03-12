@@ -30,7 +30,7 @@ class TestPapr:
         (u, cl, cu_prime), zkp, z = req_cred_anon_auth(params, iparams, t_id, priv_id)
         h = p.random() * g0
         c0 = priv_id * h
-        y, c, gamma, cl, c0 = req_cred_eq_id(params, u, h, priv_id, z, cl, c0)
+        y, c, gamma = req_cred_eq_id(params, u, h, priv_id, z, cl, c0)
         assert iss_cred_eq_id(params, u, h, y, c, gamma, cl, c0)
 
     def test_data_distrubution(self):

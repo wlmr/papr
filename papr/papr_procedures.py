@@ -1,5 +1,3 @@
-from operator import add
-from functools import reduce
 from amac.credential_scheme import setup as setup_cmz, cred_keygen as cred_keygen_cmz
 from amac.credential_scheme import prepare_blind_obtain as prepare_blind_obtain_cmz
 from amac.credential_scheme import blind_issue as blind_issue_cmz
@@ -108,23 +106,21 @@ def iss_cred_data_dist(params):
 
 def req_cred_eq_id(params, u, h, priv_id, z, cl, c0):
     (_, p, _, g1) = params
-    g2 = u + h
-    dl = [priv_id, z]
-    a = [g2, g1]
+    secret = [priv_id, z]
+    alpha = [u + h, g1]
     r = [p.random(), p.random()]
-    gamma = [r * a for r, a in zip(r, a)]
-    c = to_challenge(a + gamma)
-    y = [(r + c * dl) % p for r, dl in zip(r, dl)]
-    return y, c, gamma, cl, c0
+    gamma = [r * a for r, a in zip(r, alpha)]
+    c = to_challenge(alpha + gamma + [cl + c0])
+    y = [(r + c * dl) % p for r, dl in zip(r, secret)]
+    return y, c, gamma
 
 
 def iss_cred_eq_id(params, u, h, y, c, gamma, cl, c0):
     (G, _, _, g1) = params
-    g2 = u + h
-    a = [g2, g1]
-    lhs = reduce(add, [y * a for y, a in zip(y, a)], G.infinite())
-    rhs = reduce(add, gamma, G.infinite()) + (c * (cl + c0))
-    return c == to_challenge(a + gamma) and lhs == rhs
+    a = [u + h, g1]
+    lhs = sum([y * a for y, a in zip(y, a)], G.infinite())
+    rhs = sum(gamma, G.infinite()) + (c * (cl + c0))
+    return c == to_challenge(a + gamma + [cl + c0]) and lhs == rhs
 
 # ----
 
