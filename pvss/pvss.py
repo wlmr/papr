@@ -207,9 +207,10 @@ def participant_decrypt_and_prove(params, x_i, Y_i) -> tuple[decrypted_share_typ
     S_i = participant_decrypt(params, x_i, Y_i)
 
     y_i = x_i * G
-    
+
     decrypt_proof = cpni.DLEQ_prove(params, G, S_i, y_i, Y_i, x_i)
     return S_i, decrypt_proof
+
 
 def get_pub_key(params, x_i):
     (_, _, _, G) = params

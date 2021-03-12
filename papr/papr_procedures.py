@@ -1,3 +1,5 @@
+from papr.papr_cred_iss_data_dist import data_distrubution_issuer_verify, data_distrubution_commit_encrypt_prove, data_distrubution_random_commit, \
+     data_distrubution_select, data_distrubution_verify_commit
 from amac.credential_scheme import setup as setup_cmz, cred_keygen as cred_keygen_cmz
 from amac.credential_scheme import prepare_blind_obtain as prepare_blind_obtain_cmz
 from amac.credential_scheme import blind_issue as blind_issue_cmz
@@ -6,8 +8,6 @@ from amac.credential_scheme import blind_show as blind_show_cmz
 from amac.credential_scheme import show_verify as show_verify_cmz
 from papr.ecdsa import sign
 from papr.papr_list import Papr_list
-import pvss.pvss as pvss
-from papr.utils import hash
 
 
 def setup(k, n):
@@ -95,64 +95,32 @@ def iss_cred_anon_auth(params, iparams, i_sk, sigma, pi_show):
     return show_verify_cmz(params, iparams, i_sk, sigma, pi_show)
 
 
-def req_cred_data_dist(params):
-    pass
+def req_cred_data_dist_1(params):
+    return data_distrubution_random_commit(params)
 
 
-def iss_cred_data_dist(params):
-    pass
+def iss_cred_data_dist_1(params):
+    return data_distrubution_random_commit(params)
 
 
-# ----
-
-# def data_distrubution_U_1(params):
-#     (_, p, _, _) = params
-#     return p.random()
+def req_cred_data_dist_2(params, issuer_commit, issuer_random):
+    return data_distrubution_verify_commit(params, issuer_commit, issuer_random)
 
 
-# def data_distrubution_I_1(params):
-#     (_, p, _, _) = params
-#     return p.random()
-
-
-def data_distrubution_random_commit(params):
-    (_, p, _, G) = params
-    r = p.random()
-    c = r * G  # Is it ok to use G here?
-    return (c, r)
-
-
-def data_distrubution_verify_commit(params, c, r):
-    (_, p, _, G) = params
-    commit = r * G  # Is it ok to use G here?
-    return commit == c
-
-
-def data_distrubution_select(public_credentials, u_random, i_random, n, p):
-    selected_data_custodians = []
-    for i in range(n):
-        selected_data_custodians.append(public_credentials[prng(u_random, i_random, i, p) % len(public_credentials)])
-    return selected_data_custodians
-
-
-def data_distrubution_U_2(PrivID, data_custodians_public_credentials, k, n, params):
-    (G, p, g0, g1) = params
-    E_list, C_list, proof, group_generator = pvss.distribute_secret(data_custodians_public_credentials, PrivID, p, k, n, G)
-    # Send to I
-    return E_list, C_list, proof, group_generator
-
-
-def data_distrubution_I_2(E_list, C_list, proof, pub_keys, group_generator, p):
-    result = pvss.verify_encrypted_shares(E_list, C_list, pub_keys, proof, group_generator, p)
-    if result:
-        # Save
-        # Contrinue to "Proof of equal identity"
-        return True
-        # pass
+def iss_cred_data_dist_2(params, requester_commit, requester_random, issuer_random, pub_keys, n):
+    (_, p, _, _) = params
+    if data_distrubution_verify_commit(params, requester_commit, requester_random):
+        return data_distrubution_select(pub_keys, requester_random, issuer_random, n, p)
     else:
-        # Discard
         return None
 
 
-def prng(random_u, random_i, counter, p):
-    return int(hash([random_u, random_i, counter]) % p)
+def req_cred_data_dist_3(params, requester_random, issuer_random, PrivID, pub_keys, k, n):
+    (_, p, _, _) = params
+    selected_pub_keys = data_distrubution_select(pub_keys, requester_random, issuer_random, n, p)
+    return data_distrubution_commit_encrypt_prove(params, PrivID, selected_pub_keys, k, n)
+
+
+def iss_cred_data_dist_3(params, E_list, C_list, proof, custodian_list, group_generator):
+    (_, p, _, _) = params
+    return data_distrubution_issuer_verify(E_list, C_list, proof, custodian_list, group_generator, p)
