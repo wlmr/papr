@@ -22,14 +22,14 @@ class TestPapr:
 
     def test_eq_id(self):
         id = "Wilmer Nilsson"
-        params, (x_sign, x_encr), (y_sign, y_encr), (iparams, i_sk), sys_list, user_list, cred_list, rev_list, res_list = setup(3, 10)
-        (_, p, g0, g1) = params
+        params, (x_sign, _), (_, _), (iparams, i_sk), _, user_list, _, _, _ = setup(3, 10)
+        (_, p, g0, _) = params
         ret = enroll(params, id, iparams, i_sk, x_sign, user_list)
         assert ret is not None
-        t_id, (r, s), priv_id, pub_id, user_list = ret
-        (u, cl, cu_prime), zkp, z = req_cred_anon_auth(params, iparams, t_id, priv_id)
-        h = p.random() * g0
-        c0 = priv_id * h
+        t_id, _, priv_id, _, user_list = ret
+        (u, cl, _), _, z = req_cred_anon_auth(params, iparams, t_id, priv_id)
+        h = p.random() * g0  # making up a random generator (supposed to come from data distribution)
+        c0 = priv_id * h 
         y, c, gamma = req_cred_eq_id(params, u, h, priv_id, z, cl, c0)
         assert iss_cred_eq_id(params, u, h, y, c, gamma, cl, c0)
 

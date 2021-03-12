@@ -105,6 +105,14 @@ def iss_cred_data_dist(params):
 
 
 def req_cred_eq_id(params, u, h, priv_id, z, cl, c0):
+    """
+    Third step of ReqCred, i.e. proof of equal identity.
+    From Chaum et al.'s: "An Improved Protocol for Demonstrating Possession
+    of Discrete Logarithms and Some Generalizations".
+    Protocol 3 Relaxed Discrete Log.
+    (With the added benefit of letting the challenge, c, be a hash of public values,
+    rendering the method non-interactive).
+    """
     (_, p, _, g1) = params
     secret = [priv_id, z]
     alpha = [u + h, g1]
@@ -116,6 +124,14 @@ def req_cred_eq_id(params, u, h, priv_id, z, cl, c0):
 
 
 def iss_cred_eq_id(params, u, h, y, c, gamma, cl, c0):
+    """
+    Third step of ReqCred, i.e. proof of equal identity.
+    From Chaum et al.'s: "An Improved Protocol for Demonstrating Possession
+    of Discrete Logarithms and Some Generalizations".
+    Protocol 3 Relaxed Discrete Log.
+    (With the added benefit of letting the challenge, c, be a hash of public values,
+    rendering the method non-interactive).
+    """
     (G, _, _, g1) = params
     a = [u + h, g1]
     lhs = sum([y * a for y, a in zip(y, a)], G.infinite())
