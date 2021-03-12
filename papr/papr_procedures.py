@@ -7,7 +7,7 @@ from amac.credential_scheme import blind_obtain as blind_obtain_cmz
 from amac.credential_scheme import blind_show as blind_show_cmz
 from amac.credential_scheme import show_verify as show_verify_cmz
 from amac.proofs import to_challenge
-from papr.ecdsa import sign
+from papr.ecdsa import sign, verify
 from papr.papr_list import Papr_list
 
 
@@ -175,3 +175,13 @@ def iss_cred_sign(params, iss_priv_key, new_pub_cred):
     sigma_y_s = sign(params, iss_priv_key, new_pub_cred[1])
     # AND Publish PubCred
     return (sigma_y_e, sigma_y_s)
+
+
+def show_cred_1(params, privCred, sigma_i_pub_cred, m):
+    (x_encr, x_sign) = privCred
+    return sign(params, x_sign, [m])
+
+
+def ver_cred_1(params, r, s, pub_cred, m):
+    (y_encr, y_sign) = pub_cred
+    return verify(params, r, s, y_sign, [m])

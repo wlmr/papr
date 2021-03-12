@@ -1,7 +1,7 @@
 
 from papr.papr_procedures import iss_cred_sign, req_cred_sign, setup, enroll
 from papr.papr_procedures import req_cred_eq_id, iss_cred_eq_id
-from papr.papr_procedures import req_cred_anon_auth  # temporary until cred is fully working
+from papr.papr_procedures import req_cred_anon_auth
 from papr.papr_procedures import data_distrubution_issuer_verify, \
     data_distrubution_commit_encrypt_prove, data_distrubution_random_commit, data_distrubution_select, data_distrubution_verify_commit, \
     iss_cred_data_dist_1, iss_cred_data_dist_2, iss_cred_data_dist_3, req_cred_data_dist_1, req_cred_data_dist_2, req_cred_data_dist_3
