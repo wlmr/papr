@@ -163,6 +163,20 @@ def iss_cred_data_dist_3(params, E_list, C_list, proof, custodian_list, group_ge
     return data_distrubution_issuer_verify(E_list, C_list, proof, custodian_list, group_generator, p)
 
 
+def req_cred_sign(params):
+    (_, p, _, g1) = params
+    PrivCred = (p.random(), p.random())
+    PubCred = (PrivCred[0] * g1, PrivCred[1] * g1)
+    return PrivCred, PubCred
+
+
+def iss_cred_sign(params, iss_priv_key, new_pub_cred):
+    sigma_y_e = sign(params, iss_priv_key, new_pub_cred[0])
+    sigma_y_s = sign(params, iss_priv_key, new_pub_cred[1])
+    # AND Publish PubCred
+    return (sigma_y_e, sigma_y_s)
+
+
 def show_cred_1(params, privCred, sigma_i_pub_cred, m):
     (x_encr, x_sign) = privCred
     return sign(params, x_sign, [m])

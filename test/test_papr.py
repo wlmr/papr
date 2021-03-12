@@ -1,5 +1,5 @@
 
-from papr.papr_procedures import setup, enroll
+from papr.papr_procedures import iss_cred_sign, req_cred_sign, setup, enroll
 from papr.papr_procedures import req_cred_eq_id, iss_cred_eq_id
 from papr.papr_procedures import req_cred_anon_auth
 from papr.papr_procedures import data_distrubution_issuer_verify, \
@@ -103,3 +103,44 @@ class TestPapr:
         # E_list, C_list, proof, group_generator = data_distrubution_U_2(params, my_priv_key, selected_pub_keys, k, n)
 
         assert iss_cred_data_dist_3(params, E_list, C_list, proof, custodian_list, group_generator)
+
+    def test_cred_sign(self):
+        (k, n) = (7, 10)
+
+        id = "Mr Bond"
+        params, (x_sign, x_encr), (y_sign, y_encr), (iparams, i_sk), sys_list, user_list, cred_list, rev_list, res_list = setup(k, n)
+
+        (_, p, g0, _) = params
+        priv_keys = []
+        pub_keys = []
+        for i in range(n*2):
+            (x_i, y_i) = pvss.generate_key_pair(params)
+            priv_keys.append(x_i)
+            pub_keys.append(y_i)
+
+        (my_priv_key, my_pub_key) = pvss.generate_key_pair(params)
+
+        (requester_commit, requester_random) = req_cred_data_dist_1(params)
+        (issuer_commit, issuer_random) = iss_cred_data_dist_1(params)
+        assert req_cred_data_dist_2(params, issuer_commit, issuer_random) is True
+        custodian_list = iss_cred_data_dist_2(params, requester_commit, requester_random, issuer_random, pub_keys, n)
+        assert custodian_list is not None
+
+        E_list, C_list, proof, group_generator = req_cred_data_dist_3(params, requester_random, issuer_random, my_priv_key, pub_keys, k, n)
+
+        assert iss_cred_data_dist_3(params, E_list, C_list, proof, custodian_list, group_generator)
+
+        ret = enroll(params, id, iparams, i_sk, x_sign, user_list)
+        assert ret is not None
+        t_id, _, priv_id, _, user_list = ret
+        (u, cl, _), _, z = req_cred_anon_auth(params, iparams, t_id, priv_id)
+        h = group_generator  # making up a random generator (supposed to come from data distribution)
+        c0 = priv_id * h
+        y, c, gamma = req_cred_eq_id(params, u, h, priv_id, z, cl, c0)
+        assert iss_cred_eq_id(params, u, h, y, c, gamma, cl, c0)
+
+        PrivCred, PubCred = req_cred_sign(params)
+        sigma_y_e, sigma_y_s = iss_cred_sign(params, x_sign, PubCred)
+
+        assert verify(params, sigma_y_e[0], sigma_y_e[1], y_sign, PubCred[0])
+        assert verify(params, sigma_y_s[0], sigma_y_s[1], y_sign, PubCred[1])
