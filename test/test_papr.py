@@ -1,5 +1,5 @@
 
-from papr.papr_procedures import setup, enroll
+from papr.papr_procedures import restore, setup, enroll
 from papr.papr_procedures import req_cred_eq_id, iss_cred_eq_id
 from papr.papr_procedures import req_cred_anon_auth
 from papr.papr_procedures import data_distrubution_issuer_verify, \
@@ -103,3 +103,62 @@ class TestPapr:
         # E_list, C_list, proof, group_generator = data_distrubution_U_2(params, my_priv_key, selected_pub_keys, k, n)
 
         assert iss_cred_data_dist_3(params, E_list, C_list, proof, custodian_list, group_generator)
+
+    def test_restore(self):
+        (k, n) = (3, 10)
+
+        params, (x_sign, x_encr), (y_sign, y_encr), (iparams, i_sk), sys_list, user_list, cred_list, rev_list, res_list = setup(k, n)
+
+        (_, p, _, _) = params
+        priv_keys = []
+        pub_keys = []
+        for i in range(n*2):
+            (x_i, y_i) = pvss.generate_key_pair(params)
+            priv_keys.append(x_i)
+            pub_keys.append(y_i)
+
+        (my_priv_key, my_pub_key) = pvss.generate_key_pair(params)
+
+        # r1 = data_distrubution_U_1(params)
+        # r2 = data_distrubution_I_1(params)
+
+        (requester_commit, requester_random) = req_cred_data_dist_1(params)
+        (issuer_commit, issuer_random) = iss_cred_data_dist_1(params)
+        # Both publishes their commits. When they recive the other ones commit they send their random value.
+        # and verifyes that the commit and random value they recived are correct.
+        assert req_cred_data_dist_2(params, issuer_commit, issuer_random) is True
+        custodian_list = iss_cred_data_dist_2(params, requester_commit, requester_random, issuer_random, pub_keys, n)
+        assert custodian_list is not None
+
+        E_list, C_list, proof, group_generator = req_cred_data_dist_3(params, requester_random, issuer_random, my_priv_key, pub_keys, k, n)
+
+        # selected_pub_keys = data_distrubution_select(pub_keys, r1, r2, n, p)
+        # E_list, C_list, proof, group_generator = data_distrubution_U_2(params, my_priv_key, selected_pub_keys, k, n)
+
+        assert iss_cred_data_dist_3(params, E_list, C_list, proof, custodian_list, group_generator)
+
+        assert len(custodian_list) == n
+
+        just_k_random_index = [1, 4, 7]
+
+        decoded_list = []
+        cust_pub_keys = []
+        enc_shares = []
+
+        for index in just_k_random_index:
+            custodian_pub_key = custodian_list[index]
+            cust_pub_keys.append(custodian_pub_key)
+            enc_share = E_list[index]
+            enc_shares.append(enc_share)
+            # Here cusodian sees there key and answers. In this test instead we look up the private key.
+            for (i, pub_k) in zip(range(len(pub_keys)), pub_keys):
+                if pub_k == custodian_pub_key:
+                    # Here we skip reading from list, since we only test restore
+                    decoded_list.append(pvss.participant_decrypt_and_prove(params, priv_keys[i], enc_share))
+                    break
+
+        assert len(decoded_list) == len(just_k_random_index)
+
+        answer = restore(params, decoded_list, [2, 5, 8], cust_pub_keys, enc_shares)
+        assert answer is not None
+        assert answer == my_pub_key
