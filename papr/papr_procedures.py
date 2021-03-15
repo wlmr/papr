@@ -1,3 +1,4 @@
+from pvss.pvss import reconstruct, verify_correct_decryption
 from papr.papr_cred_iss_data_dist import data_distrubution_issuer_verify, data_distrubution_commit_encrypt_prove, data_distrubution_random_commit, \
      data_distrubution_select, data_distrubution_verify_commit
 from amac.credential_scheme import setup as setup_cmz, cred_keygen as cred_keygen_cmz
@@ -185,3 +186,36 @@ def show_cred_1(params, privCred, sigma_i_pub_cred, m):
 def ver_cred_1(params, r, s, pub_cred, m):
     (y_encr, y_sign) = pub_cred
     return verify(params, r, s, y_sign, [m])
+
+
+def restore(params, proved_decrypted_shares, index_list, custodian_public_keys, encrypted_shares):
+    '''
+    Restores public key given a set of at least k shares that's decrypted and proven, along with encrypted shares,
+        custodian public keys and a list of which indexes are used for decryption
+    '''
+    (_, p, _, G) = params
+    S_r = []
+    for ((S_i, decrypt_proof), Y_i, pub_key) in zip(proved_decrypted_shares, encrypted_shares, custodian_public_keys):
+        S_r.append(S_i)
+        if not verify_correct_decryption(S_i, Y_i, decrypt_proof, pub_key, p, G):
+            return None
+    return reconstruct(S_r, index_list, p)
+    # Return pub_id
+
+
+def respond(L_res, params, s_e, priv_key):
+    '''
+    Responds with decrypted share upon request from L_rev list
+    '''
+    pass
+    # return
+    # L_res.add(params, participant_decrypt_and_prove(params, priv_key))
+    # Publish s_r_i to L_res
+
+
+def get_rev_data(PubCred, dummy_list):
+    '''
+    Publishes to L_rev the request to revoce the privacy corresponging to PubCred
+    '''
+    pass
+    # Publish to L_rev
