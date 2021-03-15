@@ -22,9 +22,7 @@ class TestPaprSplit:
         return None
 
     def test_enroll(self):
-        
         issuer = Issuer()
-        
         id = "Wilmer Nilsson"
         (y_sign, y_encr), (iparams, i_sk), sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(3, 10)
         user = User(issuer.get_params())
@@ -40,22 +38,15 @@ class TestPaprSplit:
         id = "Wilmer Nilsson"
         (_, _), (iparams, i_sk), _, user_list, _, _, _ = issuer.setup(3, 10)
         user = User(issuer.get_params())
-        
         ret = self.helper_enroll(id, iparams, i_sk, user_list, issuer, user)
         assert ret is not None
         t_id, _, _, user_list = ret
         (u, cl, _), _, z = user.req_cred_anon_auth(iparams, t_id)
-        
-        
-        
-        # h = p.random() * g0  # making up a random generator (supposed to come from data distribution)
-        # c0 = priv_id * h
         C_list, h = self.helper_data_dist_to_get_h(3, 10, issuer.get_params(), user, issuer)
         c0 = C_list[0]
 
         y, c, gamma = user.req_cred_eq_id(u, h, z, cl, c0)
         assert issuer.iss_cred_eq_id(u, h, y, c, gamma, cl, c0)
-
 
     def helper_data_dist_to_get_h(self, k, n, params, user, issuer):
         priv_keys = []
@@ -65,7 +56,7 @@ class TestPaprSplit:
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
-        (my_priv_key, my_pub_key) = pvss.generate_key_pair(params)
+        # (my_priv_key, my_pub_key) = pvss.generate_key_pair(params)
 
         # r1 = data_distrubution_U_1(params)
         # r2 = data_distrubution_I_1(params)
@@ -78,9 +69,8 @@ class TestPaprSplit:
         custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, issuer_random, pub_keys, n)
         assert custodian_list is not None
 
-        _, C_list, _, group_generator = user.req_cred_data_dist_3(requester_random, issuer_random, my_priv_key, pub_keys, k, n)
+        _, C_list, _, group_generator = user.req_cred_data_dist_3(requester_random, issuer_random, pub_keys, k, n)
         return C_list, group_generator
-
 
     def test_data_distrubution_2(self):
 
@@ -104,12 +94,13 @@ class TestPaprSplit:
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
-        (my_priv_key, my_pub_key) = pvss.generate_key_pair(params)
+        # (my_priv_key, my_pub_key) = pvss.generate_key_pair(params)
 
         # r1 = data_distrubution_U_1(params)
         # r2 = data_distrubution_I_1(params)
 
         user = User(params)
+        user.req_enroll_1('This is just here so that priv_id is generated')
 
         (requester_commit, requester_random) = user.req_cred_data_dist_1()
         (issuer_commit, issuer_random) = issuer.iss_cred_data_dist_1()
@@ -119,13 +110,13 @@ class TestPaprSplit:
         custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, issuer_random, pub_keys, n)
         assert custodian_list is not None
 
-        E_list, C_list, proof, group_generator = user.req_cred_data_dist_3(requester_random, issuer_random, my_priv_key, pub_keys, k, n)
+        E_list, C_list, proof, group_generator = user.req_cred_data_dist_3(requester_random, issuer_random, pub_keys, k, n)
 
         # selected_pub_keys = data_distrubution_select(pub_keys, r1, r2, n, p)
         # E_list, C_list, proof, group_generator = data_distrubution_U_2(params, my_priv_key, selected_pub_keys, k, n)
 
         assert issuer.iss_cred_data_dist_3(E_list, C_list, proof, custodian_list, group_generator)
-  
+
     def test_restore(self):
         (k, n) = (3, 10)
         issuer = Issuer()
@@ -140,11 +131,10 @@ class TestPaprSplit:
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
-        (my_priv_key, my_pub_key) = pvss.generate_key_pair(params)
-
         # r1 = data_distrubution_U_1(params)
         # r2 = data_distrubution_I_1(params)
         user = User(params)
+        _, my_pub_key, _ = user.req_enroll_1('This is just here so that priv_id is generated')
 
         (requester_commit, requester_random) = user.req_cred_data_dist_1()
         (issuer_commit, issuer_random) = issuer.iss_cred_data_dist_1()
@@ -154,13 +144,13 @@ class TestPaprSplit:
         custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, issuer_random, pub_keys, n)
         assert custodian_list is not None
 
-        E_list, C_list, proof, group_generator = user.req_cred_data_dist_3(requester_random, issuer_random, my_priv_key, pub_keys, k, n)
+        E_list, C_list, proof, group_generator = user.req_cred_data_dist_3(requester_random, issuer_random, pub_keys, k, n)
 
         # selected_pub_keys = data_distrubution_select(pub_keys, r1, r2, n, p)
         # E_list, C_list, proof, group_generator = data_distrubution_U_2(params, my_priv_key, selected_pub_keys, k, n)
 
         assert issuer.iss_cred_data_dist_3(E_list, C_list, proof, custodian_list, group_generator)
-  
+
         assert len(custodian_list) == n
 
         just_k_random_index = [1, 4, 7]
@@ -186,4 +176,3 @@ class TestPaprSplit:
         answer = issuer.restore(decoded_list, [2, 5, 8], cust_pub_keys, enc_shares)
         assert answer is not None
         assert answer == my_pub_key
-    

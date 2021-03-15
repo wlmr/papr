@@ -60,7 +60,7 @@ class TestPvss():
 
         for (x_i, y_i, encrypted_share) in zip(priv_keys, pub_keys, encrypted_shares):
             (decrypted_share, proof_of_decryption) = pvss.participant_decrypt_and_prove(params, x_i, encrypted_share)
-            assert pvss.verify_decryption_proof(proof_of_decryption, decrypted_share, encrypted_share, y_i, p, G)
+            assert pvss.verify_decryption_proof(proof_of_decryption, decrypted_share, encrypted_share, y_i, p, g)
 
     def test_reconstruct(self):
         Gq = EcGroup()
@@ -90,7 +90,7 @@ class TestPvss():
             (decrypted_share, proof_of_decryption) = pvss.participant_decrypt_and_prove(params, x_i, encrypted_share)
             decrypted_list.append(decrypted_share)
             # assert verify_decryption_proof(proof_of_decryption)
-        assert pvss.reconstruct(decrypted_list, [1, 2, 3, 4], p) == secret * G
+        assert pvss.reconstruct(decrypted_list, [1, 2, 3, 4], p) == secret * g
 
     def test_full(self):
         # Generate parameters (should be same in other parts of program)
@@ -128,7 +128,7 @@ class TestPvss():
 
         # Decryption
         # Calculate what a correct decryption should be
-        expected_decryption = m * G
+        expected_decryption = m * g
 
         # Let participants decrypt their shares and generate proofs
         proved_decryptions = [pvss.participant_decrypt_and_prove(params, x_i, enc_share) for (x_i, enc_share) in zip(priv_keys, pub['Y_list'])]
@@ -181,7 +181,7 @@ class TestPvss():
 
         # Decryption
         # Calculate what a correct decryption should be
-        expected_decryption = m * G
+        expected_decryption = m * g
 
         # Let participants decrypt their shares and generate proofs
         proved_decryptions = [pvss.participant_decrypt_and_prove(params, x_i, enc_share) for (x_i, enc_share) in zip(priv_keys, pub['Y_list'])]
@@ -223,7 +223,7 @@ class TestPvss():
 
         # Decryption
         # Calculate what a correct decryption should be
-        expected_decryption = m * G
+        expected_decryption = m * g
 
         # Let participants decrypt their shares and generate proofs
         proved_decryptions = [pvss.participant_decrypt_and_prove(params, x_i, enc_share) for (x_i, enc_share) in zip(priv_keys, pub['Y_list'])]

@@ -42,10 +42,10 @@ class User():
     def req_cred_data_dist_2(self, issuer_commit, issuer_random):
         return data_distrubution_verify_commit(self.params, issuer_commit, issuer_random)
 
-    def req_cred_data_dist_3(self, requester_random, issuer_random, PrivID, pub_keys, k, n):
+    def req_cred_data_dist_3(self, requester_random, issuer_random, pub_keys, k, n):
         (_, p, _, _) = self.params
         selected_pub_keys = data_distrubution_select(pub_keys, requester_random, issuer_random, n, p)
-        return data_distrubution_commit_encrypt_prove(self.params, PrivID, selected_pub_keys, k, n)
+        return data_distrubution_commit_encrypt_prove(self.params, self.priv_id, selected_pub_keys, k, n)
 
     # Proof of equal identity
     def req_cred_eq_id(self, u, h, z, cl, c0):
