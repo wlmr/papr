@@ -2,33 +2,58 @@ syntax = "proto3";
 
 service Connector {
     rpc iss_enroll(iss_enroll_msg) returns (iss_enroll_rsp) {}
-//    rpc anon_auth(anon_auth_msg) returns (anon_auth_rsp) {}
+    rpc anon_auth(anon_auth_msg) returns (anon_auth_rsp) {}
 //    rpc data_dist_1(data_dist_1_msg) returns (data_dist_1_rsp) {}
 //    rpc data_dist_2(data_dist_2_msg) returns (data_dist_2_rsp) {}
 //    rpc data_dist_3(data_dist_3_msg) returns (data_dist_3_rsp) {}
-//    rpc eq_id(eq_id_msg) returns (eq_id_rsp) {}
-//    rpc cred_sign(cred_sign_msg) returns (cred_sign_rsp) {}
+    rpc eq_id(eq_id_msg) returns (eq_id_rsp) {}
+/    rpc cred_sign(cred_sign_msg) returns (cred_sign_rsp) {}
 //    rpc ver_cred_1(ver_cred_1_msg) returns (ver_cred_1_rsp) {}
 //    rpc ver_cred_2(ver_cred_2_msg) returns (ver_cred_2_rsp) {}
 }
 
 message iss_enroll_msg {
-    string id;
-    bytes pub_id;
-    bytes gamma;
-    map<string, bytes> ciphertext;
-    zkp proof;
+    string id = 1;
+    bytes pub_id = 2;
+    bytes gamma = 3;
+    map<string, bytes> ciphertext = 4;
+    zkp proof = 5;
 }
 
 message iss_enroll_rsp {
-    bytes sigma_pub_id;
-    bytes u;
-    bytes e_u_prime;
-    zkp pi_issue;
-    map<string, bytes> biparams;
+    bytes sigma_pub_id = 1;
+    bytes u = 2;
+    bytes e_u_prime = 3;
+    zkp pi_issue = 4;
+    map<string, bytes> biparams = 5;
+}
+
+message anon_auth_msg {
+  bytes sigma = 1; //(u, Cm, Cu_prime)
+  zkp pi_show = 2;
+}
+
+message anon_auth_rsp {
+  bool success = 1;
+}
+
+message eq_id_msg {
+  bytes y_c_gamma = 1;
+}
+
+message eq_id_rsp {
+  bool success = 1;
+}
+
+message cred_sign_msg {
+  bytes pub_cred = 1;
+}
+
+message cred_sign_rsp {
+  bytes sigma_pub_cred = 1;
 }
 
 message zkp {
-    bytes challenge;
-    map<string, string> response;
+  bytes challenge = 1;
+  map<string, string> response = 2;
 }

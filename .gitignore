@@ -132,3 +132,4 @@ dmypy.json
 .vscode/settings.json
 
 .vscode/launch.json
+prototest/
