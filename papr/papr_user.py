@@ -6,9 +6,10 @@ from amac.credential_scheme import blind_show as blind_show_cmz
 from amac.proofs import to_challenge
 from papr.ecdsa import sign
 
-class User(): 
 
-    def set_params(self, params):
+class User():
+
+    def __init__(self, params):
         self.params = params
 
     def req_enroll_1(self, id):
@@ -18,10 +19,9 @@ class User():
         Returns the tuple (id, l, g0^l, ElGamal-SK, ElGamal-PK, ElGamal-ciphertext, ZKP)
         """
         (_, p, g0, _) = self.params
-        priv_id = p.random()  # a.k.a. l
-        pub_id = priv_id * g0
-        return id, priv_id, pub_id, prepare_blind_obtain_cmz(params, priv_id)
-
+        self.priv_id = p.random()  # a.k.a. l
+        pub_id = self.priv_id * g0
+        return id, pub_id, prepare_blind_obtain_cmz(self.params, self.priv_id)
 
     def req_enroll_2(self, iparams, u_sk, u, e_u_prime, pi_issue, biparams, gamma, ciphertext):
         """
@@ -30,30 +30,25 @@ class User():
         return blind_obtain_cmz(self.params, iparams, u_sk, u, e_u_prime, pi_issue, biparams,
                                 gamma, ciphertext)
 
-
     # anonymous authentication
-    def req_cred_anon_auth(self, iparams, t_id, priv_id):
-        sigma, pi_show, z = blind_show_cmz(self.params, iparams, t_id, priv_id)
+    def req_cred_anon_auth(self, iparams, t_id):
+        sigma, pi_show, z = blind_show_cmz(self.params, iparams, t_id, self.priv_id)
         return sigma, pi_show, z
-
 
     # Data distrubution
     def req_cred_data_dist_1(self):
         return data_distrubution_random_commit(self.params)
 
-
     def req_cred_data_dist_2(self, issuer_commit, issuer_random):
         return data_distrubution_verify_commit(self.params, issuer_commit, issuer_random)
-
 
     def req_cred_data_dist_3(self, requester_random, issuer_random, PrivID, pub_keys, k, n):
         (_, p, _, _) = self.params
         selected_pub_keys = data_distrubution_select(pub_keys, requester_random, issuer_random, n, p)
         return data_distrubution_commit_encrypt_prove(self.params, PrivID, selected_pub_keys, k, n)
 
-
     # Proof of equal identity
-    def req_cred_eq_id(self, u, h, priv_id, z, cl, c0):
+    def req_cred_eq_id(self, u, h, z, cl, c0):
         """
         Third step of ReqCred, i.e. proof of equal identity.
         From Chaum et al.'s: "An Improved Protocol for Demonstrating Possession
@@ -63,14 +58,13 @@ class User():
         rendering the method non-interactive).
         """
         (_, p, _, g1) = self.params
-        secret = [priv_id, z]
+        secret = [self.priv_id, z]
         alpha = [u + h, g1]
         r = [p.random(), p.random()]
         gamma = [r * a for r, a in zip(r, alpha)]
         c = to_challenge(alpha + gamma + [cl + c0])
         y = [(r + c * dl) % p for r, dl in zip(r, secret)]
         return y, c, gamma
-
 
     # Credential signing
     def req_cred_sign(self):
@@ -79,12 +73,10 @@ class User():
         PubCred = (PrivCred[0] * g1, PrivCred[1] * g1)
         return PrivCred, PubCred
 
-
     # Show/verify credential
     def show_cred_1(self, privCred, sigma_i_pub_cred, m):
         (x_encr, x_sign) = privCred
         return sign(self.params, x_sign, [m])
-
 
     # Revoke/restore
     def respond(self, L_res, params, s_e, priv_key):

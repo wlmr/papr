@@ -11,7 +11,8 @@ from papr.papr_list import Papr_list
 
 class Issuer():
     def __init__(self):
-        self.params = Null
+        #self.params = Null
+        pass
 
     def get_params(self):
         return self.params
@@ -25,25 +26,25 @@ class Issuer():
         """
         self.params = setup_cmz(1)
         (_, p, g0, g1) = self.params
-        (x_sign, x_encr) = (p.random(), p.random())
-        (y_sign, y_encr) = (x_sign * g0, x_encr * g0)
-        (iparams, i_sk) = cred_keygen_cmz(self.params)
-        crs = ",".join([str(elem) for elem in [p.repr(), g0, g1, n, k, iparams['Cx0']]])
-        i_pk = ",".join([str(x) for x in [y_sign, y_encr]])
-        [sys_list, user_list, cred_list, rev_list, res_list] = [Papr_list(y_sign) for _ in range(5)]
+        (self.x_sign, self.x_encr) = (p.random(), p.random())
+        (self.y_sign, self.y_encr) = (self.x_sign * g0, self.x_encr * g0)
+        (self.iparams, self.i_sk) = cred_keygen_cmz(self.params)
+        crs = ",".join([str(elem) for elem in [p.repr(), g0, g1, n, k, self.iparams['Cx0']]])
+        i_pk = ",".join([str(x) for x in [self.y_sign, self.y_encr]])
+        [sys_list, user_list, cred_list, rev_list, res_list] = [Papr_list(self.y_sign) for _ in range(5)]
 
-        sys_list.add(self.params, crs, sign(self.params, x_sign, [crs]))
-        sys_list.add(self.params, i_pk, sign(self.params, x_sign, [i_pk]))
-        return (x_sign, x_encr), (y_sign, y_encr), (iparams, i_sk), sys_list, user_list, cred_list, rev_list, res_list
+        sys_list.add(self.params, crs, sign(self.params, self.x_sign, [crs]))
+        sys_list.add(self.params, i_pk, sign(self.params, self.x_sign, [i_pk]))
+        return (self.y_sign, self.y_encr), (self.iparams, self.i_sk), sys_list, user_list, cred_list, rev_list, res_list
 
-    def iss_enroll(self, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain, id, pub_id, x_sign, user_list):
+    def iss_enroll(self, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain, id, pub_id, user_list):
         """
         Returns the elgamal-encrypted credential T(ID) that only the user can
         decrypt and use, as well as a signature on the pub_id
         """
         if not user_list.has(id, 0):
-            sigma_pub_id = sign(self.params, x_sign, [id, pub_id])
-            if user_list.add(params, (id, pub_id), sigma_pub_id):
+            sigma_pub_id = sign(self.params, self.x_sign, [id, pub_id])
+            if user_list.add(self.params, (id, pub_id), sigma_pub_id):
                 return sigma_pub_id, blind_issue_cmz(self.params, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain), user_list
         return None
 
