@@ -58,11 +58,13 @@ def reconstruct(decrypted_list: decrypted_shares_list_type, index_list: index_li
 
 
 def verify_decryption_proof(proof_of_decryption: single_proof_type, decrypted_share: decrypted_share_type, encrypted_share: encrypted_share_type,
-                            pub_key: pub_keys_type, p, G) -> bool:
+                            pub_key: pub_keys_type, p, g0) -> bool:
     '''
     Verifyes that a participant has correctly decrypted their share
     '''
-    return verify_correct_decryption(decrypted_share, encrypted_share, proof_of_decryption, pub_key, p, G)
+    return verify_correct_decryption(decrypted_share, encrypted_share, proof_of_decryption, pub_key, p, g0)
+
+# __DEPRICATED__
 
 
 def gen_proof(params, k, n, secret, pub_keys):
@@ -120,11 +122,11 @@ def __calc_share(px: list[Bn], k: int, x: Bn, p: Bn):
     return result
 
 
-def get_commitments(g, px):
+def get_commitments(h, px):
     '''
     Calculates all commitments C_j for j =[0,k)
     '''
-    return [p_i * g for p_i in px]
+    return [p_i * h for p_i in px]
 
 
 def __get_encrypted_shares(pub_keys: pub_keys_type, shares: list[share_type]) -> encrypted_shares_type:
@@ -147,7 +149,7 @@ def decode(S_list, index_list, p):
     ans = __lagrange(index_list[0], index_list, p) * S_list[0]
     for (S_i, i) in zip(S_list[1:], range(1, len(S_list))):
         ans = ans + __lagrange(index_list[i], index_list, p) * S_i
-    return ans  # G**s
+    return ans  # g0**s
 
 
 def __lagrange(i, index_list, p):
@@ -185,9 +187,9 @@ def generate_key_pair(params):
     '''
     Generates a key-pair, returns both the private key and the public key
     '''
-    (_, p, _, G) = params
+    (_, p, g0, G) = params
     x_i = p.random()
-    y_i = x_i * G
+    y_i = x_i * g0
     return (x_i, y_i)
 
 
@@ -203,16 +205,16 @@ def participant_decrypt_and_prove(params, x_i, Y_i) -> tuple[decrypted_share_typ
     '''
     Decrypts a encrypted share with stored private key, and generates proof of it being done correctly.
     '''
-    (_, p, g, G) = params
+    (_, p, g0, G) = params
     S_i = participant_decrypt(params, x_i, Y_i)
 
-    y_i = x_i * G
+    y_i = x_i * g0
 
-    decrypt_proof = cpni.DLEQ_prove(params, G, S_i, y_i, Y_i, x_i)
+    decrypt_proof = cpni.DLEQ_prove(params, g0, S_i, y_i, Y_i, x_i)
     return S_i, decrypt_proof
 
 
 def get_pub_key(params, x_i):
-    (_, _, _, G) = params
-    y_i = x_i * G
+    (_, _, g0, G) = params
+    y_i = x_i * g0
     return y_i
