@@ -1,4 +1,3 @@
-
 from papr.papr_procedures import restore, setup, enroll
 from papr.papr_procedures import req_cred_eq_id, iss_cred_eq_id
 from papr.papr_procedures import req_cred_anon_auth
