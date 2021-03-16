@@ -164,3 +164,81 @@ class TestPaprSplit:
         answer = issuer.restore(decoded_list, [2, 5, 8], cust_pub_keys, enc_shares)
         assert answer is not None
         assert answer == my_pub_key
+
+    def test_full(self):
+        (k, n) = (3, 10)
+        issuer = Issuer()
+        (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(k, n)
+
+        params = issuer.get_params()
+        (_, p, _, _) = params
+        priv_keys = []
+        pub_keys = []
+        for i in range(n*2):
+            (x_i, y_i) = pvss.generate_key_pair(params)
+            priv_keys.append(x_i)
+            pub_keys.append(y_i)
+
+        # Note: take from L_sys instead??
+        user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n)
+        id = "Id text"
+        # Enroll:
+        _, pub_id, (u_sk, u_pk, c, pi_prepare_obtain) = user.req_enroll_1(id)
+        ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id, user_list)
+        if ret is not None:
+            s_pub_id, (u, e_u_prime, pi_issue, biparams) = ret
+            t_id = user.req_enroll_2(u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], c)
+            # return t_id, s_pub_id, pub_id
+        assert ret is not None  # : "user already exists"
+        # print("user already exists")
+        # return None
+
+        # Data dist
+        requester_commit = user.req_cred_data_dist_1()
+        issuer_random = issuer.iss_cred_data_dist_1()
+        requester_random, E_list, C_list, proof, group_generator = user.req_cred_data_dist_2(issuer_random, pub_keys)
+        custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator)
+        assert custodian_list is not None
+
+        # Anonimous auth:
+        sigma, pi_show, z = user.req_cred_anon_auth(t_id)
+        assert issuer.iss_cred_anon_auth(sigma, pi_show)
+
+        (u2, cl, _) = sigma  # FIXME: Why is this u different?
+
+        # Proof of eq id:
+        y, c, gamma = user.req_cred_eq_id(u2, group_generator, z, cl, C_list[0])
+        assert issuer.iss_cred_eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
+
+        # PubCred = user.req_cred_sign()
+        
+
+
+        # Reconstruction
+
+        # REVOKE PUB CRED?? method call.
+        #get_rev_data()
+
+        just_k_random_index = [1, 4, 7]
+
+        decoded_list = []
+        cust_pub_keys = []
+        enc_shares = []
+
+        for index in just_k_random_index:
+            custodian_pub_key = custodian_list[index]
+            cust_pub_keys.append(custodian_pub_key)
+            enc_share = E_list[index]
+            enc_shares.append(enc_share)
+            # Here cusodian sees there key and answers. In this test instead we look up the private key.
+            for (i, pub_k) in zip(range(len(pub_keys)), pub_keys):
+                if pub_k == custodian_pub_key:
+                    # Here we skip reading from list, since we only test restore
+                    decoded_list.append(pvss.participant_decrypt_and_prove(params, priv_keys[i], enc_share))
+                    break
+
+        assert len(decoded_list) == len(just_k_random_index)
+
+        answer = issuer.restore(decoded_list, [2, 5, 8], cust_pub_keys, enc_shares)
+        assert answer is not None
+        assert answer == pub_id

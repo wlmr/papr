@@ -38,7 +38,6 @@ class User():
         return self.u, self.u_prime
 
     # anonymous authentication
-
     def req_cred_anon_auth(self, t_id):
         """
         sigma = (u, Cm, Cu_prime)
