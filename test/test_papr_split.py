@@ -6,14 +6,14 @@ import pvss.pvss as pvss
 
 class TestPaprSplit:
 
-    def helper_enroll(self, id, iparams, i_sk, user_list, issuer, user):
+    def helper_enroll(self, id, user_list, issuer, user):
         """
         Complete Enrollment procedure. Inputs:
         id: real identity, i_sk: issuer's secret key for CMZ,
         x_sign: issuer's secret signature key, user_list: the list of users (ID: pub_ID) as described in PAPR.
         """
         id, pub_id, (u_sk, u_pk, c, pi_prepare_obtain) = user.req_enroll_1(id)
-        ret = issuer.iss_enroll(iparams, i_sk, u_pk['h'], c, pi_prepare_obtain, id, pub_id, user_list)
+        ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id, user_list)
         if ret is not None:
             s_pub_id, (u, e_u_prime, pi_issue, biparams) = ret
             t_id = user.req_enroll_2(u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], c)
@@ -24,9 +24,9 @@ class TestPaprSplit:
     def test_enroll(self):
         issuer = Issuer()
         id = "Wilmer Nilsson"
-        (y_sign, y_encr), (iparams, i_sk), sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(3, 10)
+        (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(3, 10)
         user = User(issuer.get_params(), iparams, y_sign, y_encr, 3, 10)
-        ret = self.helper_enroll(id, iparams, i_sk, user_list, issuer, user)
+        ret = self.helper_enroll(id, user_list, issuer, user)
         assert ret is not None
         t_id, (r, s), pub_id = ret
         print(f"user_list.peek():   {user_list.peek()}\n")
@@ -36,9 +36,9 @@ class TestPaprSplit:
     def test_eq_id(self):
         issuer = Issuer()
         id = "Wilmer Nilsson"
-        (_, _), (iparams, i_sk), _, user_list, _, _, _ = issuer.setup(3, 10)
+        (_, _), iparams, _, user_list, _, _, _ = issuer.setup(3, 10)
         user = User(issuer.get_params(), iparams, _, _, 3, 10)
-        ret = self.helper_enroll(id, iparams, i_sk, user_list, issuer, user)
+        ret = self.helper_enroll(id, user_list, issuer, user)
         assert ret is not None
         t_id, _, _ = ret
         (u, cl, _), _, z = user.req_cred_anon_auth(t_id)
@@ -80,7 +80,7 @@ class TestPaprSplit:
         (k, n) = (3, 10)
 
         issuer = Issuer()
-        (y_sign, y_encr), (iparams, i_sk), sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(k, n)
+        (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(k, n)
 
         params = issuer.get_params()
         (_, p, _, _) = params
@@ -112,7 +112,7 @@ class TestPaprSplit:
     def test_restore(self):
         (k, n) = (3, 10)
         issuer = Issuer()
-        (y_sign, y_encr), (iparams, i_sk), sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(k, n)
+        (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(k, n)
 
         params = issuer.get_params()
         (_, p, _, _) = params
