@@ -84,8 +84,8 @@ class User():
         return PubCred
 
     # Show/verify credential
-    def show_cred_1(self, privCred, sigma_i_pub_cred, m):
-        (x_encr, x_sign) = privCred
+    def show_cred_1(self, sigma_i_pub_cred, m):  # Need this from issuer.
+        (x_encr, x_sign) = self.PrivCred
         return sign(self.params, x_sign, [m])
 
     # Revoke/restore

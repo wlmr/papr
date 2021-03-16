@@ -93,11 +93,16 @@ class Issuer():
         sigma_y_e = sign(self.params, self.x_sign, new_pub_cred[0])
         sigma_y_s = sign(self.params, self.x_sign, new_pub_cred[1])
         # FIXME: AND Publish PubCred
-        self.cred_list.add(self.params, (sigma_y_e, sigma_y_s), sign(self.params, self.x_sign, (sigma_y_e, sigma_y_s)))  # Should this be published along with something else?
+        self.cred_list.add(self.params, (sigma_y_e, sigma_y_s), sign(self.params, self.x_sign, (sigma_y_e, sigma_y_s)))
+        # Should this be published along with something else?
         return (sigma_y_e, sigma_y_s)
 
     # Show/verify credential
-    def ver_cred_1(self, r, s, pub_cred, m):
+    def ver_cred_1(self):
+        (_, p, _, _) = self.params
+        return p.random()  # m
+
+    def ver_cred_2(self, r, s, pub_cred, m):
         (_, y_sign) = pub_cred
         return verify(self.params, r, s, y_sign, [m])
 

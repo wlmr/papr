@@ -209,16 +209,19 @@ class TestPaprSplit:
         # Proof of eq id:
         y, c, gamma = user.req_cred_eq_id(u2, group_generator, z, cl, C_list[0])
         assert issuer.iss_cred_eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
+        # Fixme message to user so that it knows that it can submit credentails (anonimously)
 
         PubCred = user.req_cred_sign()
         signed_pub_cred = issuer.iss_cred_sign(PubCred)
-        
+
         assert cred_list.peek() == signed_pub_cred
-        #assert cred_list[0] == 
+        # assert cred_list[0] ==
 
         # Cred usage:
-        # user.show_cred_1()
-
+        # FIXME: Start here.
+        # m = issuer.ver_cred_1()
+        # (r, s) = user.show_cred_1(signed_pub_cred, m)
+        # assert issuer.ver_cred_2(r, s, PubCred, m)
 
         # Reconstruction
 
@@ -226,7 +229,6 @@ class TestPaprSplit:
         issuer.get_rev_data(PubCred)
 
         assert rev_list.peek() == PubCred
- 
 
         just_k_random_index = [1, 4, 7]
 
