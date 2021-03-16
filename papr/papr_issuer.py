@@ -32,13 +32,13 @@ class Issuer():
         (self.iparams, self.i_sk) = cred_keygen_cmz(self.params)
         crs = ",".join([str(elem) for elem in [p.repr(), g0, g1, n, k, self.iparams['Cx0']]])
         i_pk = ",".join([str(x) for x in [self.y_sign, self.y_encr]])
-        [sys_list, user_list, cred_list, rev_list, res_list] = [Papr_list(self.y_sign) for _ in range(5)]
+        [self.sys_list, self.user_list, self.cred_list, self.rev_list, self.res_list] = [Papr_list(self.y_sign) for _ in range(5)]
 
-        sys_list.add(self.params, crs, sign(self.params, self.x_sign, [crs]))
-        sys_list.add(self.params, i_pk, sign(self.params, self.x_sign, [i_pk]))
-        return (self.y_sign, self.y_encr), (self.iparams, self.i_sk), sys_list, user_list, cred_list, rev_list, res_list
+        self.sys_list.add(self.params, crs, sign(self.params, self.x_sign, [crs]))
+        self.sys_list.add(self.params, i_pk, sign(self.params, self.x_sign, [i_pk]))
+        return (self.y_sign, self.y_encr), self.iparams, self.sys_list, self.user_list, self.cred_list, self.rev_list, self.res_list
 
-    def iss_enroll(self, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain, id, pub_id, user_list):
+    def iss_enroll(self, gamma, ciphertext, pi_prepare_obtain, id, pub_id, user_list):
         """
         Returns the elgamal-encrypted credential T(ID) that only the user can
         decrypt and use, as well as a signature on the pub_id
@@ -46,12 +46,12 @@ class Issuer():
         if not user_list.has(id, 0):
             sigma_pub_id = sign(self.params, self.x_sign, [id, pub_id])
             if user_list.add(self.params, (id, pub_id), sigma_pub_id):
-                return sigma_pub_id, blind_issue_cmz(self.params, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain)
+                return sigma_pub_id, blind_issue_cmz(self.params, self.iparams, self.i_sk, gamma, ciphertext, pi_prepare_obtain)
         return None
 
     # anonymous authentication
-    def iss_cred_anon_auth(self, iparams, i_sk, sigma, pi_show):
-        return show_verify_cmz(self.params, iparams, i_sk, sigma, pi_show)
+    def iss_cred_anon_auth(self, sigma, pi_show):
+        return show_verify_cmz(self.params, self.iparams, self.i_sk, sigma, pi_show)
 
     # Data distrubution
     def iss_cred_data_dist_1(self):
@@ -73,7 +73,6 @@ class Issuer():
             return None
 
     # Proof of equal identity
-
     def iss_cred_eq_id(self, u, h, y, c, gamma, cl, c0):
         """
         Third step of ReqCred, i.e. proof of equal identity.
@@ -90,24 +89,24 @@ class Issuer():
         return c == to_challenge(a + gamma + [cl + c0]) and lhs == rhs
 
     # Credential signing
-    def iss_cred_sign(self, iss_priv_key, new_pub_cred):
-        sigma_y_e = sign(self.params, iss_priv_key, new_pub_cred[0])
-        sigma_y_s = sign(self.params, iss_priv_key, new_pub_cred[1])
+    def iss_cred_sign(self, new_pub_cred):
+        sigma_y_e = sign(self.params, self.x_sign, new_pub_cred[0])
+        sigma_y_s = sign(self.params, self.x_sign, new_pub_cred[1])
         # FIXME: AND Publish PubCred
+        self.cred_list.add((sigma_y_e, sigma_y_s)) # Should this be published along with something else?
         return (sigma_y_e, sigma_y_s)
 
     # Show/verify credential
     def ver_cred_1(self, r, s, pub_cred, m):
-        (y_encr, y_sign) = pub_cred
+        (_, y_sign) = pub_cred
         return verify(self.params, r, s, y_sign, [m])
 
     # Revoke/restore
-    def get_rev_data(self, PubCred, dummy_list):
+    def get_rev_data(self, PubCred):
         '''
         Publishes to L_rev the request to revoce the privacy corresponging to PubCred
         '''
-        pass
-        # FIXME: Publish to L_rev
+        self.rev_list.add(PubCred)
 
     def restore(self, proved_decrypted_shares, index_list, custodian_public_keys, encrypted_shares):
         '''
