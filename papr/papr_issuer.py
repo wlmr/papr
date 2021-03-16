@@ -35,7 +35,7 @@ class Issuer():
         [self.sys_list, self.user_list, self.cred_list, self.rev_list, self.res_list] = [Papr_list(self.y_sign) for _ in range(5)]
 
         self.sys_list.add(self.params, crs, sign(self.params, self.x_sign, [crs]))
-        self.sys_list.add(self.params, i_pk, sign(self.params, self.x_sign, [i_pk]))
+        self.sys_list.add(self.params, i_pk, sign(self.params, self.x_sign, [i_pk])) # Note: Should we publish i_pk, or should it be y_sign, y_encr
         return (self.y_sign, self.y_encr), self.iparams, self.sys_list, self.user_list, self.cred_list, self.rev_list, self.res_list
 
     def iss_enroll(self, gamma, ciphertext, pi_prepare_obtain, id, pub_id, user_list):
