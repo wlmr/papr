@@ -7,9 +7,9 @@ service Connector {
 //    rpc data_dist_2(data_dist_2_msg) returns (data_dist_2_rsp) {}
 //    rpc data_dist_3(data_dist_3_msg) returns (data_dist_3_rsp) {}
     rpc eq_id(eq_id_msg) returns (eq_id_rsp) {}
-/    rpc cred_sign(cred_sign_msg) returns (cred_sign_rsp) {}
-//    rpc ver_cred_1(ver_cred_1_msg) returns (ver_cred_1_rsp) {}
-//    rpc ver_cred_2(ver_cred_2_msg) returns (ver_cred_2_rsp) {}
+    rpc cred_sign(cred_sign_msg) returns (cred_sign_rsp) {}
+    rpc ver_cred_1(ver_cred_1_msg) returns (ver_cred_1_rsp) {}
+    rpc ver_cred_2(ver_cred_2_msg) returns (ver_cred_2_rsp) {}
 }
 
 message iss_enroll_msg {
@@ -37,6 +37,27 @@ message anon_auth_rsp {
   bool success = 1;
 }
 
+//------
+
+// Generate random number and commit. Send commit
+message data_dist_1_msg{
+  bytes user_commit = 1;
+}
+
+message data_dist_1_rsp{
+  bytes issuer_random_value = 1;
+}
+
+message data_dist_2_msg{
+  bytes user_random_value = 1;
+  bytes E_list = 2; //encrypted shares
+  bytes C_list = 3; //commits
+  bytes proof = 4; //proofs
+  bytes h = 5; //h
+}
+
+//-------
+
 message eq_id_msg {
   bytes y_c_gamma = 1;
 }
@@ -52,6 +73,22 @@ message cred_sign_msg {
 message cred_sign_rsp {
   bytes sigma_pub_cred = 1;
 }
+
+message ver_cred_1_msg {
+  //Should be empty as the return value is all that matters
+}
+
+message ver_cred_1_rsp {
+  bytes m = 1;
+}
+message ver_cred_2_msg {
+  bytes sigma_priv_cred_m = 1;
+}
+
+message ver_cred_2_rsp {
+  bool success = 1;
+}
+
 
 message zkp {
   bytes challenge = 1;

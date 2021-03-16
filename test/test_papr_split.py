@@ -15,9 +15,9 @@ class TestPaprSplit:
         id, pub_id, (u_sk, u_pk, c, pi_prepare_obtain) = user.req_enroll_1(id)
         ret = issuer.iss_enroll(iparams, i_sk, u_pk['h'], c, pi_prepare_obtain, id, pub_id, user_list)
         if ret is not None:
-            s_pub_id, (u, e_u_prime, pi_issue, biparams), user_list = ret
-            t_id = user.req_enroll_2(iparams, u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], c)
-            return t_id, s_pub_id, pub_id, user_list
+            s_pub_id, (u, e_u_prime, pi_issue, biparams) = ret
+            t_id = user.req_enroll_2(u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], c)
+            return t_id, s_pub_id, pub_id
         print("user already exists")
         return None
 
@@ -25,10 +25,10 @@ class TestPaprSplit:
         issuer = Issuer()
         id = "Wilmer Nilsson"
         (y_sign, y_encr), (iparams, i_sk), sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(3, 10)
-        user = User(issuer.get_params())
+        user = User(issuer.get_params(), iparams, y_sign, y_encr, 3, 10)
         ret = self.helper_enroll(id, iparams, i_sk, user_list, issuer, user)
         assert ret is not None
-        t_id, (r, s), pub_id, user_list = ret
+        t_id, (r, s), pub_id = ret
         print(f"user_list.peek():   {user_list.peek()}\n")
         assert user_list.has("Wilmer Nilsson", 0)
         assert verify(issuer.get_params(), r, s, y_sign, (id, pub_id))
@@ -37,11 +37,11 @@ class TestPaprSplit:
         issuer = Issuer()
         id = "Wilmer Nilsson"
         (_, _), (iparams, i_sk), _, user_list, _, _, _ = issuer.setup(3, 10)
-        user = User(issuer.get_params())
+        user = User(issuer.get_params(), iparams, _, _, 3, 10)
         ret = self.helper_enroll(id, iparams, i_sk, user_list, issuer, user)
         assert ret is not None
-        t_id, _, _, user_list = ret
-        (u, cl, _), _, z = user.req_cred_anon_auth(iparams, t_id)
+        t_id, _, _ = ret
+        (u, cl, _), _, z = user.req_cred_anon_auth(t_id)
         C_list, h = self.helper_data_dist_to_get_h(3, 10, issuer.get_params(), user, issuer)
         c0 = C_list[0]
 
@@ -61,15 +61,12 @@ class TestPaprSplit:
         # r1 = data_distrubution_U_1(params)
         # r2 = data_distrubution_I_1(params)
 
-        (requester_commit, requester_random) = user.req_cred_data_dist_1()
-        (issuer_commit, issuer_random) = issuer.iss_cred_data_dist_1()
+        _ = user.req_cred_data_dist_1()
+        issuer_random = issuer.iss_cred_data_dist_1()
         # Both publishes their commits. When they recive the other ones commit they send their random value.
         # and verifyes that the commit and random value they recived are correct.
-        assert user.req_cred_data_dist_2(issuer_commit, issuer_random) is True
-        custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, issuer_random, pub_keys, n)
-        assert custodian_list is not None
-
-        _, C_list, _, group_generator = user.req_cred_data_dist_3(requester_random, issuer_random, pub_keys, k, n)
+        # assert user.req_cred_data_dist_2(issueer_random) is True
+        _, _, C_list, _, group_generator = user.req_cred_data_dist_2(issuer_random, pub_keys)
         return C_list, group_generator
 
     def test_data_distrubution_2(self):
@@ -99,23 +96,18 @@ class TestPaprSplit:
         # r1 = data_distrubution_U_1(params)
         # r2 = data_distrubution_I_1(params)
 
-        user = User(params)
+        user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n)
         user.req_enroll_1('This is just here so that priv_id is generated')
 
-        (requester_commit, requester_random) = user.req_cred_data_dist_1()
-        (issuer_commit, issuer_random) = issuer.iss_cred_data_dist_1()
+        requester_commit = user.req_cred_data_dist_1()
+        issuer_random = issuer.iss_cred_data_dist_1()
         # Both publishes their commits. When they recive the other ones commit they send their random value.
         # and verifyes that the commit and random value they recived are correct.
-        assert user.req_cred_data_dist_2(issuer_commit, issuer_random) is True
-        custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, issuer_random, pub_keys, n)
+        # assert user.req_cred_data_dist_2(issueer_random) is True
+        requester_random, E_list, C_list, proof, group_generator = user.req_cred_data_dist_2(issuer_random, pub_keys)
+
+        custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator)
         assert custodian_list is not None
-
-        E_list, C_list, proof, group_generator = user.req_cred_data_dist_3(requester_random, issuer_random, pub_keys, k, n)
-
-        # selected_pub_keys = data_distrubution_select(pub_keys, r1, r2, n, p)
-        # E_list, C_list, proof, group_generator = data_distrubution_U_2(params, my_priv_key, selected_pub_keys, k, n)
-
-        assert issuer.iss_cred_data_dist_3(E_list, C_list, proof, custodian_list, group_generator)
 
     def test_restore(self):
         (k, n) = (3, 10)
@@ -133,25 +125,21 @@ class TestPaprSplit:
 
         # r1 = data_distrubution_U_1(params)
         # r2 = data_distrubution_I_1(params)
-        user = User(params)
+        user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n)
         _, my_pub_key, _ = user.req_enroll_1('This is just here so that priv_id is generated')
 
-        (requester_commit, requester_random) = user.req_cred_data_dist_1()
-        (issuer_commit, issuer_random) = issuer.iss_cred_data_dist_1()
+        requester_commit = user.req_cred_data_dist_1()
+        issuer_random = issuer.iss_cred_data_dist_1()
         # Both publishes their commits. When they recive the other ones commit they send their random value.
         # and verifyes that the commit and random value they recived are correct.
-        assert user.req_cred_data_dist_2(issuer_commit, issuer_random) is True
-        custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, issuer_random, pub_keys, n)
-        assert custodian_list is not None
-
-        E_list, C_list, proof, group_generator = user.req_cred_data_dist_3(requester_random, issuer_random, pub_keys, k, n)
+        # assert user.req_cred_data_dist_2(issueer_random) is True
+        requester_random, E_list, C_list, proof, group_generator = user.req_cred_data_dist_2(issuer_random, pub_keys)
 
         # selected_pub_keys = data_distrubution_select(pub_keys, r1, r2, n, p)
         # E_list, C_list, proof, group_generator = data_distrubution_U_2(params, my_priv_key, selected_pub_keys, k, n)
 
-        assert issuer.iss_cred_data_dist_3(E_list, C_list, proof, custodian_list, group_generator)
-
-        assert len(custodian_list) == n
+        custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator)
+        assert custodian_list is not None
 
         just_k_random_index = [1, 4, 7]
 

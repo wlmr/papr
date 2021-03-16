@@ -1,7 +1,7 @@
 # notes
 
 ## TODO
-[ ] ask about whether the engamal-encryption for some reason has to be encrypted
+[x] ask about whether the engamal-encryption for some reason has to be encrypted
 with the previously used secret key, i.e. γ=l^d, and then use d again so as to create
 γ^d
 [x] make the issuance procedure take a Bn instead of bytes message
@@ -12,7 +12,9 @@ with the previously used secret key, i.e. γ=l^d, and then use d again so as to 
 [ ] fix testfiles
 [ ] investigate if to remove z from return values of blind_show. 
     It is only there for eq_id. Not even sure it is supposed to use that z tho
-
+[ ] continue with gRPC tomorrow and get it in to user
 ---
-
-python -m grpc_tools.protoc -Iproto --python_out=prototest --grpc_python_out=prototest proto/papr.proto
+from root:
+```
+$ python -m grpc_tools.protoc -Iproto --python_out=papr --grpc_python_out=papr proto/papr.proto
+```

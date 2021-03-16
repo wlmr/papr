@@ -1,5 +1,5 @@
 from papr.papr_cred_iss_data_dist import data_distrubution_commit_encrypt_prove, data_distrubution_random_commit, \
-    data_distrubution_select, data_distrubution_verify_commit
+    data_distrubution_select
 from amac.credential_scheme import prepare_blind_obtain as prepare_blind_obtain_cmz
 from amac.credential_scheme import blind_obtain as blind_obtain_cmz
 from amac.credential_scheme import blind_show as blind_show_cmz
@@ -9,8 +9,12 @@ from papr.ecdsa import sign
 
 class User():
 
-    def __init__(self, params):
+    def __init__(self, params, iparams, y_sign, y_encr, k, n):
         self.params = params
+        self.iparams = iparams
+        self.y_sign = y_sign
+        self.y_encr = y_encr
+        self.k, self.n = (k, n)
 
     def req_enroll_1(self, id):
         """
@@ -19,33 +23,40 @@ class User():
         Returns the tuple (id, l, g0^l, ElGamal-SK, ElGamal-PK, ElGamal-ciphertext, ZKP)
         """
         (_, p, g0, _) = self.params
+        self.id = id
         self.priv_id = p.random()  # a.k.a. l
-        pub_id = self.priv_id * g0
-        return id, pub_id, prepare_blind_obtain_cmz(self.params, self.priv_id)
+        self.pub_id = self.priv_id * g0
+        self.user_sk, self.user_pk, self.ciphertext, self.pi_prepare_obtain = prepare_blind_obtain_cmz(self.params, self.priv_id)
+        return self.id, self.pub_id, (self.user_sk, self.user_pk, self.ciphertext, self.pi_prepare_obtain)
 
-    def req_enroll_2(self, iparams, u_sk, u, e_u_prime, pi_issue, biparams, gamma, ciphertext):
+    def req_enroll_2(self, u_sk, u, e_u_prime, pi_issue, biparams, gamma, ciphertext):
         """
         Returns the T(ID), if all goes well.
         """
-        return blind_obtain_cmz(self.params, iparams, u_sk, u, e_u_prime, pi_issue, biparams,
-                                gamma, ciphertext)
+        self.u, self.u_prime = blind_obtain_cmz(self.params, self.iparams, u_sk, u, e_u_prime, pi_issue, biparams,
+                                                gamma, ciphertext)
+        return self.u, self.u_prime
 
     # anonymous authentication
-    def req_cred_anon_auth(self, iparams, t_id):
-        sigma, pi_show, z = blind_show_cmz(self.params, iparams, t_id, self.priv_id)
-        return sigma, pi_show, z
+
+    def req_cred_anon_auth(self, t_id):
+        """
+        sigma = (u, Cm, Cu_prime)
+        z is a random value used later in proof of equal identity
+        """
+        self.sigma, self.pi_show, self.z = blind_show_cmz(self.params, self.iparams, t_id, self.priv_id)
+        return self.sigma, self.pi_show, self.z
 
     # Data distrubution
     def req_cred_data_dist_1(self):
-        return data_distrubution_random_commit(self.params)
+        (commit, self.requester_random) = data_distrubution_random_commit(self.params)
+        return commit
 
-    def req_cred_data_dist_2(self, issuer_commit, issuer_random):
-        return data_distrubution_verify_commit(self.params, issuer_commit, issuer_random)
-
-    def req_cred_data_dist_3(self, requester_random, issuer_random, pub_keys, k, n):
+    def req_cred_data_dist_2(self, issuer_random, pub_keys):
         (_, p, _, _) = self.params
-        selected_pub_keys = data_distrubution_select(pub_keys, requester_random, issuer_random, n, p)
-        return data_distrubution_commit_encrypt_prove(self.params, self.priv_id, selected_pub_keys, k, n)
+        selected_pub_keys = data_distrubution_select(pub_keys, self.requester_random, issuer_random, self.n, p)
+        E_list, C_list, proof, group_generator = data_distrubution_commit_encrypt_prove(self.params, self.priv_id, selected_pub_keys, self.k, self.n)
+        return self.requester_random, E_list, C_list, proof, group_generator
 
     # Proof of equal identity
     def req_cred_eq_id(self, u, h, z, cl, c0):

@@ -1,5 +1,5 @@
 from pvss.pvss import reconstruct, verify_correct_decryption
-from papr.papr_cred_iss_data_dist import data_distrubution_issuer_verify, data_distrubution_random_commit, \
+from papr.papr_cred_iss_data_dist import data_distrubution_issuer_verify, \
     data_distrubution_select, data_distrubution_verify_commit
 from amac.credential_scheme import setup as setup_cmz, cred_keygen as cred_keygen_cmz
 from amac.credential_scheme import blind_issue as blind_issue_cmz
@@ -23,6 +23,8 @@ class Issuer():
 
         TODO: [ ] publish return value to Lsys.
         """
+        self.k = k
+        self.n = n
         self.params = setup_cmz(1)
         (_, p, g0, g1) = self.params
         (self.x_sign, self.x_encr) = (p.random(), p.random())
@@ -44,7 +46,7 @@ class Issuer():
         if not user_list.has(id, 0):
             sigma_pub_id = sign(self.params, self.x_sign, [id, pub_id])
             if user_list.add(self.params, (id, pub_id), sigma_pub_id):
-                return sigma_pub_id, blind_issue_cmz(self.params, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain), user_list
+                return sigma_pub_id, blind_issue_cmz(self.params, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain)
         return None
 
     # anonymous authentication
@@ -53,20 +55,25 @@ class Issuer():
 
     # Data distrubution
     def iss_cred_data_dist_1(self):
-        return data_distrubution_random_commit(self.params)
+        (_, p, _, _) = self.params
+        self.issuer_random = p.random()
+        return self.issuer_random  # FIXME: Make sure it's a new one for every user. And make sure transactin made in parallel (NOT possible now)
 
-    def iss_cred_data_dist_2(self, requester_commit, requester_random, issuer_random, pub_keys, n):
+    def iss_cred_data_dist_2(self, requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator):
         (_, p, _, _) = self.params
         if data_distrubution_verify_commit(self.params, requester_commit, requester_random):
-            return data_distrubution_select(pub_keys, requester_random, issuer_random, n, p)
+            # NOTE: Should be enouth to save this and return if it succeed or not.
+            custodian_list = data_distrubution_select(pub_keys, requester_random, self.issuer_random, self.n, p)
+            # FIXME: Save custodian_list in relation to user (alternativly save parameters needed to recreate)
+            if data_distrubution_issuer_verify(E_list, C_list, proof, custodian_list, group_generator, p):
+                return custodian_list
+            else:
+                return None
         else:
             return None
 
-    def iss_cred_data_dist_3(self, E_list, C_list, proof, custodian_list, group_generator):
-        (_, p, _, _) = self.params
-        return data_distrubution_issuer_verify(E_list, C_list, proof, custodian_list, group_generator, p)
-
     # Proof of equal identity
+
     def iss_cred_eq_id(self, u, h, y, c, gamma, cl, c0):
         """
         Third step of ReqCred, i.e. proof of equal identity.
