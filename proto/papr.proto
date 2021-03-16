@@ -3,9 +3,8 @@ syntax = "proto3";
 service Connector {
     rpc iss_enroll(iss_enroll_msg) returns (iss_enroll_rsp) {}
     rpc anon_auth(anon_auth_msg) returns (anon_auth_rsp) {}
-//    rpc data_dist_1(data_dist_1_msg) returns (data_dist_1_rsp) {}
-//    rpc data_dist_2(data_dist_2_msg) returns (data_dist_2_rsp) {}
-//    rpc data_dist_3(data_dist_3_msg) returns (data_dist_3_rsp) {}
+    rpc data_dist_1(data_dist_1_msg) returns (data_dist_1_rsp) {}
+    rpc data_dist_2(data_dist_2_msg) returns (data_dist_2_rsp) {}
     rpc eq_id(eq_id_msg) returns (eq_id_rsp) {}
     rpc cred_sign(cred_sign_msg) returns (cred_sign_rsp) {}
     rpc ver_cred_1(ver_cred_1_msg) returns (ver_cred_1_rsp) {}
@@ -44,16 +43,23 @@ message data_dist_1_msg{
   bytes user_commit = 1;
 }
 
+// Issuer gernerates random number
 message data_dist_1_rsp{
   bytes issuer_random_value = 1;
 }
 
+// User reveals random number, and send encrypted_shares, commits, proof and generator
 message data_dist_2_msg{
   bytes user_random_value = 1;
   bytes E_list = 2; //encrypted shares
   bytes C_list = 3; //commits
   bytes proof = 4; //proofs
   bytes h = 5; //h
+}
+
+// Issuer answers with success status
+message data_dist_2_rsp{
+  bool success = 1;
 }
 
 //-------
