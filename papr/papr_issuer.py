@@ -93,7 +93,7 @@ class Issuer():
         sigma_y_e = sign(self.params, self.x_sign, new_pub_cred[0])
         sigma_y_s = sign(self.params, self.x_sign, new_pub_cred[1])
         # FIXME: AND Publish PubCred
-        self.cred_list.add((sigma_y_e, sigma_y_s))  # Should this be published along with something else?
+        self.cred_list.add(self.params, (sigma_y_e, sigma_y_s), sign(self.params, self.x_sign, (sigma_y_e, sigma_y_s)))  # Should this be published along with something else?
         return (sigma_y_e, sigma_y_s)
 
     # Show/verify credential
@@ -106,7 +106,7 @@ class Issuer():
         '''
         Publishes to L_rev the request to revoce the privacy corresponging to PubCred
         '''
-        self.rev_list.add(PubCred)
+        self.rev_list.add(self.params, PubCred, sign(self.params, self.x_sign, PubCred))
 
     def restore(self, proved_decrypted_shares, index_list, custodian_public_keys, encrypted_shares):
         '''

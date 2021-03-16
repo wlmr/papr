@@ -210,14 +210,23 @@ class TestPaprSplit:
         y, c, gamma = user.req_cred_eq_id(u2, group_generator, z, cl, C_list[0])
         assert issuer.iss_cred_eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
 
-        # PubCred = user.req_cred_sign()
+        PubCred = user.req_cred_sign()
+        signed_pub_cred = issuer.iss_cred_sign(PubCred)
         
+        assert cred_list.peek() == signed_pub_cred
+        #assert cred_list[0] == 
+
+        # Cred usage:
+        # user.show_cred_1()
 
 
         # Reconstruction
 
         # REVOKE PUB CRED?? method call.
-        #get_rev_data()
+        issuer.get_rev_data(PubCred)
+
+        assert rev_list.peek() == PubCred
+ 
 
         just_k_random_index = [1, 4, 7]
 
