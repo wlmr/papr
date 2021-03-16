@@ -19,49 +19,11 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\npapr.proto\"\xb8\x01\n\x0eiss_enroll_msg\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06pub_id\x18\x02 \x01(\x0c\x12\r\n\x05gamma\x18\x03 \x01(\x0c\x12\x33\n\nciphertext\x18\x04 \x03(\x0b\x32\x1f.iss_enroll_msg.CiphertextEntry\x12\x13\n\x05proof\x18\x05 \x01(\x0b\x32\x04.zkp\x1a\x31\n\x0f\x43iphertextEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x0c:\x02\x38\x01\"\xbe\x01\n\x0eiss_enroll_rsp\x12\x14\n\x0csigma_pub_id\x18\x01 \x01(\x0c\x12\t\n\x01u\x18\x02 \x01(\x0c\x12\x11\n\te_u_prime\x18\x03 \x01(\x0c\x12\x16\n\x08pi_issue\x18\x04 \x01(\x0b\x32\x04.zkp\x12/\n\x08\x62iparams\x18\x05 \x03(\x0b\x32\x1d.iss_enroll_rsp.BiparamsEntry\x1a/\n\rBiparamsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x0c:\x02\x38\x01\"5\n\ranon_auth_msg\x12\r\n\x05sigma\x18\x01 \x01(\x0c\x12\x15\n\x07pi_show\x18\x02 \x01(\x0b\x32\x04.zkp\" \n\ranon_auth_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"&\n\x0f\x64\x61ta_dist_1_msg\x12\x13\n\x0buser_commit\x18\x01 \x01(\x0c\".\n\x0f\x64\x61ta_dist_1_rsp\x12\x1b\n\x13issuer_random_value\x18\x01 \x01(\x0c\"f\n\x0f\x64\x61ta_dist_2_msg\x12\x19\n\x11user_random_value\x18\x01 \x01(\x0c\x12\x0e\n\x06\x45_list\x18\x02 \x01(\x0c\x12\x0e\n\x06\x43_list\x18\x03 \x01(\x0c\x12\r\n\x05proof\x18\x04 \x01(\x0c\x12\t\n\x01h\x18\x05 \x01(\x0c\"\x1e\n\teq_id_msg\x12\x11\n\ty_c_gamma\x18\x01 \x01(\x0c\"\x1c\n\teq_id_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"!\n\rcred_sign_msg\x12\x10\n\x08pub_cred\x18\x01 \x01(\x0c\"\'\n\rcred_sign_rsp\x12\x16\n\x0esigma_pub_cred\x18\x01 \x01(\x0c\"\x10\n\x0ever_cred_1_msg\"\x1b\n\x0ever_cred_1_rsp\x12\t\n\x01m\x18\x01 \x01(\x0c\"+\n\x0ever_cred_2_msg\x12\x19\n\x11sigma_priv_cred_m\x18\x01 \x01(\x0c\"!\n\x0ever_cred_2_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"o\n\x03zkp\x12\x11\n\tchallenge\x18\x01 \x01(\x0c\x12$\n\x08response\x18\x02 \x03(\x0b\x32\x12.zkp.ResponseEntry\x1a/\n\rResponseEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x32\xa2\x02\n\tConnector\x12\x30\n\niss_enroll\x12\x0f.iss_enroll_msg\x1a\x0f.iss_enroll_rsp\"\x00\x12-\n\tanon_auth\x12\x0e.anon_auth_msg\x1a\x0e.anon_auth_rsp\"\x00\x12!\n\x05\x65q_id\x12\n.eq_id_msg\x1a\n.eq_id_rsp\"\x00\x12-\n\tcred_sign\x12\x0e.cred_sign_msg\x1a\x0e.cred_sign_rsp\"\x00\x12\x30\n\nver_cred_1\x12\x0f.ver_cred_1_msg\x1a\x0f.ver_cred_1_rsp\"\x00\x12\x30\n\nver_cred_2\x12\x0f.ver_cred_2_msg\x1a\x0f.ver_cred_2_rsp\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\npapr.proto\"\x1e\n\x0eiss_enroll_msg\x12\x0c\n\x04load\x18\x01 \x01(\x0c\"\x1e\n\x0eiss_enroll_rsp\x12\x0c\n\x04load\x18\x01 \x01(\x0c\"5\n\ranon_auth_msg\x12\r\n\x05sigma\x18\x01 \x01(\x0c\x12\x15\n\x07pi_show\x18\x02 \x01(\x0b\x32\x04.zkp\" \n\ranon_auth_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"&\n\x0f\x64\x61ta_dist_1_msg\x12\x13\n\x0buser_commit\x18\x01 \x01(\x0c\".\n\x0f\x64\x61ta_dist_1_rsp\x12\x1b\n\x13issuer_random_value\x18\x01 \x01(\x0c\"f\n\x0f\x64\x61ta_dist_2_msg\x12\x19\n\x11user_random_value\x18\x01 \x01(\x0c\x12\x0e\n\x06\x45_list\x18\x02 \x01(\x0c\x12\x0e\n\x06\x43_list\x18\x03 \x01(\x0c\x12\r\n\x05proof\x18\x04 \x01(\x0c\x12\t\n\x01h\x18\x05 \x01(\x0c\"\x1e\n\teq_id_msg\x12\x11\n\ty_c_gamma\x18\x01 \x01(\x0c\"\x1c\n\teq_id_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"!\n\rcred_sign_msg\x12\x10\n\x08pub_cred\x18\x01 \x01(\x0c\"\'\n\rcred_sign_rsp\x12\x16\n\x0esigma_pub_cred\x18\x01 \x01(\x0c\"\x10\n\x0ever_cred_1_msg\"\x1b\n\x0ever_cred_1_rsp\x12\t\n\x01m\x18\x01 \x01(\x0c\"+\n\x0ever_cred_2_msg\x12\x19\n\x11sigma_priv_cred_m\x18\x01 \x01(\x0c\"!\n\x0ever_cred_2_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"o\n\x03zkp\x12\x11\n\tchallenge\x18\x01 \x01(\x0c\x12$\n\x08response\x18\x02 \x03(\x0b\x32\x12.zkp.ResponseEntry\x1a/\n\rResponseEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x32\xa2\x02\n\tConnector\x12\x30\n\niss_enroll\x12\x0f.iss_enroll_msg\x1a\x0f.iss_enroll_rsp\"\x00\x12-\n\tanon_auth\x12\x0e.anon_auth_msg\x1a\x0e.anon_auth_rsp\"\x00\x12!\n\x05\x65q_id\x12\n.eq_id_msg\x1a\n.eq_id_rsp\"\x00\x12-\n\tcred_sign\x12\x0e.cred_sign_msg\x1a\x0e.cred_sign_rsp\"\x00\x12\x30\n\nver_cred_1\x12\x0f.ver_cred_1_msg\x1a\x0f.ver_cred_1_rsp\"\x00\x12\x30\n\nver_cred_2\x12\x0f.ver_cred_2_msg\x1a\x0f.ver_cred_2_rsp\"\x00\x62\x06proto3'
 )
 
 
 
-
-_ISS_ENROLL_MSG_CIPHERTEXTENTRY = _descriptor.Descriptor(
-  name='CiphertextEntry',
-  full_name='iss_enroll_msg.CiphertextEntry',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='key', full_name='iss_enroll_msg.CiphertextEntry.key', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='value', full_name='iss_enroll_msg.CiphertextEntry.value', index=1,
-      number=2, type=12, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"",
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=b'8\001',
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=150,
-  serialized_end=199,
-)
 
 _ISS_ENROLL_MSG = _descriptor.Descriptor(
   name='iss_enroll_msg',
@@ -72,75 +34,8 @@ _ISS_ENROLL_MSG = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='id', full_name='iss_enroll_msg.id', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='pub_id', full_name='iss_enroll_msg.pub_id', index=1,
-      number=2, type=12, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"",
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='gamma', full_name='iss_enroll_msg.gamma', index=2,
-      number=3, type=12, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"",
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='ciphertext', full_name='iss_enroll_msg.ciphertext', index=3,
-      number=4, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='proof', full_name='iss_enroll_msg.proof', index=4,
-      number=5, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[_ISS_ENROLL_MSG_CIPHERTEXTENTRY, ],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=15,
-  serialized_end=199,
-)
-
-
-_ISS_ENROLL_RSP_BIPARAMSENTRY = _descriptor.Descriptor(
-  name='BiparamsEntry',
-  full_name='iss_enroll_rsp.BiparamsEntry',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='key', full_name='iss_enroll_rsp.BiparamsEntry.key', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='value', full_name='iss_enroll_rsp.BiparamsEntry.value', index=1,
-      number=2, type=12, cpp_type=9, label=1,
+      name='load', full_name='iss_enroll_msg.load', index=0,
+      number=1, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=b"",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -151,15 +46,16 @@ _ISS_ENROLL_RSP_BIPARAMSENTRY = _descriptor.Descriptor(
   nested_types=[],
   enum_types=[
   ],
-  serialized_options=b'8\001',
+  serialized_options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=345,
-  serialized_end=392,
+  serialized_start=14,
+  serialized_end=44,
 )
+
 
 _ISS_ENROLL_RSP = _descriptor.Descriptor(
   name='iss_enroll_rsp',
@@ -170,44 +66,16 @@ _ISS_ENROLL_RSP = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='sigma_pub_id', full_name='iss_enroll_rsp.sigma_pub_id', index=0,
+      name='load', full_name='iss_enroll_rsp.load', index=0,
       number=1, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=b"",
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='u', full_name='iss_enroll_rsp.u', index=1,
-      number=2, type=12, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"",
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='e_u_prime', full_name='iss_enroll_rsp.e_u_prime', index=2,
-      number=3, type=12, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"",
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='pi_issue', full_name='iss_enroll_rsp.pi_issue', index=3,
-      number=4, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='biparams', full_name='iss_enroll_rsp.biparams', index=4,
-      number=5, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
-  nested_types=[_ISS_ENROLL_RSP_BIPARAMSENTRY, ],
+  nested_types=[],
   enum_types=[
   ],
   serialized_options=None,
@@ -216,8 +84,8 @@ _ISS_ENROLL_RSP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=202,
-  serialized_end=392,
+  serialized_start=46,
+  serialized_end=76,
 )
 
 
@@ -255,8 +123,8 @@ _ANON_AUTH_MSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=394,
-  serialized_end=447,
+  serialized_start=78,
+  serialized_end=131,
 )
 
 
@@ -287,8 +155,8 @@ _ANON_AUTH_RSP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=449,
-  serialized_end=481,
+  serialized_start=133,
+  serialized_end=165,
 )
 
 
@@ -319,8 +187,8 @@ _DATA_DIST_1_MSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=483,
-  serialized_end=521,
+  serialized_start=167,
+  serialized_end=205,
 )
 
 
@@ -351,8 +219,8 @@ _DATA_DIST_1_RSP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=523,
-  serialized_end=569,
+  serialized_start=207,
+  serialized_end=253,
 )
 
 
@@ -411,8 +279,8 @@ _DATA_DIST_2_MSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=571,
-  serialized_end=673,
+  serialized_start=255,
+  serialized_end=357,
 )
 
 
@@ -443,8 +311,8 @@ _EQ_ID_MSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=675,
-  serialized_end=705,
+  serialized_start=359,
+  serialized_end=389,
 )
 
 
@@ -475,8 +343,8 @@ _EQ_ID_RSP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=707,
-  serialized_end=735,
+  serialized_start=391,
+  serialized_end=419,
 )
 
 
@@ -507,8 +375,8 @@ _CRED_SIGN_MSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=737,
-  serialized_end=770,
+  serialized_start=421,
+  serialized_end=454,
 )
 
 
@@ -539,8 +407,8 @@ _CRED_SIGN_RSP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=772,
-  serialized_end=811,
+  serialized_start=456,
+  serialized_end=495,
 )
 
 
@@ -564,8 +432,8 @@ _VER_CRED_1_MSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=813,
-  serialized_end=829,
+  serialized_start=497,
+  serialized_end=513,
 )
 
 
@@ -596,8 +464,8 @@ _VER_CRED_1_RSP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=831,
-  serialized_end=858,
+  serialized_start=515,
+  serialized_end=542,
 )
 
 
@@ -628,8 +496,8 @@ _VER_CRED_2_MSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=860,
-  serialized_end=903,
+  serialized_start=544,
+  serialized_end=587,
 )
 
 
@@ -660,8 +528,8 @@ _VER_CRED_2_RSP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=905,
-  serialized_end=938,
+  serialized_start=589,
+  serialized_end=622,
 )
 
 
@@ -699,8 +567,8 @@ _ZKP_RESPONSEENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1004,
-  serialized_end=1051,
+  serialized_start=688,
+  serialized_end=735,
 )
 
 _ZKP = _descriptor.Descriptor(
@@ -737,16 +605,10 @@ _ZKP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=940,
-  serialized_end=1051,
+  serialized_start=624,
+  serialized_end=735,
 )
 
-_ISS_ENROLL_MSG_CIPHERTEXTENTRY.containing_type = _ISS_ENROLL_MSG
-_ISS_ENROLL_MSG.fields_by_name['ciphertext'].message_type = _ISS_ENROLL_MSG_CIPHERTEXTENTRY
-_ISS_ENROLL_MSG.fields_by_name['proof'].message_type = _ZKP
-_ISS_ENROLL_RSP_BIPARAMSENTRY.containing_type = _ISS_ENROLL_RSP
-_ISS_ENROLL_RSP.fields_by_name['pi_issue'].message_type = _ZKP
-_ISS_ENROLL_RSP.fields_by_name['biparams'].message_type = _ISS_ENROLL_RSP_BIPARAMSENTRY
 _ANON_AUTH_MSG.fields_by_name['pi_show'].message_type = _ZKP
 _ZKP_RESPONSEENTRY.containing_type = _ZKP
 _ZKP.fields_by_name['response'].message_type = _ZKP_RESPONSEENTRY
@@ -769,34 +631,18 @@ DESCRIPTOR.message_types_by_name['zkp'] = _ZKP
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 iss_enroll_msg = _reflection.GeneratedProtocolMessageType('iss_enroll_msg', (_message.Message,), {
-
-  'CiphertextEntry' : _reflection.GeneratedProtocolMessageType('CiphertextEntry', (_message.Message,), {
-    'DESCRIPTOR' : _ISS_ENROLL_MSG_CIPHERTEXTENTRY,
-    '__module__' : 'papr_pb2'
-    # @@protoc_insertion_point(class_scope:iss_enroll_msg.CiphertextEntry)
-    })
-  ,
   'DESCRIPTOR' : _ISS_ENROLL_MSG,
   '__module__' : 'papr_pb2'
   # @@protoc_insertion_point(class_scope:iss_enroll_msg)
   })
 _sym_db.RegisterMessage(iss_enroll_msg)
-_sym_db.RegisterMessage(iss_enroll_msg.CiphertextEntry)
 
 iss_enroll_rsp = _reflection.GeneratedProtocolMessageType('iss_enroll_rsp', (_message.Message,), {
-
-  'BiparamsEntry' : _reflection.GeneratedProtocolMessageType('BiparamsEntry', (_message.Message,), {
-    'DESCRIPTOR' : _ISS_ENROLL_RSP_BIPARAMSENTRY,
-    '__module__' : 'papr_pb2'
-    # @@protoc_insertion_point(class_scope:iss_enroll_rsp.BiparamsEntry)
-    })
-  ,
   'DESCRIPTOR' : _ISS_ENROLL_RSP,
   '__module__' : 'papr_pb2'
   # @@protoc_insertion_point(class_scope:iss_enroll_rsp)
   })
 _sym_db.RegisterMessage(iss_enroll_rsp)
-_sym_db.RegisterMessage(iss_enroll_rsp.BiparamsEntry)
 
 anon_auth_msg = _reflection.GeneratedProtocolMessageType('anon_auth_msg', (_message.Message,), {
   'DESCRIPTOR' : _ANON_AUTH_MSG,
@@ -905,8 +751,6 @@ _sym_db.RegisterMessage(zkp)
 _sym_db.RegisterMessage(zkp.ResponseEntry)
 
 
-_ISS_ENROLL_MSG_CIPHERTEXTENTRY._options = None
-_ISS_ENROLL_RSP_BIPARAMSENTRY._options = None
 _ZKP_RESPONSEENTRY._options = None
 
 _CONNECTOR = _descriptor.ServiceDescriptor(
@@ -916,8 +760,8 @@ _CONNECTOR = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=1054,
-  serialized_end=1344,
+  serialized_start=738,
+  serialized_end=1028,
   methods=[
   _descriptor.MethodDescriptor(
     name='iss_enroll',
