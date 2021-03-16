@@ -13,19 +13,21 @@ service Connector {
 }
 
 message iss_enroll_msg {
-    string id = 1;
-    bytes pub_id = 2;
-    bytes gamma = 3;
-    map<string, bytes> ciphertext = 4;
-    zkp proof = 5;
+    bytes load = 1; //[id, pub_id, gamma, ciphertext, proof]
+    //string id = 1;
+    //bytes pub_id = 2;
+    //bytes gamma = 3;
+    //map<string, bytes> ciphertext = 4;
+    //zkp proof = 5;
 }
 
 message iss_enroll_rsp {
-    bytes sigma_pub_id = 1;
-    bytes u = 2;
-    bytes e_u_prime = 3;
-    zkp pi_issue = 4;
-    map<string, bytes> biparams = 5;
+    bytes load = 1; //[sigma_pub_id, u, e_u_prime, pi_issue, biparams]
+    //bytes sigma_pub_id = 1;
+    //bytes u = 2;
+    //bytes e_u_prime = 3;
+    //zkp pi_issue = 4;
+    //map<string, bytes> biparams = 5;
 }
 
 message anon_auth_msg {
