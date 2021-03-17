@@ -1,3 +1,4 @@
+from pvss.pvss import participant_decrypt_and_prove
 from papr.papr_cred_iss_data_dist import data_distrubution_commit_encrypt_prove, data_distrubution_random_commit, \
     data_distrubution_select
 from amac.credential_scheme import prepare_blind_obtain as prepare_blind_obtain_cmz
@@ -90,11 +91,8 @@ class User():
         return sign(p, g1, x_sign, [m])
 
     # Revoke/restore
-    def respond(self, L_res, params, s_e, priv_key):
+    def respond(self, s_e):
         '''
         Responds with decrypted share upon request from L_rev list
         '''
-        pass
-        # return
-        # L_res.add(params, participant_decrypt_and_prove(params, priv_key))
-        # Publish s_r_i to L_res
+        return participant_decrypt_and_prove(self.params, self.x_i, s_e)
