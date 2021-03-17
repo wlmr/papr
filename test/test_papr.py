@@ -13,12 +13,13 @@ class TestPapr:
     def test_enroll(self):
         id = "Wilmer Nilsson"
         params, (x_sign, x_encr), (y_sign, y_encr), (iparams, i_sk), sys_list, user_list, cred_list, rev_list, res_list = setup(3, 10)
+        (G, p, g0, _) = params
         ret = enroll(params, id, iparams, i_sk, x_sign, user_list)
         assert ret is not None
         t_id, (r, s), priv_id, pub_id, user_list = ret
         print(f"user_list.peek():   {user_list.peek()}\n")
         assert user_list.has("Wilmer Nilsson", 0)
-        assert verify(params, r, s, y_sign, (id, pub_id))
+        assert verify(G, p, g0, r, s, y_sign, (id, pub_id))
 
     def test_eq_id(self):
         id = "Wilmer Nilsson"

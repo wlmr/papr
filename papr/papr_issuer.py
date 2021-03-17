@@ -34,8 +34,8 @@ class Issuer():
         i_pk = ",".join([str(x) for x in [self.y_sign, self.y_encr]])
         [self.sys_list, self.user_list, self.cred_list, self.rev_list, self.res_list] = [Papr_list(self.y_sign) for _ in range(5)]
 
-        self.sys_list.add(self.params, crs, sign(self.params, self.x_sign, [crs]))
-        self.sys_list.add(self.params, i_pk, sign(self.params, self.x_sign, [i_pk]))  # Note: Should we publish i_pk, or should it be y_sign, y_encr
+        self.sys_list.add(self.params, crs, sign(p, g0, self.x_sign, [crs]))
+        self.sys_list.add(self.params, i_pk, sign(p, g0, self.x_sign, [i_pk]))  # Note: Should we publish i_pk, or should it be y_sign, y_encr
         return (self.y_sign, self.y_encr), self.iparams, self.sys_list, self.user_list, self.cred_list, self.rev_list, self.res_list
 
     def iss_enroll(self, gamma, ciphertext, pi_prepare_obtain, id, pub_id, user_list):
@@ -44,7 +44,8 @@ class Issuer():
         decrypt and use, as well as a signature on the pub_id
         """
         if not user_list.has(id, 0):
-            sigma_pub_id = sign(self.params, self.x_sign, [id, pub_id])
+            (_, p, g0, _) = self.params
+            sigma_pub_id = sign(p, g0, self.x_sign, [id, pub_id])
             if user_list.add(self.params, (id, pub_id), sigma_pub_id):
                 return sigma_pub_id, blind_issue_cmz(self.params, self.iparams, self.i_sk, gamma, ciphertext, pi_prepare_obtain)
         return None
@@ -90,10 +91,11 @@ class Issuer():
 
     # Credential signing
     def iss_cred_sign(self, new_pub_cred):
-        sigma_y_e = sign(self.params, self.x_sign, new_pub_cred[0])
-        sigma_y_s = sign(self.params, self.x_sign, new_pub_cred[1])
+        (_, p, g0, _) = self.params
+        sigma_y_e = sign(p, g0, self.x_sign, new_pub_cred[0])
+        sigma_y_s = sign(p, g0, self.x_sign, new_pub_cred[1])
         # FIXME: AND Publish PubCred
-        self.cred_list.add(self.params, (sigma_y_e, sigma_y_s), sign(self.params, self.x_sign, (sigma_y_e, sigma_y_s)))  # Is this correct?
+        self.cred_list.add(self.params, (sigma_y_e, sigma_y_s), sign(p, g0, self.x_sign, (sigma_y_e, sigma_y_s)))  # Is this correct?
         # Should this be published along with something else?
         return (sigma_y_e, sigma_y_s)
 
@@ -105,14 +107,15 @@ class Issuer():
     def ver_cred_2(self, r, s, pub_cred, m):
         (_, y_sign) = pub_cred
         (G, p, _, g1) = self.params
-        return verify((G, p, g1, _), r, s, y_sign, [m])
+        return verify(G, p, g1, r, s, y_sign, [m])
 
     # Revoke/restore
     def get_rev_data(self, pub_cred):
         '''
         Publishes to L_rev the request to revoce the privacy corresponging to PubCred
         '''
-        self.rev_list.add(self.params, pub_cred, sign(self.params, self.x_sign, pub_cred))
+        (_, p, g0, _) = self.params
+        self.rev_list.add(self.params, pub_cred, sign(p, g0, self.x_sign, pub_cred))
 
     def restore(self, proved_decrypted_shares, index_list, custodian_public_keys, encrypted_shares):
         '''
