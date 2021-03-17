@@ -108,11 +108,11 @@ class Issuer():
         return verify((G, p, g1, _), r, s, y_sign, [m])
 
     # Revoke/restore
-    def get_rev_data(self, PubCred):
+    def get_rev_data(self, pub_cred):
         '''
         Publishes to L_rev the request to revoce the privacy corresponging to PubCred
         '''
-        self.rev_list.add(self.params, PubCred, sign(self.params, self.x_sign, PubCred))
+        self.rev_list.add(self.params, pub_cred, sign(self.params, self.x_sign, pub_cred))
 
     def restore(self, proved_decrypted_shares, index_list, custodian_public_keys, encrypted_shares):
         '''

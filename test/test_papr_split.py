@@ -213,8 +213,8 @@ class TestPaprSplit:
         assert issuer.iss_cred_eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
         # Fixme message to user so that it knows that it can submit credentails (anonimously)
 
-        PubCred = user.req_cred_sign()
-        signed_pub_cred = issuer.iss_cred_sign(PubCred)
+        pub_cred = user.req_cred_sign()
+        signed_pub_cred = issuer.iss_cred_sign(pub_cred)
 
         assert cred_list.peek() == signed_pub_cred
         # assert cred_list[0] ==
@@ -223,13 +223,13 @@ class TestPaprSplit:
         # FIXME: Start here.
         m = issuer.ver_cred_1()
         (r, s) = user.show_cred_1(m)
-        assert issuer.ver_cred_2(r, s, PubCred, m)
+        assert issuer.ver_cred_2(r, s, pub_cred, m)
         # Reconstruction
 
         # REVOKE PUB CRED?? method call.
-        issuer.get_rev_data(PubCred)
+        issuer.get_rev_data(pub_cred)
 
-        assert rev_list.peek() == PubCred
+        assert rev_list.peek() == pub_cred
 
         just_k_random_index = [1, 4, 7]
 

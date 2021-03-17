@@ -79,13 +79,13 @@ class User():
     # Credential signing
     def req_cred_sign(self):
         (_, p, _, g1) = self.params
-        self.PrivCred = (p.random(), p.random())
-        PubCred = (self.PrivCred[0] * g1, self.PrivCred[1] * g1)
-        return PubCred
+        self.priv_cred = (p.random(), p.random())
+        pub_cred = (self.priv_cred[0] * g1, self.priv_cred[1] * g1)
+        return pub_cred
 
     # Show/verify credential
     def show_cred_1(self, m):  # Need this from issuer.
-        (_, x_sign) = self.PrivCred
+        (_, x_sign) = self.priv_cred
         (G, p, _, g1) = self.params
         return sign((G, p, g1, _), x_sign, [m])
 
