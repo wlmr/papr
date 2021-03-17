@@ -24,6 +24,16 @@ class ConnectorStub(object):
                 request_serializer=papr__pb2.anon_auth_msg.SerializeToString,
                 response_deserializer=papr__pb2.anon_auth_rsp.FromString,
                 )
+        self.data_dist_1 = channel.unary_unary(
+                '/Connector/data_dist_1',
+                request_serializer=papr__pb2.data_dist_1_msg.SerializeToString,
+                response_deserializer=papr__pb2.data_dist_1_rsp.FromString,
+                )
+        self.data_dist_2 = channel.unary_unary(
+                '/Connector/data_dist_2',
+                request_serializer=papr__pb2.data_dist_2_msg.SerializeToString,
+                response_deserializer=papr__pb2.data_dist_2_rsp.FromString,
+                )
         self.eq_id = channel.unary_unary(
                 '/Connector/eq_id',
                 request_serializer=papr__pb2.eq_id_msg.SerializeToString,
@@ -61,11 +71,20 @@ class ConnectorServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def data_dist_1(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def data_dist_2(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def eq_id(self, request, context):
-        """rpc data_dist_1(data_dist_1_msg) returns (data_dist_1_rsp) {}
-        rpc data_dist_2(data_dist_2_msg) returns (data_dist_2_rsp) {}
-        rpc data_dist_3(data_dist_3_msg) returns (data_dist_3_rsp) {}
-        """
+        """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -100,6 +119,16 @@ def add_ConnectorServicer_to_server(servicer, server):
                     servicer.anon_auth,
                     request_deserializer=papr__pb2.anon_auth_msg.FromString,
                     response_serializer=papr__pb2.anon_auth_rsp.SerializeToString,
+            ),
+            'data_dist_1': grpc.unary_unary_rpc_method_handler(
+                    servicer.data_dist_1,
+                    request_deserializer=papr__pb2.data_dist_1_msg.FromString,
+                    response_serializer=papr__pb2.data_dist_1_rsp.SerializeToString,
+            ),
+            'data_dist_2': grpc.unary_unary_rpc_method_handler(
+                    servicer.data_dist_2,
+                    request_deserializer=papr__pb2.data_dist_2_msg.FromString,
+                    response_serializer=papr__pb2.data_dist_2_rsp.SerializeToString,
             ),
             'eq_id': grpc.unary_unary_rpc_method_handler(
                     servicer.eq_id,
@@ -162,6 +191,40 @@ class Connector(object):
         return grpc.experimental.unary_unary(request, target, '/Connector/anon_auth',
             papr__pb2.anon_auth_msg.SerializeToString,
             papr__pb2.anon_auth_rsp.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def data_dist_1(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/Connector/data_dist_1',
+            papr__pb2.data_dist_1_msg.SerializeToString,
+            papr__pb2.data_dist_1_rsp.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def data_dist_2(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/Connector/data_dist_2',
+            papr__pb2.data_dist_2_msg.SerializeToString,
+            papr__pb2.data_dist_2_rsp.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

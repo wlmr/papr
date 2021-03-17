@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\npapr.proto\"\x1e\n\x0eiss_enroll_msg\x12\x0c\n\x04load\x18\x01 \x01(\x0c\"\x1e\n\x0eiss_enroll_rsp\x12\x0c\n\x04load\x18\x01 \x01(\x0c\"5\n\ranon_auth_msg\x12\r\n\x05sigma\x18\x01 \x01(\x0c\x12\x15\n\x07pi_show\x18\x02 \x01(\x0b\x32\x04.zkp\" \n\ranon_auth_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"&\n\x0f\x64\x61ta_dist_1_msg\x12\x13\n\x0buser_commit\x18\x01 \x01(\x0c\".\n\x0f\x64\x61ta_dist_1_rsp\x12\x1b\n\x13issuer_random_value\x18\x01 \x01(\x0c\"f\n\x0f\x64\x61ta_dist_2_msg\x12\x19\n\x11user_random_value\x18\x01 \x01(\x0c\x12\x0e\n\x06\x45_list\x18\x02 \x01(\x0c\x12\x0e\n\x06\x43_list\x18\x03 \x01(\x0c\x12\r\n\x05proof\x18\x04 \x01(\x0c\x12\t\n\x01h\x18\x05 \x01(\x0c\"\x1e\n\teq_id_msg\x12\x11\n\ty_c_gamma\x18\x01 \x01(\x0c\"\x1c\n\teq_id_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"!\n\rcred_sign_msg\x12\x10\n\x08pub_cred\x18\x01 \x01(\x0c\"\'\n\rcred_sign_rsp\x12\x16\n\x0esigma_pub_cred\x18\x01 \x01(\x0c\"\x10\n\x0ever_cred_1_msg\"\x1b\n\x0ever_cred_1_rsp\x12\t\n\x01m\x18\x01 \x01(\x0c\"+\n\x0ever_cred_2_msg\x12\x19\n\x11sigma_priv_cred_m\x18\x01 \x01(\x0c\"!\n\x0ever_cred_2_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"o\n\x03zkp\x12\x11\n\tchallenge\x18\x01 \x01(\x0c\x12$\n\x08response\x18\x02 \x03(\x0b\x32\x12.zkp.ResponseEntry\x1a/\n\rResponseEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x32\xa2\x02\n\tConnector\x12\x30\n\niss_enroll\x12\x0f.iss_enroll_msg\x1a\x0f.iss_enroll_rsp\"\x00\x12-\n\tanon_auth\x12\x0e.anon_auth_msg\x1a\x0e.anon_auth_rsp\"\x00\x12!\n\x05\x65q_id\x12\n.eq_id_msg\x1a\n.eq_id_rsp\"\x00\x12-\n\tcred_sign\x12\x0e.cred_sign_msg\x1a\x0e.cred_sign_rsp\"\x00\x12\x30\n\nver_cred_1\x12\x0f.ver_cred_1_msg\x1a\x0f.ver_cred_1_rsp\"\x00\x12\x30\n\nver_cred_2\x12\x0f.ver_cred_2_msg\x1a\x0f.ver_cred_2_rsp\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\npapr.proto\"\x1e\n\x0eiss_enroll_msg\x12\x0c\n\x04load\x18\x01 \x01(\x0c\"\x1e\n\x0eiss_enroll_rsp\x12\x0c\n\x04load\x18\x01 \x01(\x0c\"5\n\ranon_auth_msg\x12\r\n\x05sigma\x18\x01 \x01(\x0c\x12\x15\n\x07pi_show\x18\x02 \x01(\x0b\x32\x04.zkp\" \n\ranon_auth_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"&\n\x0f\x64\x61ta_dist_1_msg\x12\x13\n\x0buser_commit\x18\x01 \x01(\x0c\".\n\x0f\x64\x61ta_dist_1_rsp\x12\x1b\n\x13issuer_random_value\x18\x01 \x01(\x0c\"f\n\x0f\x64\x61ta_dist_2_msg\x12\x19\n\x11user_random_value\x18\x01 \x01(\x0c\x12\x0e\n\x06\x45_list\x18\x02 \x01(\x0c\x12\x0e\n\x06\x43_list\x18\x03 \x01(\x0c\x12\r\n\x05proof\x18\x04 \x01(\x0c\x12\t\n\x01h\x18\x05 \x01(\x0c\"\"\n\x0f\x64\x61ta_dist_2_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"\x1e\n\teq_id_msg\x12\x11\n\ty_c_gamma\x18\x01 \x01(\x0c\"\x1c\n\teq_id_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"!\n\rcred_sign_msg\x12\x10\n\x08pub_cred\x18\x01 \x01(\x0c\"\'\n\rcred_sign_rsp\x12\x16\n\x0esigma_pub_cred\x18\x01 \x01(\x0c\"\x10\n\x0ever_cred_1_msg\"\x1b\n\x0ever_cred_1_rsp\x12\t\n\x01m\x18\x01 \x01(\x0c\"+\n\x0ever_cred_2_msg\x12\x19\n\x11sigma_priv_cred_m\x18\x01 \x01(\x0c\"!\n\x0ever_cred_2_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"o\n\x03zkp\x12\x11\n\tchallenge\x18\x01 \x01(\x0c\x12$\n\x08response\x18\x02 \x03(\x0b\x32\x12.zkp.ResponseEntry\x1a/\n\rResponseEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x32\x8c\x03\n\tConnector\x12\x30\n\niss_enroll\x12\x0f.iss_enroll_msg\x1a\x0f.iss_enroll_rsp\"\x00\x12-\n\tanon_auth\x12\x0e.anon_auth_msg\x1a\x0e.anon_auth_rsp\"\x00\x12\x33\n\x0b\x64\x61ta_dist_1\x12\x10.data_dist_1_msg\x1a\x10.data_dist_1_rsp\"\x00\x12\x33\n\x0b\x64\x61ta_dist_2\x12\x10.data_dist_2_msg\x1a\x10.data_dist_2_rsp\"\x00\x12!\n\x05\x65q_id\x12\n.eq_id_msg\x1a\n.eq_id_rsp\"\x00\x12-\n\tcred_sign\x12\x0e.cred_sign_msg\x1a\x0e.cred_sign_rsp\"\x00\x12\x30\n\nver_cred_1\x12\x0f.ver_cred_1_msg\x1a\x0f.ver_cred_1_rsp\"\x00\x12\x30\n\nver_cred_2\x12\x0f.ver_cred_2_msg\x1a\x0f.ver_cred_2_rsp\"\x00\x62\x06proto3'
 )
 
 
@@ -284,6 +284,38 @@ _DATA_DIST_2_MSG = _descriptor.Descriptor(
 )
 
 
+_DATA_DIST_2_RSP = _descriptor.Descriptor(
+  name='data_dist_2_rsp',
+  full_name='data_dist_2_rsp',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='success', full_name='data_dist_2_rsp.success', index=0,
+      number=1, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=359,
+  serialized_end=393,
+)
+
+
 _EQ_ID_MSG = _descriptor.Descriptor(
   name='eq_id_msg',
   full_name='eq_id_msg',
@@ -311,8 +343,8 @@ _EQ_ID_MSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=359,
-  serialized_end=389,
+  serialized_start=395,
+  serialized_end=425,
 )
 
 
@@ -343,8 +375,8 @@ _EQ_ID_RSP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=391,
-  serialized_end=419,
+  serialized_start=427,
+  serialized_end=455,
 )
 
 
@@ -375,8 +407,8 @@ _CRED_SIGN_MSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=421,
-  serialized_end=454,
+  serialized_start=457,
+  serialized_end=490,
 )
 
 
@@ -407,8 +439,8 @@ _CRED_SIGN_RSP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=456,
-  serialized_end=495,
+  serialized_start=492,
+  serialized_end=531,
 )
 
 
@@ -432,8 +464,8 @@ _VER_CRED_1_MSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=497,
-  serialized_end=513,
+  serialized_start=533,
+  serialized_end=549,
 )
 
 
@@ -464,8 +496,8 @@ _VER_CRED_1_RSP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=515,
-  serialized_end=542,
+  serialized_start=551,
+  serialized_end=578,
 )
 
 
@@ -496,8 +528,8 @@ _VER_CRED_2_MSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=544,
-  serialized_end=587,
+  serialized_start=580,
+  serialized_end=623,
 )
 
 
@@ -528,8 +560,8 @@ _VER_CRED_2_RSP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=589,
-  serialized_end=622,
+  serialized_start=625,
+  serialized_end=658,
 )
 
 
@@ -567,8 +599,8 @@ _ZKP_RESPONSEENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=688,
-  serialized_end=735,
+  serialized_start=724,
+  serialized_end=771,
 )
 
 _ZKP = _descriptor.Descriptor(
@@ -605,8 +637,8 @@ _ZKP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=624,
-  serialized_end=735,
+  serialized_start=660,
+  serialized_end=771,
 )
 
 _ANON_AUTH_MSG.fields_by_name['pi_show'].message_type = _ZKP
@@ -619,6 +651,7 @@ DESCRIPTOR.message_types_by_name['anon_auth_rsp'] = _ANON_AUTH_RSP
 DESCRIPTOR.message_types_by_name['data_dist_1_msg'] = _DATA_DIST_1_MSG
 DESCRIPTOR.message_types_by_name['data_dist_1_rsp'] = _DATA_DIST_1_RSP
 DESCRIPTOR.message_types_by_name['data_dist_2_msg'] = _DATA_DIST_2_MSG
+DESCRIPTOR.message_types_by_name['data_dist_2_rsp'] = _DATA_DIST_2_RSP
 DESCRIPTOR.message_types_by_name['eq_id_msg'] = _EQ_ID_MSG
 DESCRIPTOR.message_types_by_name['eq_id_rsp'] = _EQ_ID_RSP
 DESCRIPTOR.message_types_by_name['cred_sign_msg'] = _CRED_SIGN_MSG
@@ -678,6 +711,13 @@ data_dist_2_msg = _reflection.GeneratedProtocolMessageType('data_dist_2_msg', (_
   # @@protoc_insertion_point(class_scope:data_dist_2_msg)
   })
 _sym_db.RegisterMessage(data_dist_2_msg)
+
+data_dist_2_rsp = _reflection.GeneratedProtocolMessageType('data_dist_2_rsp', (_message.Message,), {
+  'DESCRIPTOR' : _DATA_DIST_2_RSP,
+  '__module__' : 'papr_pb2'
+  # @@protoc_insertion_point(class_scope:data_dist_2_rsp)
+  })
+_sym_db.RegisterMessage(data_dist_2_rsp)
 
 eq_id_msg = _reflection.GeneratedProtocolMessageType('eq_id_msg', (_message.Message,), {
   'DESCRIPTOR' : _EQ_ID_MSG,
@@ -760,8 +800,8 @@ _CONNECTOR = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=738,
-  serialized_end=1028,
+  serialized_start=774,
+  serialized_end=1170,
   methods=[
   _descriptor.MethodDescriptor(
     name='iss_enroll',
@@ -784,9 +824,29 @@ _CONNECTOR = _descriptor.ServiceDescriptor(
     create_key=_descriptor._internal_create_key,
   ),
   _descriptor.MethodDescriptor(
+    name='data_dist_1',
+    full_name='Connector.data_dist_1',
+    index=2,
+    containing_service=None,
+    input_type=_DATA_DIST_1_MSG,
+    output_type=_DATA_DIST_1_RSP,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='data_dist_2',
+    full_name='Connector.data_dist_2',
+    index=3,
+    containing_service=None,
+    input_type=_DATA_DIST_2_MSG,
+    output_type=_DATA_DIST_2_RSP,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
     name='eq_id',
     full_name='Connector.eq_id',
-    index=2,
+    index=4,
     containing_service=None,
     input_type=_EQ_ID_MSG,
     output_type=_EQ_ID_RSP,
@@ -796,7 +856,7 @@ _CONNECTOR = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='cred_sign',
     full_name='Connector.cred_sign',
-    index=3,
+    index=5,
     containing_service=None,
     input_type=_CRED_SIGN_MSG,
     output_type=_CRED_SIGN_RSP,
@@ -806,7 +866,7 @@ _CONNECTOR = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='ver_cred_1',
     full_name='Connector.ver_cred_1',
-    index=4,
+    index=6,
     containing_service=None,
     input_type=_VER_CRED_1_MSG,
     output_type=_VER_CRED_1_RSP,
@@ -816,7 +876,7 @@ _CONNECTOR = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='ver_cred_2',
     full_name='Connector.ver_cred_2',
-    index=5,
+    index=7,
     containing_service=None,
     input_type=_VER_CRED_2_MSG,
     output_type=_VER_CRED_2_RSP,

@@ -38,21 +38,11 @@ class User():
         self.pub_id = self.priv_id * g0
         self.user_sk, self.user_pk, self.ciphertext, self.pi_prepare_obtain = prepare_blind_obtain_cmz(self.params, self.priv_id)
         self.gamma = self.user_pk['h']
-        msg = self.conn.make_iss_enroll_msg(id, self.pub_id, self.gamma, self.ciphertext, self.pi_prepare_obtain)
+        msg = make_iss_enroll_msg(id, self.pub_id, self.gamma, self.ciphertext, self.pi_prepare_obtain)
         rsp = self.conn.stub.iss_enroll(msg)
-        sigma_pub_id, u, e_u_prime, pi_issue, biparams = self.conn.unpack_iss_enroll_rsp(rsp)
+        self.sigma_pub_id, u, e_u_prime, pi_issue, biparams = unpack_iss_enroll_rsp(rsp)
         self.u, self.u_prime = blind_obtain_cmz(self.params, self.iparams, self.user_sk, u, e_u_prime, pi_issue, biparams,
                                                 self.gamma, self.ciphertext)
-        # return self.id, self.pub_id, (self.user_sk, self.user_pk, self.ciphertext, self.pi_prepare_obtain)
-
-    # def req_enroll_2(self, u_sk, u, e_u_prime, pi_issue, biparams, gamma, ciphertext):
-    #     """
-    #     Returns the T(ID), if all goes well.
-    #     """
-    #     self.u, self.u_prime = blind_obtain_cmz(self.params, self.iparams, u_sk, u, e_u_prime, pi_issue, biparams,
-    #                                             gamma, ciphertext)
-    #     return self.u, self.u_prime
-
     # anonymous authentication
 
     def req_cred_anon_auth(self, t_id):
@@ -121,17 +111,20 @@ class Connector():
         channel = grpc.insecure_channel('localhost:50051')
         self.stub = ConnectorStub(channel)
 
-    def make_iss_enroll_msg(self, id, pub_id, gamma, ciphertext, proof):
-        return iss_enroll_msg(load=encode([id, pub_id, gamma, ciphertext, proof]))
 
-    def unpack_iss_enroll_rsp(self, rsp):
-        [sigma_pub_id, u, e_u_prime, pi_issue, biparams] = decode(rsp.load)
-        return sigma_pub_id, u, e_u_prime, pi_issue, biparams
-    
+def make_iss_enroll_msg(id, pub_id, gamma, ciphertext, proof):
+    return iss_enroll_msg(load=encode([id, pub_id, gamma, ciphertext, proof]))
+
+
+def unpack_iss_enroll_rsp(rsp):
+    [sigma_pub_id, u, e_u_prime, pi_issue, biparams] = decode(rsp.load)
+    # print("sigma_pub_id: ", sigma_pub_id, "u ", u, "e_u_prime: ", e_u_prime, "pi_issue: ", pi_issue, "biparams: ", biparams)
+    return tuple(sigma_pub_id), u, e_u_prime, tuple(pi_issue), biparams
+
 
 if __name__ == '__main__':
     issuer = Issuer()
-    id = "Wilmer Nilsson"
+    id = "Abradolf Lincler"
     (y_sign, y_encr), (iparams, i_sk), sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(3, 10)
     user = User(issuer.get_params(), iparams, y_sign, y_encr, 3, 10)
-    user.req_enroll_1(id)
+    user.req_enroll(id)
