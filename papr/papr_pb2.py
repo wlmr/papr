@@ -19,10 +19,67 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\npapr.proto\"\x1e\n\x0eiss_enroll_msg\x12\x0c\n\x04load\x18\x01 \x01(\x0c\"\x1e\n\x0eiss_enroll_rsp\x12\x0c\n\x04load\x18\x01 \x01(\x0c\"5\n\ranon_auth_msg\x12\r\n\x05sigma\x18\x01 \x01(\x0c\x12\x15\n\x07pi_show\x18\x02 \x01(\x0b\x32\x04.zkp\" \n\ranon_auth_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"&\n\x0f\x64\x61ta_dist_1_msg\x12\x13\n\x0buser_commit\x18\x01 \x01(\x0c\".\n\x0f\x64\x61ta_dist_1_rsp\x12\x1b\n\x13issuer_random_value\x18\x01 \x01(\x0c\"f\n\x0f\x64\x61ta_dist_2_msg\x12\x19\n\x11user_random_value\x18\x01 \x01(\x0c\x12\x0e\n\x06\x45_list\x18\x02 \x01(\x0c\x12\x0e\n\x06\x43_list\x18\x03 \x01(\x0c\x12\r\n\x05proof\x18\x04 \x01(\x0c\x12\t\n\x01h\x18\x05 \x01(\x0c\"\"\n\x0f\x64\x61ta_dist_2_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"\x1e\n\teq_id_msg\x12\x11\n\ty_c_gamma\x18\x01 \x01(\x0c\"\x1c\n\teq_id_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"!\n\rcred_sign_msg\x12\x10\n\x08pub_cred\x18\x01 \x01(\x0c\"\'\n\rcred_sign_rsp\x12\x16\n\x0esigma_pub_cred\x18\x01 \x01(\x0c\"\x10\n\x0ever_cred_1_msg\"\x1b\n\x0ever_cred_1_rsp\x12\t\n\x01m\x18\x01 \x01(\x0c\"+\n\x0ever_cred_2_msg\x12\x19\n\x11sigma_priv_cred_m\x18\x01 \x01(\x0c\"!\n\x0ever_cred_2_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"o\n\x03zkp\x12\x11\n\tchallenge\x18\x01 \x01(\x0c\x12$\n\x08response\x18\x02 \x03(\x0b\x32\x12.zkp.ResponseEntry\x1a/\n\rResponseEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x32\x8c\x03\n\tConnector\x12\x30\n\niss_enroll\x12\x0f.iss_enroll_msg\x1a\x0f.iss_enroll_rsp\"\x00\x12-\n\tanon_auth\x12\x0e.anon_auth_msg\x1a\x0e.anon_auth_rsp\"\x00\x12\x33\n\x0b\x64\x61ta_dist_1\x12\x10.data_dist_1_msg\x1a\x10.data_dist_1_rsp\"\x00\x12\x33\n\x0b\x64\x61ta_dist_2\x12\x10.data_dist_2_msg\x1a\x10.data_dist_2_rsp\"\x00\x12!\n\x05\x65q_id\x12\n.eq_id_msg\x1a\n.eq_id_rsp\"\x00\x12-\n\tcred_sign\x12\x0e.cred_sign_msg\x1a\x0e.cred_sign_rsp\"\x00\x12\x30\n\nver_cred_1\x12\x0f.ver_cred_1_msg\x1a\x0f.ver_cred_1_rsp\"\x00\x12\x30\n\nver_cred_2\x12\x0f.ver_cred_2_msg\x1a\x0f.ver_cred_2_rsp\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\npapr.proto\"\x17\n\x15get_public_params_msg\"%\n\x15get_public_params_rsp\x12\x0c\n\x04load\x18\x01 \x01(\x0c\"\x1e\n\x0eiss_enroll_msg\x12\x0c\n\x04load\x18\x01 \x01(\x0c\"\x1e\n\x0eiss_enroll_rsp\x12\x0c\n\x04load\x18\x01 \x01(\x0c\"5\n\ranon_auth_msg\x12\r\n\x05sigma\x18\x01 \x01(\x0c\x12\x15\n\x07pi_show\x18\x02 \x01(\x0b\x32\x04.zkp\" \n\ranon_auth_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"&\n\x0f\x64\x61ta_dist_1_msg\x12\x13\n\x0buser_commit\x18\x01 \x01(\x0c\".\n\x0f\x64\x61ta_dist_1_rsp\x12\x1b\n\x13issuer_random_value\x18\x01 \x01(\x0c\"f\n\x0f\x64\x61ta_dist_2_msg\x12\x19\n\x11user_random_value\x18\x01 \x01(\x0c\x12\x0e\n\x06\x45_list\x18\x02 \x01(\x0c\x12\x0e\n\x06\x43_list\x18\x03 \x01(\x0c\x12\r\n\x05proof\x18\x04 \x01(\x0c\x12\t\n\x01h\x18\x05 \x01(\x0c\"\"\n\x0f\x64\x61ta_dist_2_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"\x1e\n\teq_id_msg\x12\x11\n\ty_c_gamma\x18\x01 \x01(\x0c\"\x1c\n\teq_id_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"!\n\rcred_sign_msg\x12\x10\n\x08pub_cred\x18\x01 \x01(\x0c\"\'\n\rcred_sign_rsp\x12\x16\n\x0esigma_pub_cred\x18\x01 \x01(\x0c\"\x10\n\x0ever_cred_1_msg\"\x1b\n\x0ever_cred_1_rsp\x12\t\n\x01m\x18\x01 \x01(\x0c\"+\n\x0ever_cred_2_msg\x12\x19\n\x11sigma_priv_cred_m\x18\x01 \x01(\x0c\"!\n\x0ever_cred_2_rsp\x12\x0f\n\x07success\x18\x01 \x01(\x08\"o\n\x03zkp\x12\x11\n\tchallenge\x18\x01 \x01(\x0c\x12$\n\x08response\x18\x02 \x03(\x0b\x32\x12.zkp.ResponseEntry\x1a/\n\rResponseEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x32\xd3\x03\n\tConnector\x12\x45\n\x11get_public_params\x12\x16.get_public_params_msg\x1a\x16.get_public_params_rsp\"\x00\x12\x30\n\niss_enroll\x12\x0f.iss_enroll_msg\x1a\x0f.iss_enroll_rsp\"\x00\x12-\n\tanon_auth\x12\x0e.anon_auth_msg\x1a\x0e.anon_auth_rsp\"\x00\x12\x33\n\x0b\x64\x61ta_dist_1\x12\x10.data_dist_1_msg\x1a\x10.data_dist_1_rsp\"\x00\x12\x33\n\x0b\x64\x61ta_dist_2\x12\x10.data_dist_2_msg\x1a\x10.data_dist_2_rsp\"\x00\x12!\n\x05\x65q_id\x12\n.eq_id_msg\x1a\n.eq_id_rsp\"\x00\x12-\n\tcred_sign\x12\x0e.cred_sign_msg\x1a\x0e.cred_sign_rsp\"\x00\x12\x30\n\nver_cred_1\x12\x0f.ver_cred_1_msg\x1a\x0f.ver_cred_1_rsp\"\x00\x12\x30\n\nver_cred_2\x12\x0f.ver_cred_2_msg\x1a\x0f.ver_cred_2_rsp\"\x00\x62\x06proto3'
 )
 
 
+
+
+_GET_PUBLIC_PARAMS_MSG = _descriptor.Descriptor(
+  name='get_public_params_msg',
+  full_name='get_public_params_msg',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=14,
+  serialized_end=37,
+)
+
+
+_GET_PUBLIC_PARAMS_RSP = _descriptor.Descriptor(
+  name='get_public_params_rsp',
+  full_name='get_public_params_rsp',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='load', full_name='get_public_params_rsp.load', index=0,
+      number=1, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=39,
+  serialized_end=76,
+)
 
 
 _ISS_ENROLL_MSG = _descriptor.Descriptor(
@@ -52,8 +109,8 @@ _ISS_ENROLL_MSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=14,
-  serialized_end=44,
+  serialized_start=78,
+  serialized_end=108,
 )
 
 
@@ -84,8 +141,8 @@ _ISS_ENROLL_RSP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=46,
-  serialized_end=76,
+  serialized_start=110,
+  serialized_end=140,
 )
 
 
@@ -123,8 +180,8 @@ _ANON_AUTH_MSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=78,
-  serialized_end=131,
+  serialized_start=142,
+  serialized_end=195,
 )
 
 
@@ -155,8 +212,8 @@ _ANON_AUTH_RSP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=133,
-  serialized_end=165,
+  serialized_start=197,
+  serialized_end=229,
 )
 
 
@@ -187,8 +244,8 @@ _DATA_DIST_1_MSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=167,
-  serialized_end=205,
+  serialized_start=231,
+  serialized_end=269,
 )
 
 
@@ -219,8 +276,8 @@ _DATA_DIST_1_RSP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=207,
-  serialized_end=253,
+  serialized_start=271,
+  serialized_end=317,
 )
 
 
@@ -279,8 +336,8 @@ _DATA_DIST_2_MSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=255,
-  serialized_end=357,
+  serialized_start=319,
+  serialized_end=421,
 )
 
 
@@ -311,8 +368,8 @@ _DATA_DIST_2_RSP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=359,
-  serialized_end=393,
+  serialized_start=423,
+  serialized_end=457,
 )
 
 
@@ -343,8 +400,8 @@ _EQ_ID_MSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=395,
-  serialized_end=425,
+  serialized_start=459,
+  serialized_end=489,
 )
 
 
@@ -375,8 +432,8 @@ _EQ_ID_RSP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=427,
-  serialized_end=455,
+  serialized_start=491,
+  serialized_end=519,
 )
 
 
@@ -407,8 +464,8 @@ _CRED_SIGN_MSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=457,
-  serialized_end=490,
+  serialized_start=521,
+  serialized_end=554,
 )
 
 
@@ -439,8 +496,8 @@ _CRED_SIGN_RSP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=492,
-  serialized_end=531,
+  serialized_start=556,
+  serialized_end=595,
 )
 
 
@@ -464,8 +521,8 @@ _VER_CRED_1_MSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=533,
-  serialized_end=549,
+  serialized_start=597,
+  serialized_end=613,
 )
 
 
@@ -496,8 +553,8 @@ _VER_CRED_1_RSP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=551,
-  serialized_end=578,
+  serialized_start=615,
+  serialized_end=642,
 )
 
 
@@ -528,8 +585,8 @@ _VER_CRED_2_MSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=580,
-  serialized_end=623,
+  serialized_start=644,
+  serialized_end=687,
 )
 
 
@@ -560,8 +617,8 @@ _VER_CRED_2_RSP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=625,
-  serialized_end=658,
+  serialized_start=689,
+  serialized_end=722,
 )
 
 
@@ -599,8 +656,8 @@ _ZKP_RESPONSEENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=724,
-  serialized_end=771,
+  serialized_start=788,
+  serialized_end=835,
 )
 
 _ZKP = _descriptor.Descriptor(
@@ -637,13 +694,15 @@ _ZKP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=660,
-  serialized_end=771,
+  serialized_start=724,
+  serialized_end=835,
 )
 
 _ANON_AUTH_MSG.fields_by_name['pi_show'].message_type = _ZKP
 _ZKP_RESPONSEENTRY.containing_type = _ZKP
 _ZKP.fields_by_name['response'].message_type = _ZKP_RESPONSEENTRY
+DESCRIPTOR.message_types_by_name['get_public_params_msg'] = _GET_PUBLIC_PARAMS_MSG
+DESCRIPTOR.message_types_by_name['get_public_params_rsp'] = _GET_PUBLIC_PARAMS_RSP
 DESCRIPTOR.message_types_by_name['iss_enroll_msg'] = _ISS_ENROLL_MSG
 DESCRIPTOR.message_types_by_name['iss_enroll_rsp'] = _ISS_ENROLL_RSP
 DESCRIPTOR.message_types_by_name['anon_auth_msg'] = _ANON_AUTH_MSG
@@ -662,6 +721,20 @@ DESCRIPTOR.message_types_by_name['ver_cred_2_msg'] = _VER_CRED_2_MSG
 DESCRIPTOR.message_types_by_name['ver_cred_2_rsp'] = _VER_CRED_2_RSP
 DESCRIPTOR.message_types_by_name['zkp'] = _ZKP
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
+
+get_public_params_msg = _reflection.GeneratedProtocolMessageType('get_public_params_msg', (_message.Message,), {
+  'DESCRIPTOR' : _GET_PUBLIC_PARAMS_MSG,
+  '__module__' : 'papr_pb2'
+  # @@protoc_insertion_point(class_scope:get_public_params_msg)
+  })
+_sym_db.RegisterMessage(get_public_params_msg)
+
+get_public_params_rsp = _reflection.GeneratedProtocolMessageType('get_public_params_rsp', (_message.Message,), {
+  'DESCRIPTOR' : _GET_PUBLIC_PARAMS_RSP,
+  '__module__' : 'papr_pb2'
+  # @@protoc_insertion_point(class_scope:get_public_params_rsp)
+  })
+_sym_db.RegisterMessage(get_public_params_rsp)
 
 iss_enroll_msg = _reflection.GeneratedProtocolMessageType('iss_enroll_msg', (_message.Message,), {
   'DESCRIPTOR' : _ISS_ENROLL_MSG,
@@ -800,13 +873,23 @@ _CONNECTOR = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=774,
-  serialized_end=1170,
+  serialized_start=838,
+  serialized_end=1305,
   methods=[
+  _descriptor.MethodDescriptor(
+    name='get_public_params',
+    full_name='Connector.get_public_params',
+    index=0,
+    containing_service=None,
+    input_type=_GET_PUBLIC_PARAMS_MSG,
+    output_type=_GET_PUBLIC_PARAMS_RSP,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
   _descriptor.MethodDescriptor(
     name='iss_enroll',
     full_name='Connector.iss_enroll',
-    index=0,
+    index=1,
     containing_service=None,
     input_type=_ISS_ENROLL_MSG,
     output_type=_ISS_ENROLL_RSP,
@@ -816,7 +899,7 @@ _CONNECTOR = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='anon_auth',
     full_name='Connector.anon_auth',
-    index=1,
+    index=2,
     containing_service=None,
     input_type=_ANON_AUTH_MSG,
     output_type=_ANON_AUTH_RSP,
@@ -826,7 +909,7 @@ _CONNECTOR = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='data_dist_1',
     full_name='Connector.data_dist_1',
-    index=2,
+    index=3,
     containing_service=None,
     input_type=_DATA_DIST_1_MSG,
     output_type=_DATA_DIST_1_RSP,
@@ -836,7 +919,7 @@ _CONNECTOR = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='data_dist_2',
     full_name='Connector.data_dist_2',
-    index=3,
+    index=4,
     containing_service=None,
     input_type=_DATA_DIST_2_MSG,
     output_type=_DATA_DIST_2_RSP,
@@ -846,7 +929,7 @@ _CONNECTOR = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='eq_id',
     full_name='Connector.eq_id',
-    index=4,
+    index=5,
     containing_service=None,
     input_type=_EQ_ID_MSG,
     output_type=_EQ_ID_RSP,
@@ -856,7 +939,7 @@ _CONNECTOR = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='cred_sign',
     full_name='Connector.cred_sign',
-    index=5,
+    index=6,
     containing_service=None,
     input_type=_CRED_SIGN_MSG,
     output_type=_CRED_SIGN_RSP,
@@ -866,7 +949,7 @@ _CONNECTOR = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='ver_cred_1',
     full_name='Connector.ver_cred_1',
-    index=6,
+    index=7,
     containing_service=None,
     input_type=_VER_CRED_1_MSG,
     output_type=_VER_CRED_1_RSP,
@@ -876,7 +959,7 @@ _CONNECTOR = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='ver_cred_2',
     full_name='Connector.ver_cred_2',
-    index=7,
+    index=8,
     containing_service=None,
     input_type=_VER_CRED_2_MSG,
     output_type=_VER_CRED_2_RSP,

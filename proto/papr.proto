@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 service Connector {
+    rpc get_public_params(get_public_params_msg) returns (get_public_params_rsp) {}
     rpc iss_enroll(iss_enroll_msg) returns (iss_enroll_rsp) {}
     rpc anon_auth(anon_auth_msg) returns (anon_auth_rsp) {}
     rpc data_dist_1(data_dist_1_msg) returns (data_dist_1_rsp) {}
@@ -9,6 +10,14 @@ service Connector {
     rpc cred_sign(cred_sign_msg) returns (cred_sign_rsp) {}
     rpc ver_cred_1(ver_cred_1_msg) returns (ver_cred_1_rsp) {}
     rpc ver_cred_2(ver_cred_2_msg) returns (ver_cred_2_rsp) {}
+}
+
+
+message get_public_params_msg {
+}
+
+message get_public_params_rsp {
+  bytes load = 1;
 }
 
 message iss_enroll_msg {
