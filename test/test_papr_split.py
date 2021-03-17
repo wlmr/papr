@@ -1,8 +1,9 @@
 from papr.papr_user import User
 from papr.papr_issuer import Issuer
-from papr.ecdsa import verify
+from papr.ecdsa import sign, verify
 import pvss.pvss as pvss
 from petlib.pack import encode, decode
+from amac.credential_scheme import setup as setup_cmz
 
 
 class TestPaprSplit:
@@ -220,9 +221,13 @@ class TestPaprSplit:
 
         # Cred usage:
         # FIXME: Start here.
-        # m = issuer.ver_cred_1()
-        # (r, s) = user.show_cred_1(signed_pub_cred, m)
-        # assert issuer.ver_cred_2(r, s, PubCred, m)
+        m = issuer.ver_cred_1()
+
+        (r2, s2) = user.show_cred_1(m)
+        # assert issuer.ver_cred_2(r2, s2, PubCred, m)
+
+        # (r2, s2) = user.show_cred_1(signed_pub_cred, m)
+        # assert issuer.ver_cred_2(r2, s2, PubCred, m)
 
         # Reconstruction
 
@@ -255,30 +260,29 @@ class TestPaprSplit:
         assert answer is not None
         assert answer == pub_id
 
-
     def test_encode_decode(self):
-            (k, n) = (3, 10)
-            issuer = Issuer()
-            (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(k, n)
+        (k, n) = (3, 10)
+        issuer = Issuer()
+        (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(k, n)
 
-            params = issuer.get_params()
-            (_, p, _, _) = params
-            priv_keys = []
-            pub_keys = []
-            for i in range(n*2):
-                (x_i, y_i) = pvss.generate_key_pair(params)
-                priv_keys.append(x_i)
-                pub_keys.append(y_i)
+        params = issuer.get_params()
+        (_, p, _, _) = params
+        priv_keys = []
+        pub_keys = []
+        for i in range(n*2):
+            (x_i, y_i) = pvss.generate_key_pair(params)
+            priv_keys.append(x_i)
+            pub_keys.append(y_i)
 
-            # Note: take from L_sys instead??
-            user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n)
-            id = "Id text"
-            # Enroll:
-            _, pub_id, (u_sk, u_pk, c, pi_prepare_obtain) = user.req_enroll_1(id)
-            ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id, user_list)
-            # assert decode(encode(ret)) == ret
+        # Note: take from L_sys instead??
+        user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n)
+        id = "Id text"
+        # Enroll:
+        _, pub_id, (u_sk, u_pk, c, pi_prepare_obtain) = user.req_enroll_1(id)
+        ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id, user_list)
+        # assert decode(encode(ret)) == ret
 
-            # assert decode(encode((((1, 2))))) == [[(1, 2)]] 
+        # assert decode(encode((((1, 2))))) == [[(1, 2)]]
 
     def test_encode_decode_list(self):
         (k, n) = (3, 10)
@@ -333,3 +337,14 @@ class TestPaprSplit:
 
         # encode(cred_list)
         # assert cred_list == decode(encode(cred_list))
+
+
+    def test_sign_verify(self):
+        params = setup_cmz(1)
+        (_, p, g0, g1) = params
+
+        x_sign = p.random()
+        y_sign = x_sign * g0
+        m = p.random()
+        r, s = sign(params, x_sign, [m])
+        assert verify(params, r, s, y_sign, [m])

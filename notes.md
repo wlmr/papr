@@ -15,6 +15,8 @@ with the previously used secret key, i.e. γ=l^d, and then use d again so as to 
 [ ] continue with gRPC tomorrow and get it in to user
 [ ] Data distrubution: Save custodian_list in relation to user (alternativly save parameters needed to recreate)
 [ ] Data distrubution: Save issuer random value in relation on user (can be disgarded later if custodian_list is saved)
+[ ] Make sure issuer knows who it recieves revoke responses from 
+[ ] Bootstrap
 ---
 from root:
 ```
