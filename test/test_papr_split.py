@@ -59,29 +59,13 @@ class TestPaprSplit:
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
-        # (my_priv_key, my_pub_key) = pvss.generate_key_pair(params)
-
-        # r1 = data_distrubution_U_1(params)
-        # r2 = data_distrubution_I_1(params)
-
         _ = user.req_cred_data_dist_1()
         issuer_random = issuer.iss_cred_data_dist_1()
-        # Both publishes their commits. When they recive the other ones commit they send their random value.
-        # and verifyes that the commit and random value they recived are correct.
-        # assert user.req_cred_data_dist_2(issueer_random) is True
         _, _, C_list, _, group_generator = user.req_cred_data_dist_2(issuer_random, pub_keys)
         return C_list, group_generator
 
-    def test_data_distrubution_2(self):
-
-        # r1 U generates a random number and commitment req_cred_data_dist_1 and sends the commitment to I.
-        # i1 I stores the commitment, generates a random value with commitment and sends commitment to U.
-        # r2 U sends the commited to random value to I.
-        # i2 I responds with their random value. **??** And calculates which custodians to use and stores it.
-        # r3 U recives the random value and calulates the custodians, and generates a encrypted shares to the custodians, commitments and proof
-        # i3 I verifies proof. If valid. Proof of identity is initaited.
+    def test_data_distrubution(self):
         (k, n) = (3, 10)
-
         issuer = Issuer()
         (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(k, n)
 
@@ -94,19 +78,11 @@ class TestPaprSplit:
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
-        # (my_priv_key, my_pub_key) = pvss.generate_key_pair(params)
-
-        # r1 = data_distrubution_U_1(params)
-        # r2 = data_distrubution_I_1(params)
-
         user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n)
         user.req_enroll_1('This is just here so that priv_id is generated')
 
         requester_commit = user.req_cred_data_dist_1()
         issuer_random = issuer.iss_cred_data_dist_1()
-        # Both publishes their commits. When they recive the other ones commit they send their random value.
-        # and verifyes that the commit and random value they recived are correct.
-        # assert user.req_cred_data_dist_2(issueer_random) is True
         requester_random, E_list, C_list, proof, group_generator = user.req_cred_data_dist_2(issuer_random, pub_keys)
 
         custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator)
@@ -115,7 +91,7 @@ class TestPaprSplit:
     def test_restore(self):
         (k, n) = (3, 10)
         issuer = Issuer()
-        (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(k, n)
+        (y_sign, y_encr), iparams, _, _, _, _, _ = issuer.setup(k, n)
 
         params = issuer.get_params()
         (_, p, _, _) = params
@@ -126,20 +102,13 @@ class TestPaprSplit:
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
-        # r1 = data_distrubution_U_1(params)
-        # r2 = data_distrubution_I_1(params)
         user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n)
         _, my_pub_key, _ = user.req_enroll_1('This is just here so that priv_id is generated')
 
         requester_commit = user.req_cred_data_dist_1()
         issuer_random = issuer.iss_cred_data_dist_1()
-        # Both publishes their commits. When they recive the other ones commit they send their random value.
-        # and verifyes that the commit and random value they recived are correct.
-        # assert user.req_cred_data_dist_2(issueer_random) is True
-        requester_random, E_list, C_list, proof, group_generator = user.req_cred_data_dist_2(issuer_random, pub_keys)
 
-        # selected_pub_keys = data_distrubution_select(pub_keys, r1, r2, n, p)
-        # E_list, C_list, proof, group_generator = data_distrubution_U_2(params, my_priv_key, selected_pub_keys, k, n)
+        requester_random, E_list, C_list, proof, group_generator = user.req_cred_data_dist_2(issuer_random, pub_keys)
 
         custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator)
         assert custodian_list is not None
@@ -174,7 +143,6 @@ class TestPaprSplit:
         (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(k, n)
 
         params = issuer.get_params()
-        (_, p, _, _) = params
         priv_keys = []
         pub_keys = []
         for i in range(n*2):
@@ -185,16 +153,14 @@ class TestPaprSplit:
         # Note: take from L_sys instead??
         user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n)
         id = "Id text"
+
         # Enroll:
         _, pub_id, (u_sk, u_pk, c, pi_prepare_obtain) = user.req_enroll_1(id)
         ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id, user_list)
         if ret is not None:
             s_pub_id, (u, e_u_prime, pi_issue, biparams) = ret
             t_id = user.req_enroll_2(u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], c)
-            # return t_id, s_pub_id, pub_id
         assert ret is not None  # : "user already exists"
-        # print("user already exists")
-        # return None
 
         # Data dist
         requester_commit = user.req_cred_data_dist_1()
@@ -207,7 +173,7 @@ class TestPaprSplit:
         sigma, pi_show, z = user.req_cred_anon_auth(t_id)
         assert issuer.iss_cred_anon_auth(sigma, pi_show)
 
-        (u2, cl, _) = sigma  # FIXME: Why is this u different?
+        (u2, cl, _) = sigma
 
         # Proof of eq id:
         y, c, gamma = user.req_cred_eq_id(u2, group_generator, z, cl, C_list[0])
@@ -218,16 +184,13 @@ class TestPaprSplit:
         signed_pub_cred = issuer.iss_cred_sign(pub_cred)
 
         assert cred_list.peek() == signed_pub_cred
-        # assert cred_list[0] ==
 
         # Cred usage:
-        # FIXME: Start here.
         m = issuer.ver_cred_1()
         (r, s) = user.show_cred_1(m)
         assert issuer.ver_cred_2(r, s, pub_cred, m)
-        # Reconstruction
 
-        # REVOKE PUB CRED?? method call.
+        # Reconstruction
         issuer.get_rev_data(pub_cred)
 
         assert rev_list.peek() == pub_cred
@@ -270,7 +233,6 @@ class TestPaprSplit:
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
-        # Note: take from L_sys instead??
         user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n)
         id = "Id text"
         # Enroll:
@@ -278,7 +240,6 @@ class TestPaprSplit:
         ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id, user_list)
         ret  # Just here to remove flake error.
         # assert decode(encode(ret)) == ret
-
         # assert decode(encode((((1, 2))))) == [[(1, 2)]]
 
     def test_encode_decode_list(self):
@@ -304,10 +265,7 @@ class TestPaprSplit:
         if ret is not None:
             s_pub_id, (u, e_u_prime, pi_issue, biparams) = ret
             t_id = user.req_enroll_2(u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], c)
-            # return t_id, s_pub_id, pub_id
         assert ret is not None  # : "user already exists"
-        # print("user already exists")
-        # return None
 
         # Data dist
         requester_commit = user.req_cred_data_dist_1()
@@ -319,19 +277,17 @@ class TestPaprSplit:
         # Anonimous auth:
         sigma, pi_show, z = user.req_cred_anon_auth(t_id)
         assert issuer.iss_cred_anon_auth(sigma, pi_show)
-
-        (u2, cl, _) = sigma  # FIXME: Why is this u different?
+        (u2, cl, _) = sigma
 
         # Proof of eq id:
         y, c, gamma = user.req_cred_eq_id(u2, group_generator, z, cl, C_list[0])
         assert issuer.iss_cred_eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
-        # Fixme message to user so that it knows that it can submit credentails (anonimously)
+        # Fixme: message to user so that it knows that it can submit credentails (anonimously)
 
         PubCred = user.req_cred_sign()
         signed_pub_cred = issuer.iss_cred_sign(PubCred)
 
         assert cred_list.peek() == signed_pub_cred
-
         # encode(cred_list)
         # assert cred_list == decode(encode(cred_list))
 
