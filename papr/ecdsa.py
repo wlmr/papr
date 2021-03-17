@@ -2,8 +2,7 @@ from petlib.ec import EcGroup, Bn
 from papr.utils import hash
 
 
-def sign(params, priv_key, m: list):
-    (_, p, g, _) = params
+def sign(p, g, priv_key, m: list):
     r = 0
     s = 0
     while (r == 0 or s == 0):
@@ -14,8 +13,7 @@ def sign(params, priv_key, m: list):
     return r, s
 
 
-def verify(params, r, s, pub_key, m: list):
-    (G, p, g, _) = params
+def verify(G, p, g, r, s, pub_key, m: list):
     if pub_key != G.infinite() and G.check_point(pub_key) and (p * pub_key) == G.infinite():
         u1 = (hash(m) * s.mod_inverse(p)) % p
         u2 = (r * s.mod_inverse(p)) % p
@@ -45,16 +43,16 @@ if __name__ == '__main__':
     pub_id_x, _ = pub_id.get_affine()
     x = p.random()
     y = x * g
-    r, s = sign(params, x, pub_id_x)
-    print(verify(params, r, s, y, pub_id_x))
+    r, s = sign(p, g, x, pub_id_x)
+    print(verify(G, p, g, r, s, y, pub_id_x))
     print("-----------------------------------")
     print("-----------------------------------")
     print("should NOT work, i.e. return false:")
     print("-----(wrong signing key)-----------")
     print("-----------------------------------")
     x = Bn.from_decimal("100")
-    r, s = sign(params, x, pub_id_x)
-    print(verify(params, r, s, y, pub_id_x))
+    r, s = sign(p, g, x, pub_id_x)
+    print(verify(G, p, g, r, s, y, pub_id_x))
     print("-----------------------------------")
     print("-----------------------------------")
     print("should NOT work, i.e. return false:")
@@ -64,6 +62,6 @@ if __name__ == '__main__':
     pub_id_x, _ = pub_id.get_affine()
     x = p.random()
     y = x * g
-    r, s = sign(params, x, pub_id_x)
+    r, s = sign(p, g, x, pub_id_x)
     pub_id_x += 1
-    print(verify(params, r, s, y, pub_id_x))
+    print(verify(G, p, g, r, s, y, pub_id_x))

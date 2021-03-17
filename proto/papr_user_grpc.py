@@ -92,7 +92,7 @@ class User():
     # Show/verify credential
     def show_cred_1(self, privCred, sigma_i_pub_cred, m):
         (x_encr, x_sign) = privCred
-        return sign(self.params, x_sign, [m])
+        return sign(p, g0, x_sign, [m])
 
     # Revoke/restore
     def respond(self, L_res, params, s_e, priv_key):

@@ -87,7 +87,7 @@ class User():
     def show_cred_1(self, m):  # Need this from issuer.
         (_, x_sign) = self.priv_cred
         (G, p, _, g1) = self.params
-        return sign((G, p, g1, _), x_sign, [m])
+        return sign(p, g1, x_sign, [m])
 
     # Revoke/restore
     def respond(self, L_res, params, s_e, priv_key):

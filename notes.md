@@ -7,12 +7,11 @@ with the previously used secret key, i.e. γ=l^d, and then use d again so as to 
 [x] make the issuance procedure take a Bn instead of bytes message
 [x] implement ecdsa
 [x] make sure the signature of pub_id is checkable by y_sign
-[ ] make ecdsa use hash that can hash any object 
-[ ] make parent_list that all others inherit from
+[x] make ecdsa use hash that can hash any object 
+[x] make parent_list that all others inherit from
 [ ] fix testfiles
 [ ] investigate if to remove z from return values of blind_show. 
     It is only there for eq_id. Not even sure it is supposed to use that z tho
-[ ] continue with gRPC tomorrow and get it in to user
 [ ] Data distrubution: Save custodian_list in relation to user (alternativly save parameters needed to recreate)
 [ ] Data distrubution: Save issuer random value in relation on user (can be disgarded later if custodian_list is saved)
 [ ] Make sure issuer knows who it recieves revoke responses from 

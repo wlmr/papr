@@ -26,8 +26,9 @@ class Papr_list():
         Only allows adds comming from the issuer, as all
         calls must include a valid signature.
         """
+        (G, p, g, _) = params
         r, s = issue_signature
-        if verify(params, r, s, self.issuer_y_sign, [*entry]):
+        if verify(G, p, g, r, s, self.issuer_y_sign, [*entry]):
             self.papr_list.append(entry)
             return True
         return False

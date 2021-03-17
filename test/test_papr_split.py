@@ -33,7 +33,8 @@ class TestPaprSplit:
         t_id, (r, s), pub_id = ret
         print(f"user_list.peek():   {user_list.peek()}\n")
         assert user_list.has("Wilmer Nilsson", 0)
-        assert verify(issuer.get_params(), r, s, y_sign, (id, pub_id))
+        (G, p, g0, g1) = issuer.get_params()
+        assert verify(G, p, g0, r, s, y_sign, (id, pub_id))
 
     def test_eq_id(self):
         issuer = Issuer()
@@ -336,10 +337,10 @@ class TestPaprSplit:
 
     def test_sign_verify(self):
         params = setup_cmz(1)
-        (_, p, g0, g1) = params
+        (G, p, g0, _) = params
 
         x_sign = p.random()
         y_sign = x_sign * g0
         m = p.random()
-        r, s = sign(params, x_sign, [m])
-        assert verify(params, r, s, y_sign, [m])
+        r, s = sign(p, g0, x_sign, [m])
+        assert verify(G, p, g0, r, s, y_sign, [m])

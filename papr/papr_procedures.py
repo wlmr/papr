@@ -28,8 +28,8 @@ def setup(k, n):
     i_pk = ",".join([str(x) for x in [y_sign, y_encr]])
     [sys_list, user_list, cred_list, rev_list, res_list] = [Papr_list(y_sign) for _ in range(5)]
 
-    sys_list.add(params, crs, sign(params, x_sign, [crs]))
-    sys_list.add(params, i_pk, sign(params, x_sign, [i_pk]))
+    sys_list.add(params, crs, sign(p, g0, x_sign, [crs]))
+    sys_list.add(params, i_pk, sign(p, g0, x_sign, [i_pk]))
     return params, (x_sign, x_encr), (y_sign, y_encr), (iparams, i_sk), sys_list, user_list, cred_list, rev_list, res_list
 
 
@@ -51,7 +51,8 @@ def iss_enroll(params, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain, id, 
     decrypt and use, as well as a signature on the pub_id
     """
     if not user_list.has(id, 0):
-        sigma_pub_id = sign(params, x_sign, [id, pub_id])
+        (_, p, g0, g1) = params
+        sigma_pub_id = sign(p, g0, x_sign, [id, pub_id])
         if user_list.add(params, (id, pub_id), sigma_pub_id):
             return sigma_pub_id, blind_issue_cmz(params, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain), user_list
     return None
@@ -172,20 +173,23 @@ def req_cred_sign(params):
 
 
 def iss_cred_sign(params, iss_priv_key, new_pub_cred):
-    sigma_y_e = sign(params, iss_priv_key, new_pub_cred[0])
-    sigma_y_s = sign(params, iss_priv_key, new_pub_cred[1])
+    (_, p, g0, _) = params
+    sigma_y_e = sign(p, g0, iss_priv_key, new_pub_cred[0])
+    sigma_y_s = sign(p, g0, iss_priv_key, new_pub_cred[1])
     # AND Publish PubCred
     return (sigma_y_e, sigma_y_s)
 
 
 def show_cred_1(params, privCred, sigma_i_pub_cred, m):
+    (_, p, _, g1) = params
     (x_encr, x_sign) = privCred
-    return sign(params, x_sign, [m])
+    return sign(p, g1, x_sign, [m])
 
 
 def ver_cred_1(params, r, s, pub_cred, m):
+    (G, p, g, _) = params
     (y_encr, y_sign) = pub_cred
-    return verify(params, r, s, y_sign, [m])
+    return verify(G, p, g, r, s, y_sign, [m])
 
 
 def restore(params, proved_decrypted_shares, index_list, custodian_public_keys, encrypted_shares):
