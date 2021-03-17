@@ -26,11 +26,11 @@ class TestPaprSplit:
     def test_enroll(self):
         issuer = Issuer()
         id = "Wilmer Nilsson"
-        (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(3, 10)
+        (y_sign, y_encr), iparams, _, user_list, _, _, _ = issuer.setup(3, 10)
         user = User(issuer.get_params(), iparams, y_sign, y_encr, 3, 10)
         ret = self.helper_enroll(id, user_list, issuer, user)
         assert ret is not None
-        t_id, (r, s), pub_id = ret
+        _, (r, s), pub_id = ret
         print(f"user_list.peek():   {user_list.peek()}\n")
         assert user_list.has("Wilmer Nilsson", 0)
         assert verify(issuer.get_params(), r, s, y_sign, (id, pub_id))
@@ -66,13 +66,12 @@ class TestPaprSplit:
     def test_data_distrubution(self):
         (k, n) = (3, 10)
         issuer = Issuer()
-        (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(k, n)
+        (y_sign, y_encr), iparams, _, _, _, _, _ = issuer.setup(k, n)
 
         params = issuer.get_params()
-        (_, p, _, _) = params
         priv_keys = []
         pub_keys = []
-        for i in range(n*2):
+        for _ in range(n*2):
             (x_i, y_i) = pvss.generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
@@ -139,12 +138,12 @@ class TestPaprSplit:
     def test_full(self):
         (k, n) = (3, 10)
         issuer = Issuer()
-        (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(k, n)
+        (y_sign, y_encr), iparams, _, user_list, cred_list, rev_list, _ = issuer.setup(k, n)
 
         params = issuer.get_params()
         priv_keys = []
         pub_keys = []
-        for i in range(n*2):
+        for _ in range(n*2):
             (x_i, y_i) = pvss.generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
@@ -157,7 +156,7 @@ class TestPaprSplit:
         _, pub_id, (u_sk, u_pk, c, pi_prepare_obtain) = user.req_enroll_1(id)
         ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id, user_list)
         if ret is not None:
-            s_pub_id, (u, e_u_prime, pi_issue, biparams) = ret
+            _, (u, e_u_prime, pi_issue, biparams) = ret
             t_id = user.req_enroll_2(u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], c)
         assert ret is not None  # : "user already exists"
 
@@ -221,13 +220,13 @@ class TestPaprSplit:
     def test_encode_decode(self):
         (k, n) = (3, 10)
         issuer = Issuer()
-        (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(k, n)
+        (y_sign, y_encr), iparams, _, user_list, _, _, _ = issuer.setup(k, n)
 
         params = issuer.get_params()
         (_, p, _, _) = params
         priv_keys = []
         pub_keys = []
-        for i in range(n*2):
+        for _ in range(n*2):
             (x_i, y_i) = pvss.generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
@@ -244,13 +243,13 @@ class TestPaprSplit:
     def test_encode_decode_list(self):
         (k, n) = (3, 10)
         issuer = Issuer()
-        (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(k, n)
+        (y_sign, y_encr), iparams, _, user_list, cred_list, _, _ = issuer.setup(k, n)
 
         params = issuer.get_params()
         (_, p, _, _) = params
         priv_keys = []
         pub_keys = []
-        for i in range(n*2):
+        for _ in range(n*2):
             (x_i, y_i) = pvss.generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
