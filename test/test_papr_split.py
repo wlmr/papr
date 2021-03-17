@@ -2,6 +2,7 @@ from papr.papr_user import User
 from papr.papr_issuer import Issuer
 from papr.ecdsa import verify
 import pvss.pvss as pvss
+from petlib.pack import encode, decode
 
 
 class TestPaprSplit:
@@ -253,3 +254,28 @@ class TestPaprSplit:
         answer = issuer.restore(decoded_list, [2, 5, 8], cust_pub_keys, enc_shares)
         assert answer is not None
         assert answer == pub_id
+
+
+    def test_encode_decode(self):
+            (k, n) = (3, 10)
+            issuer = Issuer()
+            (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(k, n)
+
+            params = issuer.get_params()
+            (_, p, _, _) = params
+            priv_keys = []
+            pub_keys = []
+            for i in range(n*2):
+                (x_i, y_i) = pvss.generate_key_pair(params)
+                priv_keys.append(x_i)
+                pub_keys.append(y_i)
+
+            # Note: take from L_sys instead??
+            user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n)
+            id = "Id text"
+            # Enroll:
+            _, pub_id, (u_sk, u_pk, c, pi_prepare_obtain) = user.req_enroll_1(id)
+            ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id, user_list)
+            # assert decode(encode(ret)) == ret
+
+            # assert decode(encode((((1, 2))))) == [[(1, 2)]] 
