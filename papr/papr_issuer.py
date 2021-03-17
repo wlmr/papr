@@ -93,7 +93,7 @@ class Issuer():
         sigma_y_e = sign(self.params, self.x_sign, new_pub_cred[0])
         sigma_y_s = sign(self.params, self.x_sign, new_pub_cred[1])
         # FIXME: AND Publish PubCred
-        self.cred_list.add(self.params, (sigma_y_e, sigma_y_s), sign(self.params, self.x_sign, (sigma_y_e, sigma_y_s)))
+        self.cred_list.add(self.params, (sigma_y_e, sigma_y_s), sign(self.params, self.x_sign, (sigma_y_e, sigma_y_s)))  # Is this correct?
         # Should this be published along with something else?
         return (sigma_y_e, sigma_y_s)
 
@@ -104,7 +104,8 @@ class Issuer():
 
     def ver_cred_2(self, r, s, pub_cred, m):
         (_, y_sign) = pub_cred
-        return verify(self.params, r, s, y_sign, [m])
+        (G, p, _, g1) = self.params
+        return verify((G, p, g1, _), r, s, y_sign, [m])
 
     # Revoke/restore
     def get_rev_data(self, PubCred):

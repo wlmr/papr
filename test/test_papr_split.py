@@ -2,7 +2,7 @@ from papr.papr_user import User
 from papr.papr_issuer import Issuer
 from papr.ecdsa import sign, verify
 import pvss.pvss as pvss
-from petlib.pack import encode, decode
+# from petlib.pack import encode, decode
 from amac.credential_scheme import setup as setup_cmz
 
 
@@ -222,13 +222,8 @@ class TestPaprSplit:
         # Cred usage:
         # FIXME: Start here.
         m = issuer.ver_cred_1()
-
-        (r2, s2) = user.show_cred_1(m)
-        # assert issuer.ver_cred_2(r2, s2, PubCred, m)
-
-        # (r2, s2) = user.show_cred_1(signed_pub_cred, m)
-        # assert issuer.ver_cred_2(r2, s2, PubCred, m)
-
+        (r, s) = user.show_cred_1(m)
+        assert issuer.ver_cred_2(r, s, PubCred, m)
         # Reconstruction
 
         # REVOKE PUB CRED?? method call.
@@ -280,6 +275,7 @@ class TestPaprSplit:
         # Enroll:
         _, pub_id, (u_sk, u_pk, c, pi_prepare_obtain) = user.req_enroll_1(id)
         ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id, user_list)
+        ret  # Just here to remove flake error.
         # assert decode(encode(ret)) == ret
 
         # assert decode(encode((((1, 2))))) == [[(1, 2)]]
@@ -337,7 +333,6 @@ class TestPaprSplit:
 
         # encode(cred_list)
         # assert cred_list == decode(encode(cred_list))
-
 
     def test_sign_verify(self):
         params = setup_cmz(1)
