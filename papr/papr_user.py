@@ -95,4 +95,5 @@ class User():
         '''
         Responds with decrypted share upon request from L_rev list
         '''
-        return participant_decrypt_and_prove(self.params, self.x_i, s_e)
+        (x_encr, x_sign) = self.priv_cred
+        return participant_decrypt_and_prove(self.params, x_encr, s_e)
