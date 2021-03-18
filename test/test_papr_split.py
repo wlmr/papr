@@ -114,6 +114,7 @@ class TestPaprSplit:
 
         just_k_random_index = [1, 4, 7]
 
+
         decoded_list = []
         cust_pub_keys = []
         enc_shares = []
@@ -192,7 +193,7 @@ class TestPaprSplit:
         # Reconstruction
         issuer.get_rev_data(pub_cred)
 
-        assert rev_list.peek() == pub_cred
+        # assert rev_list.peek() == pub_cred
 
         just_k_random_index = [1, 4, 7]
 
@@ -299,3 +300,89 @@ class TestPaprSplit:
         m = p.random()
         r, s = sign(p, g0, x_sign, [m])
         assert verify(G, p, g0, r, s, y_sign, [m])
+
+
+
+    def test_bootstrap(self):
+        (k, n) = (3, 10)
+        issuer = Issuer()
+        (y_sign, y_encr), iparams, _, user_list, cred_list, rev_list, _ = issuer.setup(k, n)
+
+
+
+        bootstrap_users = []
+        pub_creds_full = []
+        pub_creds = []
+        priv_rev_tuple = []
+        for i in range(n):
+            user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n)
+            t_id, s_pub_id, pub_id = self.helper_enroll(str(i), user_list, issuer, user)
+            bootstrap_users.append((user, t_id, s_pub_id, pub_id))
+            PubCred = user.req_cred_sign()
+            pub_creds_full.append(PubCred)
+            pub_creds.append(PubCred[0])
+            #pub_creds.append
+
+        for ((user, t_id, s_pub_id, pub_id), pub_cred) in zip(bootstrap_users, pub_creds_full):
+            
+            requester_commit = user.req_cred_data_dist_1()
+            issuer_random = issuer.iss_cred_data_dist_1()
+
+            requester_random, E_list, C_list, proof, group_generator = user.req_cred_data_dist_2(issuer_random, pub_creds)
+
+            custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_creds, E_list, C_list, proof, group_generator)
+            assert custodian_list is not None
+
+
+            # Anonimous auth:
+            sigma, pi_show, z = user.req_cred_anon_auth(t_id)
+            assert issuer.iss_cred_anon_auth(sigma, pi_show)
+            (u2, cl, _) = sigma
+
+            # Proof of eq id:
+            y, c, gamma = user.req_cred_eq_id(u2, group_generator, z, cl, C_list[0])
+            assert issuer.iss_cred_eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
+            # Fixme: message to user so that it knows that it can submit credentails (anonimously)
+
+            
+            signed_pub_cred = issuer.iss_cred_sign(pub_cred)
+
+            priv_rev_tuple.append((pub_cred, E_list, custodian_list))
+       
+
+       
+       
+        
+        #just_k_random_index = [1, 4, 7]
+
+        (pub_cred, E_list, cust_pub_keys) = priv_rev_tuple[0]
+        
+
+
+        decoded_list = []
+        # cust_pub_keys = []
+        enc_shares = []
+
+        indexes = []
+
+        for (enc_share, cust_pub_key) in zip(E_list, cust_pub_keys):
+
+            # Here cusodian sees there key and answers. In this test instead we look up the private key.
+            for (i, pub_k) in zip(range(len(pub_creds)), pub_creds):
+                if pub_k == cust_pub_key:
+                    # Here we skip reading from list, since we only test restore
+                    user = (bootstrap_users[i])[0]
+                    decoded_list.append(user.respond(enc_share))
+                    indexes.append(i+1)
+                    enc_shares.append(enc_share)
+
+
+        # assert len(decoded_list) == len(just_k_random_index)
+
+        answer = issuer.restore(decoded_list[:3], indexes[:3], cust_pub_keys[:3], enc_shares[:3])
+        assert answer is not None
+        assert answer == pub_creds[0]
+
+        # [x] Enc shares empty. : Fixed
+        # [ ] Index repeat sometimes?
+        # [ ] verify correct decryption fail, called in issuer.restore
