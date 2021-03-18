@@ -11,7 +11,7 @@ from papr.papr_list import Papr_list
 
 class Issuer():
     def __init__(self):
-        pass
+        self.rev_data = {}
 
     def get_params(self):
         return self.params
@@ -90,8 +90,9 @@ class Issuer():
         return c == to_challenge(a + gamma + [cl + c0]) and lhs == rhs
 
     # Credential signing
-    def iss_cred_sign(self, new_pub_cred):
+    def iss_cred_sign(self, new_pub_cred, escrow_shares, custodian_encr_keys):
         (_, p, g0, _) = self.params
+        self.rev_data[new_pub_cred] = (escrow_shares, custodian_encr_keys)
         sigma_y_e = sign(p, g0, self.x_sign, new_pub_cred[0])
         sigma_y_s = sign(p, g0, self.x_sign, new_pub_cred[1])
         # FIXME: AND Publish PubCred
@@ -115,7 +116,7 @@ class Issuer():
         Publishes to L_rev the request to revoce the privacy corresponging to PubCred
         '''
         (_, p, g0, _) = self.params
-        self.rev_list.add(self.params, pub_cred, sign(p, g0, self.x_sign, pub_cred))
+        self.rev_list.add(self.params, (pub_cred, self.rev_data[pub_cred]), sign(p, g0, self.x_sign, (pub_cred, self.rev_data[pub_cred])))
 
     def restore(self, proved_decrypted_shares, index_list, custodian_public_keys, encrypted_shares):
         '''
@@ -130,3 +131,4 @@ class Issuer():
                 return None
         return reconstruct(S_r, index_list, p)
         # Return pub_id
+
