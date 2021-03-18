@@ -96,9 +96,9 @@ class TestPvss():
         # Generate parameters (should be same in other parts of program)
         Gq = EcGroup()
         p = Gq.order()
-        g = Gq.generator()
+        h = Gq.generator()
         G = Gq.hash_to_point(b'G')
-        params = (Gq, p, g, G)
+        params = (Gq, p, G, h)
 
         # Decide on a secret to be distributed
         m = p.from_binary(b'This is a test')
@@ -124,11 +124,11 @@ class TestPvss():
         print("Test verify")
         Y_list = pub['Y_list']
         C_list = pub['C_list']
-        assert cpni.DLEQ_verify_list(p, g, pub_keys, C_list, Y_list, proof) is True
+        assert cpni.DLEQ_verify_list(p, h, pub_keys, C_list, Y_list, proof) is True
 
         # Decryption
         # Calculate what a correct decryption should be
-        expected_decryption = m * g
+        expected_decryption = m * G
 
         # Let participants decrypt their shares and generate proofs
         proved_decryptions = [pvss.participant_decrypt_and_prove(params, x_i, enc_share) for (x_i, enc_share) in zip(priv_keys, pub['Y_list'])]
@@ -149,9 +149,9 @@ class TestPvss():
         # Generate parameters (should be same in other parts of program)
         Gq = EcGroup()
         p = Gq.order()
-        g = Gq.generator()
+        h = Gq.generator()
         G = Gq.hash_to_point(b'G')
-        params = (Gq, p, g, G)
+        params = (Gq, p, G, h)
 
         # Decide on a secret to be distrubuted
         m = p-1
@@ -177,11 +177,11 @@ class TestPvss():
         print("Test verify")
         Y_list = pub['Y_list']
         C_list = pub['C_list']
-        assert cpni.DLEQ_verify_list(p, g, pub_keys, C_list, Y_list, proof) is True
+        assert cpni.DLEQ_verify_list(p, h, pub_keys, C_list, Y_list, proof) is True
 
         # Decryption
         # Calculate what a correct decryption should be
-        expected_decryption = m * g
+        expected_decryption = m * G
 
         # Let participants decrypt their shares and generate proofs
         proved_decryptions = [pvss.participant_decrypt_and_prove(params, x_i, enc_share) for (x_i, enc_share) in zip(priv_keys, pub['Y_list'])]
