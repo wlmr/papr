@@ -181,7 +181,7 @@ class TestPaprSplit:
         # Fixme message to user so that it knows that it can submit credentails (anonimously)
 
         pub_cred = user.req_cred_sign()
-        signed_pub_cred = issuer.iss_cred_sign(pub_cred)
+        signed_pub_cred = issuer.iss_cred_sign(pub_cred, E_list, custodian_list)
 
         assert cred_list.peek() == signed_pub_cred
 
@@ -193,7 +193,7 @@ class TestPaprSplit:
         # Reconstruction
         issuer.get_rev_data(pub_cred)
 
-        # assert rev_list.peek() == pub_cred
+        assert rev_list.peek() == (pub_cred, (E_list, custodian_list))
 
         just_k_random_index = [1, 4, 7]
 
@@ -285,7 +285,7 @@ class TestPaprSplit:
         # Fixme: message to user so that it knows that it can submit credentails (anonimously)
 
         PubCred = user.req_cred_sign()
-        signed_pub_cred = issuer.iss_cred_sign(PubCred)
+        signed_pub_cred = issuer.iss_cred_sign(PubCred, E_list, custodian_list)
 
         assert cred_list.peek() == signed_pub_cred
         # encode(cred_list)
