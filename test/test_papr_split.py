@@ -252,7 +252,7 @@ class TestPaprSplit:
         priv_keys = []
         pub_keys = []
         for _ in range(n*2):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.generate_key_pair(params)  # START HERE: Which g is correct 
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
@@ -345,7 +345,7 @@ class TestPaprSplit:
             # Fixme: message to user so that it knows that it can submit credentails (anonimously)
 
             
-            signed_pub_cred = issuer.iss_cred_sign(pub_cred)
+            #signed_pub_cred = issuer.iss_cred_sign(pub_cred)
 
             priv_rev_tuple.append((pub_cred, E_list, custodian_list))
        
