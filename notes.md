@@ -18,6 +18,7 @@ with the previously used secret key, i.e. γ=l^d, and then use d again so as to 
 [ ] Bootstrap
 [ ] Same custodian can be selected twice
 [ ] You can select yourself as custodian (in bootstrap at least)
+[ ] rename group_generator to h
 ---
 from root:
 ```

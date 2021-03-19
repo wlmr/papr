@@ -44,7 +44,7 @@ def prepare_blind_obtain(params: Params, m: Bn) -> tuple[BnDict, EcPtDict, EcPtD
     with the elgamal key with some random r, as according to elgamal,
     3. sends the encryption E along with proof of knowledge of r and m to issuer.
     """
-    (_, p, g, _) = params
+    (_, p, g, h) = params
     (user_pk, user_sk) = keygen_elgamal((g, p))
     gamma = user_pk['h']
     (ciphertext, r) = encrypt_elgamal(user_pk, m)
