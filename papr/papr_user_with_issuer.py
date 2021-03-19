@@ -25,12 +25,12 @@ class User():
         Returns the tuple (id, l, g0^l, ElGamal-SK, ElGamal-PK, ElGamal-ciphertext, ZKP)
         Returns the T(ID), if all goes well.
         """
-        (_, p, g0, _) = self.params
+        (_, p, _, g1) = self.params
         self.id = id
         self.priv_id = p.random()  # a.k.a. l
-        self.pub_id = self.priv_id * g0
-        self.gamma = self.user_pk['h']
+        self.pub_id = self.priv_id * g1
         self.user_sk, self.user_pk, self.ciphertext, self.pi_prepare_obtain = prepare_blind_obtain_cmz(self.params, self.priv_id)
+        self.gamma = self.user_pk['h']
         result = self.issuer.iss_enroll(self.gamma, self.ciphertext, self.pi_prepare_obtain, id, self.pub_id)
         self.sigma_pub_id, u, e_u_prime, pi_issue, biparams = result
         self.t_id = blind_obtain_cmz(self.params, self.iparams, self.user_sk, u, e_u_prime, pi_issue, biparams,
@@ -40,15 +40,15 @@ class User():
 
     def req_cred(self):
         (_, _, _, g1) = self.params
-        pub_cred = self.req_cred_sign_1()
-        sigma, pi_show, z = self.req_cred_anon_auth(self.t_id)
+        self.pub_cred = self.req_cred_sign_1()
+        sigma, pi_show, z = self.req_cred_anon_auth()
         if not self.issuer.iss_cred_anon_auth(sigma, pi_show):
             return None
         commit = self.req_cred_data_dist_1()
         cred_signing_keys_list = [y_s for (y_s, _) in self.issuer.cred_list.read()]
-        iss_random_value = self.issuer.iss_cred_data_dist_1(pub_cred)
+        iss_random_value = self.issuer.iss_cred_data_dist_1(self.pub_cred)
         requester_random, escrow_shares, commits, proof, group_generator = self.req_cred_data_dist_2(iss_random_value, cred_signing_keys_list)
-        custodian_list = self.issuer.iss_cred_data_dist_2(commit, requester_random, cred_signing_keys_list, escrow_shares, commits, proof, group_generator, pub_cred)
+        custodian_list = self.issuer.iss_cred_data_dist_2(commit, requester_random, cred_signing_keys_list, escrow_shares, commits, proof, group_generator, self.pub_cred)
         if custodian_list is None:
             return None
         cl = self.priv_id * sigma[0] + z * g1
@@ -56,7 +56,12 @@ class User():
         y, c, gamma = self.req_cred_eq_id(sigma[0], group_generator, z, cl, c0)
         if not self.issuer.iss_cred_eq_id(sigma[0], group_generator, y, c, gamma, cl, c0):
             return None
-        self.issuer.iss_cred_sign(pub_cred)
+        self.sigma_pub_cred = self.issuer.iss_cred_sign(self.pub_cred)
+
+    def show_cred(self):
+        m = self.issuer.ver_cred_1()
+        signature = self.show_cred_1(m)
+        return self.issuer.ver_cred_2(*signature, self.pub_cred, m)
 
     # anonymous authentication
     def req_cred_anon_auth(self):
@@ -113,12 +118,13 @@ class User():
     # Show/verify credential
     def show_cred_1(self, m):  # Need this from issuer.
         (_, x_sign) = self.priv_cred
-        (G, p, _, g1) = self.params
+        (_, p, _, g1) = self.params
         return sign(p, g1, x_sign, [m])
 
     # Revoke/restore
-    def respond(self, s_e):
+    def respond(self, s_e, pub_cred):
         '''
         Responds with decrypted share upon request from L_rev list
         '''
-        return participant_decrypt_and_prove(self.params, self.x_i, s_e)
+        S_i, decryption_proof = participant_decrypt_and_prove(self.params, self.priv_cred[0], s_e)
+        self.issuer.res_list[pub_cred].append((S_i, decryption_proof))

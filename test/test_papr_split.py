@@ -26,7 +26,7 @@ class TestPaprSplit:
     def test_enroll(self):
         issuer = Issuer()
         id = "Wilmer Nilsson"
-        (y_sign, y_encr), iparams, _, user_list, _, _, _ = issuer.setup(3, 10)
+        (y_sign, y_encr), iparams, _, user_list, _, _ = issuer.setup(3, 10)
         user = User(issuer.get_params(), iparams, y_sign, y_encr, 3, 10)
         ret = self.helper_enroll(id, user_list, issuer, user)
         assert ret is not None
@@ -39,7 +39,7 @@ class TestPaprSplit:
     def test_eq_id(self):
         issuer = Issuer()
         id = "Wilmer Nilsson"
-        (_, _), iparams, _, user_list, _, _, _ = issuer.setup(3, 10)
+        (_, _), iparams, _, user_list, _, _ = issuer.setup(3, 10)
         user = User(issuer.get_params(), iparams, _, _, 3, 10)
         ret = self.helper_enroll(id, user_list, issuer, user)
         assert ret is not None
@@ -66,7 +66,7 @@ class TestPaprSplit:
     def test_data_distrubution(self):
         (k, n) = (3, 10)
         issuer = Issuer()
-        (y_sign, y_encr), iparams, _, _, _, _, _ = issuer.setup(k, n)
+        (y_sign, y_encr), iparams, _, _, _, _ = issuer.setup(k, n)
 
         params = issuer.get_params()
         priv_keys = []
@@ -90,7 +90,7 @@ class TestPaprSplit:
     def test_restore(self):
         (k, n) = (3, 10)
         issuer = Issuer()
-        (y_sign, y_encr), iparams, _, _, _, _, _ = issuer.setup(k, n)
+        (y_sign, y_encr), iparams, _, _, _, _ = issuer.setup(k, n)
 
         params = issuer.get_params()
         (_, p, _, _) = params
@@ -139,7 +139,7 @@ class TestPaprSplit:
     def test_full(self):
         (k, n) = (3, 10)
         issuer = Issuer()
-        (y_sign, y_encr), iparams, _, user_list, cred_list, rev_list, _ = issuer.setup(k, n)
+        (y_sign, y_encr), iparams, _, user_list, cred_list, rev_list = issuer.setup(k, n)
 
         params = issuer.get_params()
         priv_keys = []
@@ -221,7 +221,7 @@ class TestPaprSplit:
     def test_encode_decode(self):
         (k, n) = (3, 10)
         issuer = Issuer()
-        (y_sign, y_encr), iparams, _, user_list, _, _, _ = issuer.setup(k, n)
+        (y_sign, y_encr), iparams, _, user_list, _, _ = issuer.setup(k, n)
 
         params = issuer.get_params()
         (_, p, _, _) = params
@@ -244,7 +244,7 @@ class TestPaprSplit:
     def test_encode_decode_list(self):
         (k, n) = (3, 10)
         issuer = Issuer()
-        (y_sign, y_encr), iparams, _, user_list, cred_list, _, _ = issuer.setup(k, n)
+        (y_sign, y_encr), iparams, _, user_list, cred_list, _ = issuer.setup(k, n)
 
         params = issuer.get_params()
         (_, p, _, _) = params

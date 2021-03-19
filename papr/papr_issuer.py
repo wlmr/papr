@@ -13,6 +13,7 @@ class Issuer():
     def __init__(self):
         self.rev_data = {}
         self.temp_creds = {}
+        self.res_list = {}
 
     def get_params(self):
         return self.params
@@ -33,10 +34,10 @@ class Issuer():
         (self.iparams, self.i_sk) = cred_keygen_cmz(self.params)
         crs = ",".join([str(elem) for elem in [p.repr(), g0, g1, n, k, self.iparams['Cx0']]])
         i_pk = ",".join([str(x) for x in [self.y_sign, self.y_encr]])
-        [self.sys_list, self.user_list, self.cred_list, self.rev_list, self.res_list] = [Papr_list(self.y_sign) for _ in range(5)]
+        [self.sys_list, self.user_list, self.cred_list, self.rev_list] = [Papr_list(self.y_sign) for _ in range(4)]
         self.sys_list.add(self.params, crs, sign(p, g0, self.x_sign, [crs]))
         self.sys_list.add(self.params, i_pk, sign(p, g0, self.x_sign, [i_pk]))  # Note: Should we publish i_pk, or should it be y_sign, y_encr
-        return (self.y_sign, self.y_encr), self.iparams, self.sys_list, self.user_list, self.cred_list, self.rev_list, self.res_list
+        return (self.y_sign, self.y_encr), self.iparams, self.sys_list, self.user_list, self.cred_list, self.rev_list  # , self.res_list
 
     def iss_enroll(self, gamma, ciphertext, pi_prepare_obtain, id, pub_id):
         """
@@ -105,6 +106,7 @@ class Issuer():
         sigma_y_e = sign(p, g0, self.x_sign, pub_cred[0])
         sigma_y_s = sign(p, g0, self.x_sign, pub_cred[1])
         self.cred_list.add(self.params, (sigma_y_e, sigma_y_s), sign(p, g0, self.x_sign, (sigma_y_e, sigma_y_s)))  # Is this correct?
+        self.res_list[pub_cred] = []
         return (sigma_y_e, sigma_y_s)
 
     # Show/verify credential
