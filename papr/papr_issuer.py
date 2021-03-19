@@ -62,18 +62,18 @@ class Issuer():
     # Data distrubution
     def iss_cred_data_dist_1(self, pub_cred):
         (_, p, _, _) = self.params
-        self.temp_creds[pub_cred].append(p.random())
+        issuer_random = p.random()
+        self.temp_creds[pub_cred] = {'issuer_random': issuer_random}
+        return issuer_random
 
-    def iss_cred_data_dist_2(self, requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator, pub_cred):
+    def iss_cred_data_dist_2(self, requester_commit, requester_random, pub_keys, escrow_shares, commits, proof, group_generator, pub_cred):
         (_, p, _, _) = self.params
         if data_distrubution_verify_commit(self.params, requester_commit, requester_random):
-            # NOTE: Should be enouth to save this and return if it succeed or not.
-            custodian_list = data_distrubution_select(pub_keys, requester_random, self.temp_creds[pub_cred][0], self.n, p)
-            # FIXME: Save custodian_list in relation to user (alternativly save parameters needed to recreate)
-            if data_distrubution_issuer_verify(E_list, C_list, proof, custodian_list, group_generator, p):
-                self.temp_creds[pub_cred].append(custodian_list)
-                self.temp_creds[pub_cred].append(E_list)
-                return custodian_list
+            custodians = data_distrubution_select(pub_keys, requester_random, self.temp_creds[pub_cred]['issuer_random'], self.n, p)
+            if data_distrubution_issuer_verify(escrow_shares, commits, proof, custodians, group_generator, p):
+                self.temp_creds[pub_cred]['custodians'] = custodians
+                self.temp_creds[pub_cred]['escrow_shares'] = escrow_shares
+                return custodians
             else:
                 return None
         else:
@@ -98,8 +98,8 @@ class Issuer():
     # Credential signing
     def iss_cred_sign(self, pub_cred):
         (_, p, g0, _) = self.params
-        escrow_shares = self.temp_creds[pub_cred][1]
-        custodian_encr_keys = self.temp_creds[pub_cred][2]
+        escrow_shares = self.temp_creds[pub_cred]['escrow_shares']
+        custodian_encr_keys = self.temp_creds[pub_cred]['custodians']
         del self.temp_creds[pub_cred]
         self.rev_data[pub_cred] = (escrow_shares, custodian_encr_keys)
         sigma_y_e = sign(p, g0, self.x_sign, pub_cred[0])

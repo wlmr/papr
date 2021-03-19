@@ -15,9 +15,9 @@ class TestPaprSplit:
         x_sign: issuer's secret signature key, user_list: the list of users (ID: pub_ID) as described in PAPR.
         """
         id, pub_id, (u_sk, u_pk, c, pi_prepare_obtain) = user.req_enroll_1(id)
-        ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id, user_list)
+        ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id)
         if ret is not None:
-            s_pub_id, (u, e_u_prime, pi_issue, biparams) = ret
+            s_pub_id, u, e_u_prime, pi_issue, biparams = ret
             t_id = user.req_enroll_2(u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], c)
             return t_id, s_pub_id, pub_id
         print("user already exists")
@@ -47,7 +47,6 @@ class TestPaprSplit:
         (u, cl, _), _, z = user.req_cred_anon_auth(t_id)
         C_list, h = self.helper_data_dist_to_get_h(3, 10, issuer.get_params(), user, issuer)
         c0 = C_list[0]
-
         y, c, gamma = user.req_cred_eq_id(u, h, z, cl, c0)
         assert issuer.iss_cred_eq_id(u, h, y, c, gamma, cl, c0)
 
@@ -58,9 +57,9 @@ class TestPaprSplit:
             (x_i, y_i) = pvss.generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
-
+        pub_cred = user.req_cred_sign()
         _ = user.req_cred_data_dist_1()
-        issuer_random = issuer.iss_cred_data_dist_1()
+        issuer_random = issuer.iss_cred_data_dist_1(pub_cred)
         _, _, C_list, _, group_generator = user.req_cred_data_dist_2(issuer_random, pub_keys)
         return C_list, group_generator
 
@@ -80,11 +79,12 @@ class TestPaprSplit:
         user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n)
         user.req_enroll_1('This is just here so that priv_id is generated')
 
+        pub_cred = user.req_cred_sign()
         requester_commit = user.req_cred_data_dist_1()
-        issuer_random = issuer.iss_cred_data_dist_1()
+        issuer_random = issuer.iss_cred_data_dist_1(pub_cred)
         requester_random, E_list, C_list, proof, group_generator = user.req_cred_data_dist_2(issuer_random, pub_keys)
 
-        custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator)
+        custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator, pub_cred)
         assert custodian_list is not None
 
     def test_restore(self):
@@ -103,13 +103,13 @@ class TestPaprSplit:
 
         user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n)
         _, my_pub_key, _ = user.req_enroll_1('This is just here so that priv_id is generated')
-
+        pub_cred = user.req_cred_sign()
         requester_commit = user.req_cred_data_dist_1()
-        issuer_random = issuer.iss_cred_data_dist_1()
+        issuer_random = issuer.iss_cred_data_dist_1(pub_cred)
 
         requester_random, E_list, C_list, proof, group_generator = user.req_cred_data_dist_2(issuer_random, pub_keys)
 
-        custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator)
+        custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator, pub_cred)
         assert custodian_list is not None
 
         just_k_random_index = [1, 4, 7]
@@ -155,17 +155,18 @@ class TestPaprSplit:
 
         # Enroll:
         _, pub_id, (u_sk, u_pk, c, pi_prepare_obtain) = user.req_enroll_1(id)
-        ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id, user_list)
+        ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id)
         if ret is not None:
-            _, (u, e_u_prime, pi_issue, biparams) = ret
+            _, u, e_u_prime, pi_issue, biparams = ret
             t_id = user.req_enroll_2(u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], c)
         assert ret is not None  # : "user already exists"
 
+        pub_cred = user.req_cred_sign()
         # Data dist
         requester_commit = user.req_cred_data_dist_1()
-        issuer_random = issuer.iss_cred_data_dist_1()
+        issuer_random = issuer.iss_cred_data_dist_1(pub_cred)
         requester_random, E_list, C_list, proof, group_generator = user.req_cred_data_dist_2(issuer_random, pub_keys)
-        custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator)
+        custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator, pub_cred)
         assert custodian_list is not None
 
         # Anonimous auth:
@@ -179,8 +180,7 @@ class TestPaprSplit:
         assert issuer.iss_cred_eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
         # Fixme message to user so that it knows that it can submit credentails (anonimously)
 
-        pub_cred = user.req_cred_sign()
-        signed_pub_cred = issuer.iss_cred_sign(pub_cred, E_list, custodian_list)
+        signed_pub_cred = issuer.iss_cred_sign(pub_cred)
 
         assert cred_list.peek() == signed_pub_cred
 
@@ -236,7 +236,7 @@ class TestPaprSplit:
         id = "Id text"
         # Enroll:
         _, pub_id, (u_sk, u_pk, c, pi_prepare_obtain) = user.req_enroll_1(id)
-        ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id, user_list)
+        ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id)
         ret  # Just here to remove flake error.
         # assert decode(encode(ret)) == ret
         # assert decode(encode((((1, 2))))) == [[(1, 2)]]
@@ -260,17 +260,19 @@ class TestPaprSplit:
         id = "Id text"
         # Enroll:
         _, pub_id, (u_sk, u_pk, c, pi_prepare_obtain) = user.req_enroll_1(id)
-        ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id, user_list)
+        ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id)
         if ret is not None:
-            s_pub_id, (u, e_u_prime, pi_issue, biparams) = ret
+            s_pub_id, u, e_u_prime, pi_issue, biparams = ret
             t_id = user.req_enroll_2(u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], c)
         assert ret is not None  # : "user already exists"
 
+        pub_cred = user.req_cred_sign()
+
         # Data dist
         requester_commit = user.req_cred_data_dist_1()
-        issuer_random = issuer.iss_cred_data_dist_1()
+        issuer_random = issuer.iss_cred_data_dist_1(pub_cred)
         requester_random, E_list, C_list, proof, group_generator = user.req_cred_data_dist_2(issuer_random, pub_keys)
-        custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator)
+        custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator, pub_cred)
         assert custodian_list is not None
 
         # Anonimous auth:
@@ -283,8 +285,7 @@ class TestPaprSplit:
         assert issuer.iss_cred_eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
         # Fixme: message to user so that it knows that it can submit credentails (anonimously)
 
-        PubCred = user.req_cred_sign()
-        signed_pub_cred = issuer.iss_cred_sign(PubCred, E_list, custodian_list)
+        signed_pub_cred = issuer.iss_cred_sign(pub_cred)
 
         assert cred_list.peek() == signed_pub_cred
         # encode(cred_list)
