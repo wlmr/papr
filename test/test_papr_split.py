@@ -4,6 +4,7 @@ from papr.ecdsa import sign, verify
 import pvss.pvss as pvss
 # from petlib.pack import encode, decode
 from amac.credential_scheme import setup as setup_cmz
+from papr.papr_cred_iss_data_dist import prng
 
 
 class TestPaprSplit:
@@ -314,6 +315,7 @@ class TestPaprSplit:
         pub_creds_full = []
         pub_creds = []
         priv_rev_tuple = []
+        pub_ids = []
         for i in range(n):
             user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n)
             t_id, s_pub_id, pub_id = self.helper_enroll(str(i), user_list, issuer, user)
@@ -321,16 +323,28 @@ class TestPaprSplit:
             PubCred = user.req_cred_sign()
             pub_creds_full.append(PubCred)
             pub_creds.append(PubCred[0])
+            pub_ids.append(pub_id)
             # pub_creds.append
 
+
+        user_0_indexes = []  
+        first_user = True     
         for ((user, t_id, s_pub_id, pub_id), pub_cred) in zip(bootstrap_users, pub_creds_full):
             
             requester_commit = user.req_cred_data_dist_1()
             issuer_random = issuer.iss_cred_data_dist_1()
-
             requester_random, E_list, C_list, proof, group_generator = user.req_cred_data_dist_2(issuer_random, pub_creds)
-
             custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_creds, E_list, C_list, proof, group_generator)
+            
+
+            (_, p, _, _) = issuer.get_params()
+           
+            if first_user:
+                for i in range(n):
+                    user_0_indexes.append(prng(requester_random, issuer_random, i, p) % len(pub_creds))
+                first_user = False
+
+
             assert custodian_list is not None
 
 
@@ -362,6 +376,7 @@ class TestPaprSplit:
         decoded_list = []
         # cust_pub_keys = []
         enc_shares = []
+        cust_list = []
 
         indexes = []
 
@@ -375,13 +390,22 @@ class TestPaprSplit:
                     decoded_list.append(user.respond(enc_share))
                     indexes.append(i+1)
                     enc_shares.append(enc_share)
+                    cust_list.append(cust_pub_key)
 
 
         # assert len(decoded_list) == len(just_k_random_index)
 
-        answer = issuer.restore(decoded_list[:3], indexes[:3], cust_pub_keys[:3], enc_shares[:3])
+
+        print(user_0_indexes)
+
+        indexes2 = [i+1 for i in user_0_indexes]
+        assert indexes2 == indexes
+
+        #import pdb; pdb.set_trace()
+
+        answer = issuer.restore(decoded_list[:3], [1,2,3], cust_list[:3], enc_shares[:3])
         assert answer is not None
-        assert answer == pub_creds[0]
+        assert answer == pub_ids[0]
 
         # [x] Enc shares empty. : Fixed
         # [ ] Index repeat sometimes?

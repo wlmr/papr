@@ -107,8 +107,8 @@ class Issuer():
 
     def ver_cred_2(self, r, s, pub_cred, m):
         (_, y_sign) = pub_cred
-        (G, p, _, g1) = self.params
-        return verify(G, p, g1, r, s, y_sign, [m])
+        (G, p, g0, g1) = self.params
+        return verify(G, p, g0, r, s, y_sign, [m])
 
     # Revoke/restore
     def get_rev_data(self, pub_cred):
@@ -123,7 +123,7 @@ class Issuer():
         Restores public key given a set of at least k shares that's decrypted and proven, along with encrypted shares,
             custodian public keys and a list of which indexes are used for decryption
         '''
-        (_, p, g0, _) = self.params # START HERE: Which g is correct for usage together with participant_decrypt_and_prove 
+        (_, p, g0, g1) = self.params # START HERE: Which g is correct for usage together with participant_decrypt_and_prove 
         S_r = []
         for ((S_i, decrypt_proof), Y_i, pub_key) in zip(proved_decrypted_shares, encrypted_shares, custodian_public_keys):
             S_r.append(S_i)

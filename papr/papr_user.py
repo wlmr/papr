@@ -79,16 +79,16 @@ class User():
 
     # Credential signing
     def req_cred_sign(self):
-        (_, p, _, g1) = self.params
+        (_, p, g0, g1) = self.params
         self.priv_cred = (p.random(), p.random())
-        pub_cred = (self.priv_cred[0] * g1, self.priv_cred[1] * g1)
+        pub_cred = (self.priv_cred[0] * g0, self.priv_cred[1] * g0)
         return pub_cred
 
     # Show/verify credential
     def show_cred_1(self, m):  # Need this from issuer.
         (_, x_sign) = self.priv_cred
-        (G, p, _, g1) = self.params
-        return sign(p, g1, x_sign, [m])
+        (G, p, g0, g1) = self.params
+        return sign(p, g0, x_sign, [m])
 
     # Revoke/restore
     def respond(self, s_e):
