@@ -16,6 +16,7 @@ with the previously used secret key, i.e. γ=l^d, and then use d again so as to 
 [ ] Data distrubution: Save issuer random value in relation on user (can be disgarded later if custodian_list is saved)
 [ ] Make sure issuer knows who it recieves revoke responses from 
 [ ] Bootstrap
+[ ] rename group_generator to h
 ---
 from root:
 ```

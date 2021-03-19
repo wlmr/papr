@@ -12,6 +12,8 @@ from papr.papr_list import Papr_list
 class Issuer():
     def __init__(self):
         self.rev_data = {}
+        self.temp_creds = {}
+        self.res_list = {}
 
     def get_params(self):
         return self.params
@@ -32,42 +34,47 @@ class Issuer():
         (self.iparams, self.i_sk) = cred_keygen_cmz(self.params)
         crs = ",".join([str(elem) for elem in [p.repr(), g0, g1, n, k, self.iparams['Cx0']]])
         i_pk = ",".join([str(x) for x in [self.y_sign, self.y_encr]])
-        [self.sys_list, self.user_list, self.cred_list, self.rev_list, self.res_list] = [Papr_list(self.y_sign) for _ in range(5)]
-
+        [self.sys_list, self.user_list, self.cred_list, self.rev_list] = [Papr_list(self.y_sign) for _ in range(4)]
         self.sys_list.add(self.params, crs, sign(p, g0, self.x_sign, [crs]))
         self.sys_list.add(self.params, i_pk, sign(p, g0, self.x_sign, [i_pk]))  # Note: Should we publish i_pk, or should it be y_sign, y_encr
-        return (self.y_sign, self.y_encr), self.iparams, self.sys_list, self.user_list, self.cred_list, self.rev_list, self.res_list
+        return (self.y_sign, self.y_encr), self.iparams, self.sys_list, self.user_list, self.cred_list, self.rev_list  # , self.res_list
 
-    def iss_enroll(self, gamma, ciphertext, pi_prepare_obtain, id, pub_id, user_list):
+    def iss_enroll(self, gamma, ciphertext, pi_prepare_obtain, id, pub_id):
         """
         Returns the elgamal-encrypted credential T(ID) that only the user can
         decrypt and use, as well as a signature on the pub_id
         """
-        if not user_list.has(id, 0):
+        if not self.user_list.has(id, 0):
             (_, p, g0, _) = self.params
             sigma_pub_id = sign(p, g0, self.x_sign, [id, pub_id])
-            if user_list.add(self.params, (id, pub_id), sigma_pub_id):
-                return sigma_pub_id, blind_issue_cmz(self.params, self.iparams, self.i_sk, gamma, ciphertext, pi_prepare_obtain)
+            if self.user_list.add(self.params, (id, pub_id), sigma_pub_id):
+                u, e_u_prime, pi_issue, biparams = blind_issue_cmz(self.params, self.iparams,
+                                                                   self.i_sk, gamma, ciphertext, pi_prepare_obtain)
+                return sigma_pub_id, u, e_u_prime, pi_issue, biparams
         return None
+
+    def iss_cred(self, pub_cred):
+        self.temp_creds[pub_cred] = []
 
     # anonymous authentication
     def iss_cred_anon_auth(self, sigma, pi_show):
         return show_verify_cmz(self.params, self.iparams, self.i_sk, sigma, pi_show)
 
     # Data distrubution
-    def iss_cred_data_dist_1(self):
+    def iss_cred_data_dist_1(self, pub_cred):
         (_, p, _, _) = self.params
-        self.issuer_random = p.random()
-        return self.issuer_random  # FIXME: Make sure it's a new one for every user. And make sure transactin made in parallel (NOT possible now)
+        issuer_random = p.random()
+        self.temp_creds[pub_cred] = {'issuer_random': issuer_random}
+        return issuer_random
 
-    def iss_cred_data_dist_2(self, requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator):
+    def iss_cred_data_dist_2(self, requester_commit, requester_random, pub_keys, escrow_shares, commits, proof, group_generator, pub_cred):
         (_, p, _, _) = self.params
         if data_distrubution_verify_commit(self.params, requester_commit, requester_random):
-            # NOTE: Should be enouth to save this and return if it succeed or not.
-            custodian_list = data_distrubution_select(pub_keys, requester_random, self.issuer_random, self.n, p)
-            # FIXME: Save custodian_list in relation to user (alternativly save parameters needed to recreate)
-            if data_distrubution_issuer_verify(E_list, C_list, proof, custodian_list, group_generator, p):
-                return custodian_list
+            custodians = data_distrubution_select(pub_keys, requester_random, self.temp_creds[pub_cred]['issuer_random'], self.n, p)
+            if data_distrubution_issuer_verify(escrow_shares, commits, proof, custodians, group_generator, p):
+                self.temp_creds[pub_cred]['custodians'] = custodians
+                self.temp_creds[pub_cred]['escrow_shares'] = escrow_shares
+                return custodians
             else:
                 return None
         else:
@@ -90,14 +97,16 @@ class Issuer():
         return c == to_challenge(a + gamma + [cl + c0]) and lhs == rhs
 
     # Credential signing
-    def iss_cred_sign(self, new_pub_cred, escrow_shares, custodian_encr_keys):
+    def iss_cred_sign(self, pub_cred):
         (_, p, g0, _) = self.params
-        self.rev_data[new_pub_cred] = (escrow_shares, custodian_encr_keys)
-        sigma_y_e = sign(p, g0, self.x_sign, new_pub_cred[0])
-        sigma_y_s = sign(p, g0, self.x_sign, new_pub_cred[1])
-        # FIXME: AND Publish PubCred
+        escrow_shares = self.temp_creds[pub_cred]['escrow_shares']
+        custodian_encr_keys = self.temp_creds[pub_cred]['custodians']
+        del self.temp_creds[pub_cred]
+        self.rev_data[pub_cred] = (escrow_shares, custodian_encr_keys)
+        sigma_y_e = sign(p, g0, self.x_sign, pub_cred[0])
+        sigma_y_s = sign(p, g0, self.x_sign, pub_cred[1])
         self.cred_list.add(self.params, (sigma_y_e, sigma_y_s), sign(p, g0, self.x_sign, (sigma_y_e, sigma_y_s)))  # Is this correct?
-        # Should this be published along with something else?
+        self.res_list[pub_cred] = []
         return (sigma_y_e, sigma_y_s)
 
     # Show/verify credential
