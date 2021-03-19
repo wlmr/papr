@@ -353,14 +353,13 @@ class TestPaprSplit:
 
             priv_rev_tuple.append((pub_cred, E_list, custodian_list))
 
-        #just_k_random_index = [1, 4, 7]
+        # just_k_random_index = [1, 4, 7]
 
         (pub_cred, E_list, cust_pub_keys) = priv_rev_tuple[0]
 
         decoded_list = []
-        # cust_pub_keys = []
-        enc_shares = []
-        cust_list = []
+        # enc_shares = []
+        # cust_list = []
 
         indexes = []
 
@@ -373,19 +372,16 @@ class TestPaprSplit:
                     user = (bootstrap_users[i])[0]
                     decoded_list.append(user.respond(enc_share))
                     indexes.append(i+1)
-                    enc_shares.append(enc_share)
-                    cust_list.append(cust_pub_key)
-
-        # assert len(decoded_list) == len(just_k_random_index)
+                    # enc_shares.append(enc_share)
+                    # cust_list.append(cust_pub_key)
 
         print(user_0_indexes)
 
-        indexes2 = [i+1 for i in user_0_indexes]
-        assert indexes2 == indexes
+        # indexes2 = [i+1 for i in user_0_indexes]
+        # assert indexes2 == indexes # These indexes are relative to the total list.
+        # We instead need indexes as in which order the different pub keys are.
 
-        #import pdb; pdb.set_trace()
-
-        answer = issuer.restore(decoded_list[:3], [1, 2, 3], cust_list[:3], enc_shares[:3])
+        answer = issuer.restore(decoded_list[:3], [1, 2, 3], cust_pub_keys[:3], E_list[:3])
         assert answer is not None
         assert answer == pub_ids[0]
 
