@@ -321,7 +321,7 @@ class TestPaprSplit:
             PubCred = user.req_cred_sign()
             pub_creds_full.append(PubCred)
             pub_creds.append(PubCred[0])
-            #pub_creds.append
+            # pub_creds.append
 
         for ((user, t_id, s_pub_id, pub_id), pub_cred) in zip(bootstrap_users, pub_creds_full):
             
@@ -345,7 +345,7 @@ class TestPaprSplit:
             # Fixme: message to user so that it knows that it can submit credentails (anonimously)
 
             
-            #signed_pub_cred = issuer.iss_cred_sign(pub_cred)
+            # signed_pub_cred = issuer.iss_cred_sign(pub_cred)
 
             priv_rev_tuple.append((pub_cred, E_list, custodian_list))
        
