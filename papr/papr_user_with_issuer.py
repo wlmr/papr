@@ -43,20 +43,22 @@ class User():
         self.pub_cred = self.req_cred_sign_1()
         sigma, pi_show, z = self.req_cred_anon_auth()
         if not self.issuer.iss_cred_anon_auth(sigma, pi_show):
-            return None
+            return False
         commit = self.req_cred_data_dist_1()
         cred_signing_keys_list = [y_s for (y_s, _) in self.issuer.cred_list.read()]
         iss_random_value = self.issuer.iss_cred_data_dist_1(self.pub_cred)
         requester_random, escrow_shares, commits, proof, group_generator = self.req_cred_data_dist_2(iss_random_value, cred_signing_keys_list)
-        custodian_list = self.issuer.iss_cred_data_dist_2(commit, requester_random, cred_signing_keys_list, escrow_shares, commits, proof, group_generator, self.pub_cred)
+        custodian_list = self.issuer.iss_cred_data_dist_2(commit, requester_random, cred_signing_keys_list,
+                                                          escrow_shares, commits, proof, group_generator, self.pub_cred)
         if custodian_list is None:
-            return None
+            return False
         cl = self.priv_id * sigma[0] + z * g1
         c0 = commits[0]
         y, c, gamma = self.req_cred_eq_id(sigma[0], group_generator, z, cl, c0)
         if not self.issuer.iss_cred_eq_id(sigma[0], group_generator, y, c, gamma, cl, c0):
-            return None
+            return False
         self.sigma_pub_cred = self.issuer.iss_cred_sign(self.pub_cred)
+        return True
 
     def show_cred(self):
         m = self.issuer.ver_cred_1()
