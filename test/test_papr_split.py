@@ -321,8 +321,8 @@ class TestPaprSplit:
             pub_ids.append(pub_id)
             # pub_creds.append
 
-        user_0_indexes = []
-        first_user = True
+        # user_0_indexes = []
+        # first_user = True
         for ((user, t_id, s_pub_id, pub_id), pub_cred) in zip(bootstrap_users, pub_creds_full):
 
             requester_commit = user.req_cred_data_dist_1()
@@ -332,10 +332,10 @@ class TestPaprSplit:
 
             (_, p, _, _) = issuer.get_params()
 
-            if first_user:
-                for i in range(n):
-                    user_0_indexes.append(prng(requester_random, issuer_random, i, p) % len(pub_creds))
-                first_user = False
+            # if first_user:
+            #    for i in range(n):
+            #        user_0_indexes.append(prng(requester_random, issuer_random, i, p) % len(pub_creds))
+            #    first_user = False
 
             assert custodian_list is not None
 
@@ -364,7 +364,6 @@ class TestPaprSplit:
         indexes = []
 
         for (enc_share, cust_pub_key) in zip(E_list, cust_pub_keys):
-
             # Here cusodian sees there key and answers. In this test instead we look up the private key.
             for (i, pub_k) in zip(range(len(pub_creds)), pub_creds):
                 if pub_k == cust_pub_key:
@@ -375,7 +374,7 @@ class TestPaprSplit:
                     # enc_shares.append(enc_share)
                     # cust_list.append(cust_pub_key)
 
-        print(user_0_indexes)
+        # print(user_0_indexes)
 
         # indexes2 = [i+1 for i in user_0_indexes]
         # assert indexes2 == indexes # These indexes are relative to the total list.
