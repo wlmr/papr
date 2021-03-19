@@ -115,7 +115,6 @@ class TestPaprSplit:
 
         just_k_random_index = [1, 4, 7]
 
-
         decoded_list = []
         cust_pub_keys = []
         enc_shares = []
@@ -253,7 +252,7 @@ class TestPaprSplit:
         priv_keys = []
         pub_keys = []
         for _ in range(n*2):
-            (x_i, y_i) = pvss.generate_key_pair(params)  # START HERE: Which g is correct 
+            (x_i, y_i) = pvss.generate_key_pair(params)  # START HERE: Which g is correct
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
@@ -302,14 +301,10 @@ class TestPaprSplit:
         r, s = sign(p, g0, x_sign, [m])
         assert verify(G, p, g0, r, s, y_sign, [m])
 
-
-
     def test_bootstrap(self):
         (k, n) = (3, 10)
         issuer = Issuer()
         (y_sign, y_encr), iparams, _, user_list, cred_list, rev_list, _ = issuer.setup(k, n)
-
-
 
         bootstrap_users = []
         pub_creds_full = []
@@ -326,27 +321,23 @@ class TestPaprSplit:
             pub_ids.append(pub_id)
             # pub_creds.append
 
-
-        user_0_indexes = []  
-        first_user = True     
+        user_0_indexes = []
+        first_user = True
         for ((user, t_id, s_pub_id, pub_id), pub_cred) in zip(bootstrap_users, pub_creds_full):
-            
+
             requester_commit = user.req_cred_data_dist_1()
             issuer_random = issuer.iss_cred_data_dist_1()
             requester_random, E_list, C_list, proof, group_generator = user.req_cred_data_dist_2(issuer_random, pub_creds)
             custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_creds, E_list, C_list, proof, group_generator)
-            
 
             (_, p, _, _) = issuer.get_params()
-           
+
             if first_user:
                 for i in range(n):
                     user_0_indexes.append(prng(requester_random, issuer_random, i, p) % len(pub_creds))
                 first_user = False
 
-
             assert custodian_list is not None
-
 
             # Anonimous auth:
             sigma, pi_show, z = user.req_cred_anon_auth(t_id)
@@ -358,20 +349,13 @@ class TestPaprSplit:
             assert issuer.iss_cred_eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
             # Fixme: message to user so that it knows that it can submit credentails (anonimously)
 
-            
             # signed_pub_cred = issuer.iss_cred_sign(pub_cred)
 
             priv_rev_tuple.append((pub_cred, E_list, custodian_list))
-       
 
-       
-       
-        
         #just_k_random_index = [1, 4, 7]
 
         (pub_cred, E_list, cust_pub_keys) = priv_rev_tuple[0]
-        
-
 
         decoded_list = []
         # cust_pub_keys = []
@@ -392,9 +376,7 @@ class TestPaprSplit:
                     enc_shares.append(enc_share)
                     cust_list.append(cust_pub_key)
 
-
         # assert len(decoded_list) == len(just_k_random_index)
-
 
         print(user_0_indexes)
 
@@ -403,7 +385,7 @@ class TestPaprSplit:
 
         #import pdb; pdb.set_trace()
 
-        answer = issuer.restore(decoded_list[:3], [1,2,3], cust_list[:3], enc_shares[:3])
+        answer = issuer.restore(decoded_list[:3], [1, 2, 3], cust_list[:3], enc_shares[:3])
         assert answer is not None
         assert answer == pub_ids[0]
 
