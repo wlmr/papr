@@ -43,11 +43,11 @@ class TestPapr:
         priv_keys = []
         pub_keys = []
         for i in range(n*2):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
-        (my_priv_key, my_pub_key) = pvss.generate_key_pair(params)
+        (my_priv_key, my_pub_key) = pvss.helper_generate_key_pair(params)
 
         # r1 = data_distrubution_U_1(params)
         # r2 = data_distrubution_I_1(params)
@@ -80,11 +80,11 @@ class TestPapr:
         priv_keys = []
         pub_keys = []
         for i in range(n*2):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
-        (my_priv_key, my_pub_key) = pvss.generate_key_pair(params)
+        (my_priv_key, my_pub_key) = pvss.helper_generate_key_pair(params)
 
         # r1 = data_distrubution_U_1(params)
         # r2 = data_distrubution_I_1(params)
@@ -113,11 +113,11 @@ class TestPapr:
         priv_keys = []
         pub_keys = []
         for i in range(n*2):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
-        (my_priv_key, my_pub_key) = pvss.generate_key_pair(params)
+        (my_priv_key, my_pub_key) = pvss.helper_generate_key_pair(params)
 
         # r1 = data_distrubution_U_1(params)
         # r2 = data_distrubution_I_1(params)

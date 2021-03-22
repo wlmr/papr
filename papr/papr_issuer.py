@@ -116,8 +116,8 @@ class Issuer():
 
     def ver_cred_2(self, r, s, pub_cred, m):
         (_, y_sign) = pub_cred
-        (G, p, _, g1) = self.params
-        return verify(G, p, g1, r, s, y_sign, [m])
+        (G, p, g0, _) = self.params
+        return verify(G, p, g0, r, s, y_sign, [m])
 
     # Revoke/restore
     def get_rev_data(self, pub_cred):
@@ -140,4 +140,3 @@ class Issuer():
                 return None
         return reconstruct(S_r, index_list, p)
         # Return pub_id
-
