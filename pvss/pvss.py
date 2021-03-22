@@ -183,7 +183,7 @@ def batch_verify_correct_decryption(proved_decryptions, Y_list, pub_keys, p, G):
     return True
 
 
-def generate_key_pair(params):
+def helper_generate_key_pair(params):
     '''
     Generates a key-pair, returns both the private key and the public key
     '''
@@ -205,7 +205,7 @@ def participant_decrypt_and_prove(params, x_i, Y_i) -> tuple[decrypted_share_typ
     '''
     Decrypts a encrypted share with stored private key, and generates proof of it being done correctly.
     '''
-    (_, p, g0, _) = params # START HERE: Which g is correct for usage together with papr_issuer 
+    (_, p, g0, _) = params
     S_i = participant_decrypt(params, x_i, Y_i)
 
     y_i = x_i * g0

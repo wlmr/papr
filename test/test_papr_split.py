@@ -55,7 +55,7 @@ class TestPaprSplit:
         priv_keys = []
         pub_keys = []
         for i in range(n*2):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
         pub_cred = user.req_cred_sign()
@@ -73,7 +73,7 @@ class TestPaprSplit:
         priv_keys = []
         pub_keys = []
         for _ in range(n*2):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
@@ -98,7 +98,7 @@ class TestPaprSplit:
         priv_keys = []
         pub_keys = []
         for i in range(n*2):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
@@ -146,7 +146,7 @@ class TestPaprSplit:
         priv_keys = []
         pub_keys = []
         for _ in range(n*2):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
@@ -229,7 +229,7 @@ class TestPaprSplit:
         priv_keys = []
         pub_keys = []
         for _ in range(n*2):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
@@ -252,7 +252,7 @@ class TestPaprSplit:
         priv_keys = []
         pub_keys = []
         for _ in range(n*2):
-            (x_i, y_i) = pvss.generate_key_pair(params)  # START HERE: Which g is correct
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 

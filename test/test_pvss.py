@@ -27,7 +27,7 @@ class TestPvss():
         priv_keys = []
         pub_keys = []
         for i in range(n):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
@@ -49,7 +49,7 @@ class TestPvss():
         priv_keys = []
         pub_keys = []
         for i in range(n):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
@@ -76,7 +76,7 @@ class TestPvss():
         priv_keys = []
         pub_keys = []
         for i in range(n):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
@@ -113,7 +113,7 @@ class TestPvss():
         priv_keys = []
         pub_keys = []
         for i in range(n):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
@@ -166,7 +166,7 @@ class TestPvss():
         priv_keys = []
         pub_keys = []
         for i in range(n):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
@@ -214,7 +214,7 @@ class TestPvss():
         priv_keys = []
         pub_keys = []
         for i in range(n):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
