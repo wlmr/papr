@@ -245,11 +245,13 @@ class TestPvss():
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [2, 3, 4])
+    
     def test_1_4_2(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [1, 4, 2])
+    
     @pytest.mark.skip(reason="Disable for performance reasons")
     def test_all_reconstuctions(self):
         # Set (t,n)-threshold parameters
