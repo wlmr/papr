@@ -4,7 +4,7 @@ from papr.ecdsa import sign, verify
 import pvss.pvss as pvss
 # from petlib.pack import encode, decode
 from amac.credential_scheme import setup as setup_cmz
-from papr.papr_cred_iss_data_dist import prng
+# from papr.papr_cred_iss_data_dist import prng
 
 
 class TestPaprSplit:
@@ -363,9 +363,9 @@ class TestPaprSplit:
         assert answer is not None
         assert answer == pub_ids[0]
 
-
-        # Test another order and other numbers for decryption. 
-        answer = issuer.restore([decoded_list[0], decoded_list[3], decoded_list[1]], [1, 4, 2], [cust_pub_keys[0], cust_pub_keys[3], cust_pub_keys[1]], [E_list[0], E_list[3], E_list[1]])
+        # Test another order and other numbers for decryption.
+        answer = issuer.restore([decoded_list[0], decoded_list[3], decoded_list[1]], [1, 4, 2], [
+                                cust_pub_keys[0], cust_pub_keys[3], cust_pub_keys[1]], [E_list[0], E_list[3], E_list[1]])
         assert answer is not None
         assert answer == pub_ids[0]
 
