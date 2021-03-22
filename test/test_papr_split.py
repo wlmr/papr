@@ -305,7 +305,7 @@ class TestPaprSplit:
     def test_bootstrap(self):
         (k, n) = (3, 10)
         issuer = Issuer()
-        (y_sign, y_encr), iparams, _, user_list, cred_list, rev_list, _ = issuer.setup(k, n)
+        (y_sign, y_encr), iparams, _, user_list, cred_list, rev_list = issuer.setup(k, n)
 
         bootstrap_users = []
         pub_creds_full = []
@@ -327,9 +327,9 @@ class TestPaprSplit:
         for ((user, t_id, s_pub_id, pub_id), pub_cred) in zip(bootstrap_users, pub_creds_full):
 
             requester_commit = user.req_cred_data_dist_1()
-            issuer_random = issuer.iss_cred_data_dist_1()
+            issuer_random = issuer.iss_cred_data_dist_1(pub_cred)
             requester_random, E_list, C_list, proof, group_generator = user.req_cred_data_dist_2(issuer_random, pub_creds)
-            custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_creds, E_list, C_list, proof, group_generator)
+            custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_creds, E_list, C_list, proof, group_generator, pub_cred)
 
             (_, p, _, _) = issuer.get_params()
 
