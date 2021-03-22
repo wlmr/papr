@@ -73,17 +73,17 @@ def gen_proof(params, k, n, secret, pub_keys):
     '''
     assert n > k
     assert len(pub_keys) == n
-    (Gq, p, g, G) = params
+    (Gq, p, g0, h) = params
 
     px = gen_polynomial(k, secret, p)
-    commitments = get_commitments(g, px)
+    commitments = get_commitments(h, px)
     shares_list = calc_shares(px, k, n, p)
     enc_shares = __get_encrypted_shares(pub_keys, shares_list)
 
     pub = {'C_list': commitments, 'Y_list': enc_shares}
 
     # params = (Gq, p, g, G)
-    proof = cpni.DLEQ_prove_list(p, g, commitments, enc_shares, pub_keys, shares_list)
+    proof = cpni.DLEQ_prove_list(p, h, commitments, enc_shares, pub_keys, shares_list)
 
     # Debug:
     assert len(px) == k
@@ -183,11 +183,11 @@ def batch_verify_correct_decryption(proved_decryptions, Y_list, pub_keys, p, G):
     return True
 
 
-def generate_key_pair(params):
+def helper_generate_key_pair(params):
     '''
     Generates a key-pair, returns both the private key and the public key
     '''
-    (_, p, g0, G) = params
+    (_, p, g0, g1) = params
     x_i = p.random()
     y_i = x_i * g0
     return (x_i, y_i)
@@ -205,7 +205,7 @@ def participant_decrypt_and_prove(params, x_i, Y_i) -> tuple[decrypted_share_typ
     '''
     Decrypts a encrypted share with stored private key, and generates proof of it being done correctly.
     '''
-    (_, p, g0, G) = params
+    (_, p, g0, _) = params
     S_i = participant_decrypt(params, x_i, Y_i)
 
     y_i = x_i * g0

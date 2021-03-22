@@ -27,7 +27,7 @@ class TestPvss():
         priv_keys = []
         pub_keys = []
         for i in range(n):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
@@ -49,7 +49,7 @@ class TestPvss():
         priv_keys = []
         pub_keys = []
         for i in range(n):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
@@ -76,7 +76,7 @@ class TestPvss():
         priv_keys = []
         pub_keys = []
         for i in range(n):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
@@ -96,9 +96,9 @@ class TestPvss():
         # Generate parameters (should be same in other parts of program)
         Gq = EcGroup()
         p = Gq.order()
-        g = Gq.generator()
+        h = Gq.generator()
         G = Gq.hash_to_point(b'G')
-        params = (Gq, p, g, G)
+        params = (Gq, p, G, h)
 
         # Decide on a secret to be distributed
         m = p.from_binary(b'This is a test')
@@ -113,7 +113,7 @@ class TestPvss():
         priv_keys = []
         pub_keys = []
         for i in range(n):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
@@ -124,11 +124,11 @@ class TestPvss():
         print("Test verify")
         Y_list = pub['Y_list']
         C_list = pub['C_list']
-        assert cpni.DLEQ_verify_list(p, g, pub_keys, C_list, Y_list, proof) is True
+        assert cpni.DLEQ_verify_list(p, h, pub_keys, C_list, Y_list, proof) is True
 
         # Decryption
         # Calculate what a correct decryption should be
-        expected_decryption = m * g
+        expected_decryption = m * G
 
         # Let participants decrypt their shares and generate proofs
         proved_decryptions = [pvss.participant_decrypt_and_prove(params, x_i, enc_share) for (x_i, enc_share) in zip(priv_keys, pub['Y_list'])]
@@ -149,9 +149,9 @@ class TestPvss():
         # Generate parameters (should be same in other parts of program)
         Gq = EcGroup()
         p = Gq.order()
-        g = Gq.generator()
+        h = Gq.generator()
         G = Gq.hash_to_point(b'G')
-        params = (Gq, p, g, G)
+        params = (Gq, p, G, h)
 
         # Decide on a secret to be distrubuted
         m = p-1
@@ -166,7 +166,7 @@ class TestPvss():
         priv_keys = []
         pub_keys = []
         for i in range(n):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
@@ -177,11 +177,11 @@ class TestPvss():
         print("Test verify")
         Y_list = pub['Y_list']
         C_list = pub['C_list']
-        assert cpni.DLEQ_verify_list(p, g, pub_keys, C_list, Y_list, proof) is True
+        assert cpni.DLEQ_verify_list(p, h, pub_keys, C_list, Y_list, proof) is True
 
         # Decryption
         # Calculate what a correct decryption should be
-        expected_decryption = m * g
+        expected_decryption = m * G
 
         # Let participants decrypt their shares and generate proofs
         proved_decryptions = [pvss.participant_decrypt_and_prove(params, x_i, enc_share) for (x_i, enc_share) in zip(priv_keys, pub['Y_list'])]
@@ -214,7 +214,7 @@ class TestPvss():
         priv_keys = []
         pub_keys = []
         for i in range(n):
-            (x_i, y_i) = pvss.generate_key_pair(params)
+            (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
@@ -245,175 +245,13 @@ class TestPvss():
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [2, 3, 4])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_1_2_3(self):
-        # Set (t,n)-threshold parameters
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [1, 2, 3])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_1_2_4(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [1, 2, 4])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_1_3_2(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [1, 3, 2])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_1_3_4(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [1, 3, 4])
-
+    
     def test_1_4_2(self):
         # Set (t,n)-threshold parameters
         n = 4
         t = 3
         self.helper_function_reconstuct_and_test(t, n, [1, 4, 2])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_1_4_3(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [1, 4, 3])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_2_1_3(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [2, 1, 3])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_2_1_4(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [2, 1, 4])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_2_3_1(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [2, 3, 1])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_2_3_4(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [2, 3, 4])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_2_4_1(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [2, 4, 1])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_2_4_3(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [2, 4, 3])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_3_1_2(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [3, 1, 2])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_3_1_4(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [3, 1, 4])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_3_2_1(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [3, 2, 1])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_3_2_4(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [3, 2, 4])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_3_4_1(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [3, 4, 1])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_3_4_2(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [3, 4, 1])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_4_1_2(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [4, 1, 2])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_4_1_3(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [4, 1, 3])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_4_2_1(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [4, 2, 1])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_4_2_3(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [4, 2, 3])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_4_3_1(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [4, 3, 1])
-
-    @pytest.mark.skip(reason="Disable for performance reasons")
-    def test_4_3_2(self):
-        # Set (t,n)-threshold parameters
-        n = 4
-        t = 3
-        self.helper_function_reconstuct_and_test(t, n, [4, 3, 2])
-
+    
     @pytest.mark.skip(reason="Disable for performance reasons")
     def test_all_reconstuctions(self):
         # Set (t,n)-threshold parameters
