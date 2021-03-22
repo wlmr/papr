@@ -305,7 +305,7 @@ class TestPaprSplit:
     def test_bootstrap(self):
         (k, n) = (3, 10)
         issuer = Issuer()
-        (y_sign, y_encr), iparams, _, user_list, cred_list, rev_list = issuer.setup(k, n)
+        (y_sign, y_encr), iparams, _, user_list, _, _ = issuer.setup(k, n)
 
         bootstrap_users = []
         pub_creds_full = []
@@ -320,10 +320,7 @@ class TestPaprSplit:
             pub_creds_full.append(PubCred)
             pub_creds.append(PubCred[0])
             pub_ids.append(pub_id)
-            # pub_creds.append
 
-        # user_0_indexes = []
-        # first_user = True
         for ((user, t_id, s_pub_id, pub_id), pub_cred) in zip(bootstrap_users, pub_creds_full):
 
             requester_commit = user.req_cred_data_dist_1()
@@ -332,11 +329,6 @@ class TestPaprSplit:
             custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_creds, E_list, C_list, proof, group_generator, pub_cred)
 
             (_, p, _, _) = issuer.get_params()
-
-            # if first_user:
-            #    for i in range(n):
-            #        user_0_indexes.append(prng(requester_random, issuer_random, i, p) % len(pub_creds))
-            #    first_user = False
 
             assert custodian_list is not None
 
@@ -350,17 +342,11 @@ class TestPaprSplit:
             assert issuer.iss_cred_eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
             # Fixme: message to user so that it knows that it can submit credentails (anonimously)
 
-            # signed_pub_cred = issuer.iss_cred_sign(pub_cred)
-
             priv_rev_tuple.append((pub_cred, E_list, custodian_list))
-
-        # just_k_random_index = [1, 4, 7]
 
         (pub_cred, E_list, cust_pub_keys) = priv_rev_tuple[0]
 
         decoded_list = []
-        # enc_shares = []
-        # cust_list = []
 
         indexes = []
 
@@ -372,16 +358,14 @@ class TestPaprSplit:
                     user = (bootstrap_users[i])[0]
                     decoded_list.append(user.respond(enc_share))
                     indexes.append(i+1)
-                    # enc_shares.append(enc_share)
-                    # cust_list.append(cust_pub_key)
-
-        # print(user_0_indexes)
-
-        # indexes2 = [i+1 for i in user_0_indexes]
-        # assert indexes2 == indexes # These indexes are relative to the total list.
-        # We instead need indexes as in which order the different pub keys are.
 
         answer = issuer.restore(decoded_list[:3], [1, 2, 3], cust_pub_keys[:3], E_list[:3])
+        assert answer is not None
+        assert answer == pub_ids[0]
+
+
+        # Test another order and other numbers for decryption. 
+        answer = issuer.restore([decoded_list[0], decoded_list[3], decoded_list[1]], [1, 4, 2], [cust_pub_keys[0], cust_pub_keys[3], cust_pub_keys[1]], [E_list[0], E_list[3], E_list[1]])
         assert answer is not None
         assert answer == pub_ids[0]
 
