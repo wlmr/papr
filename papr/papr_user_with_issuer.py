@@ -45,7 +45,7 @@ class User():
         if not self.issuer.iss_cred_anon_auth(sigma, pi_show):
             return False
         commit = self.req_cred_data_dist_1()
-        cred_signing_keys_list = [y_s for (y_s, _) in self.issuer.cred_list.read()]
+        cred_signing_keys_list = [y_s for (y_s, _) in self.issuer.cred_list.read(False)]
         iss_random_value = self.issuer.iss_cred_data_dist_1(self.pub_cred)
         requester_random, escrow_shares, commits, proof, group_generator = self.req_cred_data_dist_2(iss_random_value, cred_signing_keys_list)
         custodian_list = self.issuer.iss_cred_data_dist_2(commit, requester_random, cred_signing_keys_list,

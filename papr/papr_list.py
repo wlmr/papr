@@ -16,7 +16,7 @@ class Papr_list():
         elif index in range(0, len(self.papr_list)):
             return self.papr_list[index]
         else:
-            return (None, None)
+            return None
 
     def has(self, id, index):
         return id in [entry[index] for entry in self.papr_list]
