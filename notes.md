@@ -24,3 +24,14 @@ from root:
 ```
 $ python -m grpc_tools.protoc -Iproto --python_out=papr --grpc_python_out=papr proto/papr.proto
 ```
+
+## how to bitcoin
+pip install bit
+somehow install libsecp256k1 with your package manager
+pip install https://download.electrum.org/4.0.9/Electrum-4.0.9.tar.gz
+
+### testnet
+https://armedia.com/blog/bitcoin-testnet-beginners-guide/
+
+### get the coins
+https://testnet-faucet.mempool.co/
