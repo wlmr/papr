@@ -13,8 +13,8 @@ Mac = tuple[EcPt, EcPt]
 
 def setup(k: int) -> Params:
     """ generate all public parameters """
-    G = EcGroup()
-    g = G.hash_to_point(b'g')
+    G = EcGroup(714)
+    g = G.generator()
     h = G.hash_to_point(b'h')
     return (G, G.order(), g, h)
 
