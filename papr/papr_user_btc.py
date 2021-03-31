@@ -12,16 +12,13 @@ from petlib.bn import Bn
 
 class User():
 
-    def __init__(self, params, iparams, y_sign, y_encr, k, n):
+    def __init__(self, params, iparams, y_sign, y_encr, k, n, btc_key):
         self.params = params
         self.iparams = iparams
         self.y_sign = y_sign
         self.y_encr = y_encr
         self.k, self.n = (k, n)
-        self.btc_key = PrivateKeyTestnet()
-
-    def DEBUG_get_btc_key(self):
-        return self.btc_key
+        self.btc_key = btc_key
 
     def req_enroll_1(self, id):
         """
@@ -86,7 +83,7 @@ class User():
     # Credential signing
     def req_cred_sign(self):
         (_, p, g0, g1) = self.params
-        self.priv_cred = (p.random(),  Bn.from_decimal(str(self.btc_key.to_int())))  #
+        self.priv_cred = (p.random(),  Bn.from_decimal(str(self.btc_key.to_int())))
         pub_cred = (self.priv_cred[0] * g0, self.priv_cred[1] * g0)
         return pub_cred
 
