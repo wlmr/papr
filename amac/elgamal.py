@@ -29,7 +29,7 @@ def decrypt(sk, ciphertext):
 
 
 if __name__ == "__main__":
-    G = EcGroup()
+    G = EcGroup(714)
     p = G.order()
     g = G.generator()
 

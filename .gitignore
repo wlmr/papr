@@ -133,3 +133,5 @@ dmypy.json
 
 .vscode/launch.json
 prototest/
+
+papr-money/key
