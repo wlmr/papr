@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+petlib = "*"
+pytest = "*"
+bit = "*"
+
+[dev-packages]
+flake8 = "*"
+autopep8 = "*"
+rope = "*"
+
+[requires]
+python_version = "3.9"
