@@ -6,19 +6,17 @@ from amac.credential_scheme import blind_obtain as blind_obtain_cmz
 from amac.credential_scheme import blind_show as blind_show_cmz
 from amac.proofs import to_challenge
 from papr.ecdsa import sign
-from bit import Key, PrivateKeyTestnet
-from petlib.bn import Bn
 
 
 class User():
 
-    def __init__(self, params, iparams, y_sign, y_encr, k, n, btc_key):
+    def __init__(self, params, iparams, y_sign, y_encr, k, n, private_authentication_key):
         self.params = params
         self.iparams = iparams
         self.y_sign = y_sign
         self.y_encr = y_encr
         self.k, self.n = (k, n)
-        self.btc_key = btc_key
+        self.private_authentication_key = private_authentication_key
 
     def req_enroll_1(self, id):
         """
@@ -83,7 +81,7 @@ class User():
     # Credential signing
     def req_cred_sign(self):
         (_, p, g0, g1) = self.params
-        self.priv_cred = (p.random(),  Bn.from_decimal(str(self.btc_key.to_int())))
+        self.priv_cred = (p.random(),  self.private_authentication_key)
         pub_cred = (self.priv_cred[0] * g0, self.priv_cred[1] * g0)
         return pub_cred
 
