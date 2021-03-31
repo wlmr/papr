@@ -1,1 +1,3 @@
 petlib
+pytest
+bit
