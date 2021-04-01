@@ -1,8 +1,8 @@
 from typing import Any
 from petlib.bn import Bn
 from petlib.ec import EcGroup, EcPt
-import pvss.pvss.cpni as cpni
-import pvss.pvss.pvss as pvss
+import pvss_python.cpni as cpni
+import pvss_python.pvss as pvss
 
 
 encrypted_share_type = Bn
