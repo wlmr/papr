@@ -3,7 +3,7 @@
 from typing import Any
 from petlib.bn import Bn
 from petlib.ec import EcGroup, EcPt
-import pvss.cpni as cpni
+import pvss.pvss.cpni as cpni
 
 # A = tuple[Bn, Bn]
 encrypted_share_type = Bn
@@ -19,52 +19,6 @@ generator_type = EcPt
 decrypted_share_type = Bn
 decrypted_shares_list_type = list[decrypted_share_type]
 index_list_type = list[Bn]
-
-
-def distribute_secret(pub_keys: pub_keys_type, secret: Bn, p: Bn, k: int, n: int, Gq: EcGroup) -> tuple[encrypted_shares_type, commitments_type,
-                                                                                                        proof_type, generator_type]:
-    '''
-    Generates encrypted shares, commitments, proof and a random generator of Gq. Given secret, n public keys of participants who will hold the secret.
-    k participants (out of n) can then later recreate (secret * G).
-    Lists of encrypted shares and commitments will be returned in same order the public keys was sent in.
-    '''
-    assert len(pub_keys) == n
-    h = p.random() * Gq.hash_to_point(b'h')
-    px = gen_polynomial(k, secret, p)
-    commitments = get_commitments(h, px)
-    shares_list = calc_shares(px, k, n, p)
-    enc_shares = __get_encrypted_shares(pub_keys, shares_list)
-    proof = cpni.DLEQ_prove_list(p, h, commitments, enc_shares, pub_keys, shares_list)
-    return enc_shares, commitments, proof, h
-
-
-def verify_encrypted_shares(encrypted_shares: encrypted_shares_type, commitments: commitments_type, pub_keys: pub_keys_type, proof: proof_type,
-                            h: generator_type, p) -> bool:
-    '''
-    Verifies that encrypted shares and commitments represents the same data using proof. Note: encrypted shares, commitments and pub_keys must
-        be original order.
-    '''
-    assert len(encrypted_shares) == len(pub_keys)
-    return cpni.DLEQ_verify_list(p=p, g=h, y_list=pub_keys, C_list=commitments, Y_list=encrypted_shares, proof=proof)
-
-
-def reconstruct(decrypted_list: decrypted_shares_list_type, index_list: index_list_type, p) -> Bn:
-    '''
-    Recontructs (secret * G) given at least k decrypted shares, along with their indexes (starting from 1!) as the respective public keys was originaly
-        sent into distrubute_secret.
-    '''
-    assert len(decrypted_list) == len(index_list)
-    return decode(decrypted_list, index_list, p)
-
-
-def verify_decryption_proof(proof_of_decryption: single_proof_type, decrypted_share: decrypted_share_type, encrypted_share: encrypted_share_type,
-                            pub_key: pub_keys_type, p, g0) -> bool:
-    '''
-    Verifyes that a participant has correctly decrypted their share
-    '''
-    return verify_correct_decryption(decrypted_share, encrypted_share, proof_of_decryption, pub_key, p, g0)
-
-# __DEPRICATED__
 
 
 def gen_proof(params, k, n, secret, pub_keys):

@@ -5,7 +5,7 @@ from papr.papr_procedures import data_distrubution_issuer_verify, \
     data_distrubution_commit_encrypt_prove, data_distrubution_random_commit, data_distrubution_select, data_distrubution_verify_commit, \
     iss_cred_data_dist_1, iss_cred_data_dist_2, iss_cred_data_dist_3, req_cred_data_dist_1, req_cred_data_dist_2, req_cred_data_dist_3
 from papr.ecdsa import verify
-import pvss.pvss as pvss
+import pvss.pvss_wrapper as pvss
 
 
 class TestPapr:
