@@ -1,4 +1,4 @@
 
 [submodule "pvss/pvss_python"]
 	path = pvss/pvss_python
-	url = git@github.com:KronP/pvss-python.git
+	url = git@github.com:KronP/pvss_python.git
