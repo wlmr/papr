@@ -1,4 +1,4 @@
-from pvss.pvss import reconstruct, verify_correct_decryption
+from pvss.pvss_wrapper import reconstruct, verify_correct_decryption
 from papr.papr_cred_iss_data_dist import data_distrubution_issuer_verify, \
     data_distrubution_select, data_distrubution_verify_commit
 from amac.credential_scheme import setup as setup_cmz, cred_keygen as cred_keygen_cmz

@@ -1,4 +1,4 @@
-import pvss.pvss as pvss
+import pvss.pvss_wrapper as pvss
 from papr.utils import hash
 
 

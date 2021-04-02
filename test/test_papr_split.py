@@ -1,7 +1,7 @@
 from papr.papr_user import User
 from papr.papr_issuer import Issuer
 from papr.ecdsa import sign, verify
-import pvss.pvss as pvss
+import pvss.pvss_wrapper as pvss
 # from petlib.pack import encode, decode
 from amac.credential_scheme import setup as setup_cmz
 # from papr.papr_cred_iss_data_dist import prng

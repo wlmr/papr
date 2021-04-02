@@ -1,8 +1,8 @@
 from typing import Any
 from petlib.bn import Bn
 from petlib.ec import EcGroup, EcPt
-import pvss_python.cpni as cpni
-import pvss_python.pvss as pvss
+import pvss.pvss_python.cpni as cpni
+import pvss.pvss_python.pvss as pvss
 
 
 encrypted_share_type = Bn
@@ -66,3 +66,6 @@ def participant_decrypt_and_prove(params, x_i, encrypted_share):
 
 def helper_generate_key_pair(params):
     return pvss.helper_generate_key_pair(params)
+
+def verify_correct_decryption(S_i, Y_i, decrypt_proof, pub_key, p, G):
+    return pvss.verify_correct_decryption(S_i, Y_i, decrypt_proof, pub_key, p, G)

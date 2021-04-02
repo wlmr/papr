@@ -1,4 +1,4 @@
-from pvss.pvss import participant_decrypt_and_prove
+from pvss.pvss_wrapper import participant_decrypt_and_prove
 from papr.papr_cred_iss_data_dist import data_distrubution_commit_encrypt_prove, data_distrubution_random_commit, \
     data_distrubution_select
 from amac.credential_scheme import prepare_blind_obtain as prepare_blind_obtain_cmz
