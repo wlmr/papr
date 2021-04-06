@@ -183,7 +183,7 @@ class TestPaprSplit:
 
         signed_pub_cred = issuer.iss_cred_sign(pub_cred)
 
-        assert cred_list.peek() == signed_pub_cred
+        assert cred_list.peek() == pub_cred
 
         # Cred usage:
         m = issuer.ver_cred_1()
@@ -287,8 +287,7 @@ class TestPaprSplit:
         # Fixme: message to user so that it knows that it can submit credentails (anonimously)
 
         signed_pub_cred = issuer.iss_cred_sign(pub_cred)
-
-        assert cred_list.peek() == signed_pub_cred
+        assert cred_list.peek() == pub_cred
         # encode(cred_list)
         # assert cred_list == decode(encode(cred_list))
 

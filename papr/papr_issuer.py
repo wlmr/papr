@@ -105,7 +105,7 @@ class Issuer():
         self.rev_data[pub_cred] = (escrow_shares, custodian_encr_keys)
         sigma_y_e = sign(p, g0, self.x_sign, pub_cred[0])
         sigma_y_s = sign(p, g0, self.x_sign, pub_cred[1])
-        self.cred_list.add(self.params, (sigma_y_e, sigma_y_s), sign(p, g0, self.x_sign, (sigma_y_e, sigma_y_s)))  # Is this correct?
+        self.cred_list.add(self.params, pub_cred, sign(p, g0, self.x_sign, pub_cred))
         self.res_list[pub_cred] = []
         return (sigma_y_e, sigma_y_s)
 
