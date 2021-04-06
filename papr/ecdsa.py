@@ -29,7 +29,7 @@ def verify(G, p, g, r, s, pub_key, m: list):
 
 
 if __name__ == '__main__':
-    G = EcGroup(713)
+    G = EcGroup(714)
     p = G.order()
     g = G.hash_to_point(b'g')
     h = G.hash_to_point(b'h')
