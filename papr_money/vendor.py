@@ -1,6 +1,7 @@
 from papr.papr_issuer import Issuer
 from bit import PrivateKeyTestnet, wif_to_key
 from pickle import dump, load
+from json import dumps
 
 
 class Vendor():
@@ -25,12 +26,19 @@ class Vendor():
         dump(self.registry, registry_file)
         registry_file.close()
 
+    def register_key(self, pub_key, address):
+        self.registry[address] = pub_key
+
     def is_valid_address(self, address):
         return address in self.registry.keys()  # TODO: make registry correspond to cred_list
 
     def send(self, address, amount, currency):
         output = [(address, amount, currency)]
         return self.key.send(output)
+
+    def publish_hash(self):
+        dumps(self.registry).encode("utf-8")
+        self.key.send()
 
     def get_address(self):
         return self.key.address
