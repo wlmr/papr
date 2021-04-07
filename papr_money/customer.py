@@ -11,7 +11,7 @@ class Customer(User):
         except FileNotFoundError:
             wip_file = open(f"{id}-key", "w")
             self.key = PrivateKeyTestnet()
-            wip_file.write(self.key.to_wif)
+            wip_file.write(self.key.to_wif())
         wip_file.close()
 
     def send(self, address, amount, currency, vendor):
@@ -24,3 +24,5 @@ class Customer(User):
 
     def get_balance(self, currency):
         return self.key.balance_as(currency)
+
+
