@@ -1,7 +1,7 @@
-from papr.papr_issuer import Issuer
 from bit import PrivateKeyTestnet, wif_to_key
 from pickle import dump, load
 from json import dumps
+from hashlib import sha256
 
 
 class Vendor():
@@ -36,9 +36,10 @@ class Vendor():
         output = [(address, amount, currency)]
         return self.key.send(output)
 
-    def publish_hash(self):
-        dumps(self.registry).encode("utf-8")
-        self.key.send()
+    def publish_hash(self, ledger):
+        b = dumps(ledger).encode("utf-8")
+        m = sha256(b).hexdigest()
+        self.txnid = self.key.send([(self.key.address, 1, "satoshi")], message=m, message_is_hex=True)
 
     def get_address(self):
         return self.key.address

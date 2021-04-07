@@ -21,7 +21,7 @@ class Customer(User):
         self.vendor.register_key(pub_key, address)
 
     def send(self, address, amount, currency, vendor):
-        if vendor.valid_address(address):
+        if vendor.is_valid_address(address):
             output = [(address, amount, currency)]
             return self.key.send(output)
 
@@ -29,4 +29,4 @@ class Customer(User):
         return self.key.address
 
     def get_balance(self, currency: str):
-        return self.key.balance_as(currency)
+        return self.key.get_balance(currency)
