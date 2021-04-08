@@ -135,4 +135,4 @@ dmypy.json
 prototest/
 
 papr-money/key
-data/vendor-registry
+data/
