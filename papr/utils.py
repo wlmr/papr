@@ -6,3 +6,7 @@ from petlib.pack import encode
 def hash(elements: list) -> Bn:
     bin_hash = sha256(encode(elements)).digest()
     return Bn.from_binary(bin_hash)
+
+
+def bit_privkey_to_petlib_bn(key):
+    return Bn.from_decimal(str(key.to_int()))

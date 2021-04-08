@@ -276,7 +276,7 @@ class TestPaprSplit:
         custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator, pub_cred)
         assert custodian_list is not None
 
-        # Anonimous auth:
+        # Anonymous auth:
         sigma, pi_show, z = user.req_cred_anon_auth(t_id)
         assert issuer.iss_cred_anon_auth(sigma, pi_show)
         (u2, cl, _) = sigma

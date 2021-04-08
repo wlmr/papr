@@ -18,9 +18,9 @@ class Vendor(Issuer):
             wif_file = open("data/vendor-key", "w")
             self.key = PrivateKeyTestnet()
             wif_file.write(self.key.to_wif())
-            self.registry = {}
+            self.registry = {}  # swap to cred_list
         except EOFError:
-            self.registry = {}
+            self.registry = {}  # swap to cred_list
         wif_file.close()
 
     def __del__(self):
