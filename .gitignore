@@ -134,8 +134,5 @@ dmypy.json
 .vscode/launch.json
 prototest/
 
-papr-money/key
-data/vendor-registry
 
 papr_money/testing_key.txt
-data/
