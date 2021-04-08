@@ -17,6 +17,7 @@ class Vendor():
             wif_file = open("data/vendor-key", "w")
             self.key = PrivateKeyTestnet()
             wif_file.write(self.key.to_wif())
+            self.registry = {}
         except EOFError:
             self.registry = {}
         wif_file.close()
