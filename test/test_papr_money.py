@@ -1,6 +1,7 @@
 
 from papr_money.vendor import Vendor
 from papr_money.customer import Customer
+import pytest
 
 
 class TestPaprMoney:
@@ -16,6 +17,7 @@ class TestPaprMoney:
         assert pubkey1 == vendor.key.public_key
         assert vendor.registry['address1'] == 'pubkey1'
 
+    @pytest.mark.skip(reason="Disable since github actions creates a new wallet every run. Therefore the wallet will always be empty.")
     # NOTE: give Tito more coins if this test fails
     def test_customer_balance(self):
         vendor = Vendor()
