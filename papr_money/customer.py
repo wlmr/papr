@@ -3,8 +3,7 @@ from bit import PrivateKeyTestnet, wif_to_key
 
 
 class Customer(User):
-    def __init__(self, id: str, vendor):
-        self.vendor = vendor
+    def __init__(self, id: str, vendor, params, iparams, y_sign, y_encr, k, n):
         id = id.replace(' ', '-').lower()
         try:
             wif_file = open(f"data/{id}-key", "r")
@@ -15,10 +14,11 @@ class Customer(User):
             self.key = PrivateKeyTestnet()
             wif_file.write(self.key.to_wif())
         wif_file.close()
-        self.notify_vendor(self.key.public_key, self.key.address)
+        self.notify_vendor(vendor, self.key.public_key, self.key.address)
+        User.__init__(params, iparams, y_sign, y_encr, k, n, self.key._pk)
 
-    def notify_vendor(self, pub_key, address):
-        self.vendor.register_key(pub_key, address)
+    def notify_vendor(self, vendor, pub_key, address):
+        vendor.register_key(pub_key, address)
 
     def send(self, address, amount, currency, vendor):
         if vendor.is_valid_address(address):

@@ -1,4 +1,3 @@
-
 from papr_money.vendor import Vendor
 from papr_money.customer import Customer
 import pytest
@@ -31,6 +30,12 @@ class TestPaprMoney:
         customer2 = Customer("Josip Tito", vendor)
         addr2 = customer2.get_address()
         assert addr1 == addr2
+
+    def test_new_user_procedure(self):
+        k, n = 3, 10
+        vendor = Vendor()
+        (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list = vendor.setup(3, 10)
+        customer = Customer("Josip Tito", vendor, vendor.get_params(), iparams, y_sign, y_encr, k, n)
 
     # Wasteful and slow test.
     # def test_send(self):

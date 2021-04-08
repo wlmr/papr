@@ -10,17 +10,26 @@ from papr.ecdsa import sign
 
 class User():
 
-    def __init__(self, params, iparams, y_sign, y_encr, k, n, private_authentication_key=None):
+    def __init__(self, params, iparams, y_sign, y_encr, k, n, x_sign=None):
+        """
+        For a user to be instantiated it requires the following:
+        1. curve params,
+        2. issuer public params,
+        3. issuer public signing key,
+        4. issuer public encryption key,
+        5. k and n to define the PVSS-parameters,
+        6. potential predefined private authentication key (for its credential generation later on).
+        """
         self.params = params
         self.iparams = iparams
         self.y_sign = y_sign
         self.y_encr = y_encr
-        self.k, self.n = (k, n)
-        if private_authentication_key is None:
+        self.k, self.n = (k, n) 
+        if x_sign is None:
             (_, p, _, _) = params
-            self.private_authentication_key = p.random()
+            self.x_sign = p.random()
         else:
-            self.private_authentication_key = private_authentication_key
+            self.x_sign = x_sign
 
     def req_enroll_1(self, id):
         """
@@ -54,10 +63,16 @@ class User():
 
     # Data distrubution
     def req_cred_data_dist_1(self):
+        '''
+        Distribute data to custodians (part 1). Second part of credential issuance.
+        '''
         (commit, self.requester_random) = data_distrubution_random_commit(self.params)
         return commit
 
     def req_cred_data_dist_2(self, issuer_random, pub_keys):
+        '''
+        Distribute data to custodians (part 2). Second part of credential issuance.
+        '''
         (_, p, _, _) = self.params
         selected_pub_keys = data_distrubution_select(pub_keys, self.requester_random, issuer_random, self.n, p)
         E_list, C_list, proof, group_generator = data_distrubution_commit_encrypt_prove(self.params, self.priv_id, selected_pub_keys, self.k, self.n)
@@ -84,15 +99,23 @@ class User():
 
     # Credential signing
     def req_cred_sign(self):
-        (_, p, g0, g1) = self.params
-        self.priv_cred = (p.random(),  self.private_authentication_key)
+        """
+        Generates a credential to be sent to the issuer for signing. 
+        The credential consists of two key pairs: one for encryption and one for signature.
+        priv_cred = (private encryption key, private signature key)
+        """
+        (_, p, g0, _) = self.params
+        self.priv_cred = (p.random(),  self.x_sign)
         pub_cred = (self.priv_cred[0] * g0, self.priv_cred[1] * g0)
         return pub_cred
 
     # Show/verify credential
     def show_cred_1(self, m):  # Need this from issuer.
+        '''
+        Show credential. Used to prove that the user is a valid registered user. 
+        '''
         (_, x_sign) = self.priv_cred
-        (G, p, g0, g1) = self.params
+        (_, p, g0, _) = self.params
         return sign(p, g0, x_sign, [m])
 
     # Revoke/restore
@@ -100,5 +123,5 @@ class User():
         '''
         Responds with decrypted share upon request from L_rev list
         '''
-        (x_encr, x_sign) = self.priv_cred
+        (x_encr, _) = self.priv_cred
         return participant_decrypt_and_prove(self.params, x_encr, s_e)

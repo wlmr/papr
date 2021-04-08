@@ -5,7 +5,7 @@ from json import dumps
 from hashlib import sha256
 
 
-class Vendor():
+class Vendor(Issuer):
     def __init__(self):
         try:
             wif_file = open("data/vendor-key", "r")
