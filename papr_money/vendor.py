@@ -1,3 +1,4 @@
+from papr.papr_issuer import Issuer 
 from bit import PrivateKeyTestnet, wif_to_key
 from pickle import dump, load
 from json import dumps
