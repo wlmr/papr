@@ -10,13 +10,17 @@ from papr.ecdsa import sign
 
 class User():
 
-    def __init__(self, params, iparams, y_sign, y_encr, k, n, private_authentication_key):
+    def __init__(self, params, iparams, y_sign, y_encr, k, n, private_authentication_key=None):
         self.params = params
         self.iparams = iparams
         self.y_sign = y_sign
         self.y_encr = y_encr
         self.k, self.n = (k, n)
-        self.private_authentication_key = private_authentication_key
+        if private_authentication_key is None:
+            (_, p, _, _) = params
+            self.private_authentication_key = p.random()
+        else:
+            self.private_authentication_key = private_authentication_key
 
     def req_enroll_1(self, id):
         """
