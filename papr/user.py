@@ -23,7 +23,7 @@ class User():
         self.iparams = iparams
         self.y_sign = y_sign
         self.y_encr = y_encr
-        self.k, self.n = (k, n) 
+        self.k, self.n = (k, n)
         if x_sign is None:
             (_, p, _, _) = params
             self.x_sign = p.random()
@@ -99,7 +99,7 @@ class User():
     # Credential signing
     def cred_sign(self):
         """
-        Generates a credential to be sent to the issuer for signing. 
+        Generates a credential to be sent to the issuer for signing.
         The credential consists of two key pairs: one for encryption and one for signature.
         priv_cred = (private encryption key, private signature key)
         """
@@ -111,7 +111,7 @@ class User():
     # Show/verify credential
     def show_cred_1(self, m):  # Need this from issuer.
         '''
-        Show credential. Used to prove that the user is a valid registered user. 
+        Show credential. Used to prove that the user is a valid registered user.
         '''
         (_, x_sign) = self.priv_cred
         (_, p, g0, _) = self.params
@@ -126,19 +126,18 @@ class User():
         return participant_decrypt_and_prove(self.params, x_encr, s_e)
 
 
-
 def data_distrubution_select(public_credentials, u_random, i_random, n, p):
     selected_data_custodians = []
     for i in range(n):
         selected_data_custodians.append(public_credentials[prng(u_random, i_random, i, p) % len(public_credentials)])
     return selected_data_custodians
 
+
 def data_distrubution_commit_encrypt_prove(params, PrivID, data_custodians_public_credentials, k, n):
     (Gq, p, _, _) = params
     E_list, C_list, proof, group_generator = distribute_secret(data_custodians_public_credentials, PrivID, p, k, n, Gq)
     # Send to I
     return E_list, C_list, proof, group_generator
-
 
 
 def data_distrubution_random_commit(params):

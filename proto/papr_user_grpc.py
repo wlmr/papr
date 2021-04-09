@@ -1,11 +1,10 @@
-
-from papr.papr_cred_iss_data_dist import  data_distrubution_random_commit, \
-    data_distrubution_select
 from amac.credential_scheme import prepare_blind_obtain as prepare_blind_obtain_cmz
 from amac.credential_scheme import blind_obtain as blind_obtain_cmz
 from amac.credential_scheme import blind_show as blind_show_cmz
 from amac.proofs import to_challenge
 from papr.ecdsa import sign
+from pvss.pvss import distribute_secret
+from papr.utils import prng
 
 from petlib.pack import encode, decode
 import grpc
@@ -13,7 +12,6 @@ import grpc
 from papr.papr_pb2 import iss_enroll_msg, iss_enroll_rsp
 from papr.papr_pb2_grpc import ConnectorStub
 from papr.issuer import Issuer
-
 
 
 class User():
@@ -91,7 +89,8 @@ class User():
 
     # Show/verify credential
     def show_cred_1(self, privCred, sigma_i_pub_cred, m):
-        (x_encr, x_sign) = privCred
+        (_, p, g0, _) = self.params
+        (_, x_sign) = privCred
         return sign(p, g0, x_sign, [m])
 
     # Revoke/restore
@@ -125,6 +124,27 @@ def unpack_iss_enroll_rsp(rsp):
 if __name__ == '__main__':
     issuer = Issuer()
     id = "Abradolf Lincler"
-    (y_sign, y_encr), (iparams, i_sk), sys_list, user_list, cred_list, rev_list, res_list = issuer.setup(3, 10)
+    (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list = issuer.setup(3, 10)
     user = User(issuer.get_params(), iparams, y_sign, y_encr, 3, 10)
     user.req_enroll(id)
+
+
+def data_distrubution_select(public_credentials, u_random, i_random, n, p):
+    selected_data_custodians = []
+    for i in range(n):
+        selected_data_custodians.append(public_credentials[prng(u_random, i_random, i, p) % len(public_credentials)])
+    return selected_data_custodians
+
+
+def data_distrubution_commit_encrypt_prove(params, PrivID, data_custodians_public_credentials, k, n):
+    (Gq, p, _, _) = params
+    E_list, C_list, proof, group_generator = distribute_secret(data_custodians_public_credentials, PrivID, p, k, n, Gq)
+    # Send to I
+    return E_list, C_list, proof, group_generator
+
+
+def data_distrubution_random_commit(params):
+    (_, p, _, G) = params
+    r = p.random()
+    c = r * G  # Is it ok to use G here?
+    return (c, r)

@@ -11,18 +11,18 @@ import pvss.pvss as pvss
 class TestPapr:
 
     def test_enroll(self):
-        id = "Wilmer Nilsson"
-        params, (x_sign, x_encr), (y_sign, y_encr), (iparams, i_sk), sys_list, user_list, cred_list, rev_list, res_list = setup(3, 10)
+        id = "Bertrand Russel"
+        params, (x_sign, _), (y_sign, _), (iparams, i_sk), _, user_list, _, _, _ = setup(3, 10)
         (G, p, g0, _) = params
         ret = enroll(params, id, iparams, i_sk, x_sign, user_list)
         assert ret is not None
-        t_id, (r, s), priv_id, pub_id, user_list = ret
+        _, (r, s), _, pub_id, user_list = ret
         print(f"user_list.peek():   {user_list.peek()}\n")
-        assert user_list.has("Wilmer Nilsson", 0)
+        assert user_list.has("Bertrand Russel", 0)
         assert verify(G, p, g0, r, s, y_sign, (id, pub_id))
 
     def test_eq_id(self):
-        id = "Wilmer Nilsson"
+        id = "Bertrand Russel"
         params, (x_sign, _), (_, _), (iparams, i_sk), _, user_list, _, _, _ = setup(3, 10)
         (_, p, g0, _) = params
         ret = enroll(params, id, iparams, i_sk, x_sign, user_list)

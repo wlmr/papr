@@ -27,20 +27,20 @@ class TestPaprSplit:
 
     def test_enroll(self):
         issuer = Issuer()
-        id = "Wilmer Nilsson"
+        id = "Ettan"
         (y_sign, y_encr), iparams, _, user_list, _, _ = issuer.setup(3, 10)
         user = User(issuer.get_params(), iparams, y_sign, y_encr, 3, 10)
         ret = self.helper_enroll(id, user_list, issuer, user)
         assert ret is not None
         _, (r, s), pub_id = ret
         print(f"user_list.peek():   {user_list.peek()}\n")
-        assert user_list.has("Wilmer Nilsson", 0)
-        (G, p, g0, g1) = issuer.get_params()
+        assert user_list.has("Ettan", 0)
+        (G, p, g0, _) = issuer.get_params()
         assert verify(G, p, g0, r, s, y_sign, (id, pub_id))
 
     def test_eq_id(self):
         issuer = Issuer()
-        id = "Wilmer Nilsson"
+        id = "Bertrand Russel"
         (_, _), iparams, _, user_list, _, _ = issuer.setup(3, 10)
         user = User(issuer.get_params(), iparams, _, _, 3, 10)
         ret = self.helper_enroll(id, user_list, issuer, user)
@@ -55,7 +55,7 @@ class TestPaprSplit:
     def helper_data_dist_to_get_h(self, k, n, params, user, issuer):
         priv_keys = []
         pub_keys = []
-        for i in range(n*2):
+        for _ in range(n*2):
             (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
@@ -95,7 +95,6 @@ class TestPaprSplit:
         (y_sign, y_encr), iparams, _, _, _, _ = issuer.setup(k, n)
 
         params = issuer.get_params()
-        (_, p, _, _) = params
         priv_keys = []
         pub_keys = []
         for i in range(n*2):
@@ -142,8 +141,8 @@ class TestPaprSplit:
         (k, n) = (3, 10)
         issuer = Issuer()
         (y_sign, y_encr), iparams, _, _, cred_list, rev_list = issuer.setup(k, n)
-
         params = issuer.get_params()
+        (G, p, g0, _) = params
         priv_keys = []
         pub_keys = []
         for _ in range(n*2):
@@ -182,7 +181,10 @@ class TestPaprSplit:
         assert issuer.eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
         # Fixme message to user so that it knows that it can submit credentails (anonimously)
 
-        signed_pub_cred = issuer.cred_sign(pub_cred)
+        sigma_pub_cred = issuer.cred_sign(pub_cred)
+        (sigma_y_e, sigma_y_s) = sigma_pub_cred
+        assert verify(G, p, g0, *sigma_y_e, y_sign, [pub_cred[0]])
+        assert verify(G, p, g0, *sigma_y_s, y_sign, [pub_cred[1]])
 
         assert cred_list.peek() == pub_cred
 
@@ -224,10 +226,9 @@ class TestPaprSplit:
     def test_encode_decode(self):
         (k, n) = (3, 10)
         issuer = Issuer()
-        (y_sign, y_encr), iparams, _, user_list, _, _ = issuer.setup(k, n)
+        (y_sign, y_encr), iparams, _, _, _, _ = issuer.setup(k, n)
 
         params = issuer.get_params()
-        (_, p, _, _) = params
         priv_keys = []
         pub_keys = []
         for _ in range(n*2):
@@ -238,7 +239,7 @@ class TestPaprSplit:
         user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n)
         id = "Id text"
         # Enroll:
-        _, pub_id, (u_sk, u_pk, c, pi_prepare_obtain) = user.req_enroll_1(id)
+        _, pub_id, (_, u_pk, c, pi_prepare_obtain) = user.req_enroll_1(id)
         ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id)
         ret  # Just here to remove flake error.
         # assert decode(encode(ret)) == ret
@@ -247,10 +248,10 @@ class TestPaprSplit:
     def test_encode_decode_list(self):
         (k, n) = (3, 10)
         issuer = Issuer()
-        (y_sign, y_encr), iparams, _, user_list, cred_list, _ = issuer.setup(k, n)
+        (y_sign, y_encr), iparams, _, _, cred_list, _ = issuer.setup(k, n)
 
         params = issuer.get_params()
-        (_, p, _, _) = params
+        (G, p, g0, _) = params
         priv_keys = []
         pub_keys = []
         for _ in range(n*2):
@@ -265,8 +266,10 @@ class TestPaprSplit:
         _, pub_id, (u_sk, u_pk, c, pi_prepare_obtain) = user.req_enroll_1(id)
         ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id)
         if ret is not None:
-            s_pub_id, u, e_u_prime, pi_issue, biparams = ret
+            sigma_pub_id, u, e_u_prime, pi_issue, biparams = ret
             t_id = user.req_enroll_2(u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], c)
+
+            assert verify(G, p, g0, *sigma_pub_id, y_sign, [id, pub_id])
         assert ret is not None  # : "user already exists"
 
         pub_cred = user.cred_sign()
@@ -288,7 +291,10 @@ class TestPaprSplit:
         assert issuer.eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
         # Fixme: message to user so that it knows that it can submit credentails (anonimously)
 
-        signed_pub_cred = issuer.cred_sign(pub_cred)
+        (sigma_y_e, sigma_y_s) = issuer.cred_sign(pub_cred)
+
+        assert verify(G, p, g0, *sigma_y_e, y_sign, [pub_cred[0]])
+        assert verify(G, p, g0, *sigma_y_s, y_sign, [pub_cred[1]])
         assert cred_list.peek() == pub_cred
         # encode(cred_list)
         # assert cred_list == decode(encode(cred_list))
@@ -307,13 +313,15 @@ class TestPaprSplit:
         (k, n) = (3, 10)
         issuer = Issuer()
         (y_sign, y_encr), iparams, _, user_list, _, _ = issuer.setup(k, n)
+        (G, p, g0, _) = issuer.get_params()
         bootstrap_users = []
         pub_creds_encr = []
         priv_rev_tuple = []
         # pub_ids = []
         for i in range(n):
             user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n)
-            t_id, s_pub_id, pub_id = self.helper_enroll(str(i), user_list, issuer, user)
+            t_id, sigma_pub_id, pub_id = self.helper_enroll(str(i), user_list, issuer, user)
+            assert verify(G, p, g0, *sigma_pub_id, y_sign, [str(i), pub_id])
             pub_cred = user.cred_sign()
             bootstrap_users.append({"user": user, "t_id": t_id, "pub_id": pub_id, "pub_cred": pub_cred})
             pub_creds_encr.append(pub_cred[0])

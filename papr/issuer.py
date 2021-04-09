@@ -102,8 +102,8 @@ class Issuer():
         custodian_encr_keys = self.temp_creds[pub_cred]['custodians']
         del self.temp_creds[pub_cred]
         self.rev_data[pub_cred] = (escrow_shares, custodian_encr_keys)
-        sigma_y_e = sign(p, g0, self.x_sign, pub_cred[0])
-        sigma_y_s = sign(p, g0, self.x_sign, pub_cred[1])
+        sigma_y_e = sign(p, g0, self.x_sign, [pub_cred[0]])
+        sigma_y_s = sign(p, g0, self.x_sign, [pub_cred[1]])
         self.cred_list.add(self.params, pub_cred, sign(p, g0, self.x_sign, pub_cred))
         self.res_list[pub_cred] = []
         return (sigma_y_e, sigma_y_s)
@@ -111,7 +111,8 @@ class Issuer():
     # Show/verify credential
     def ver_cred_1(self):
         (_, p, _, _) = self.params
-        return p.random()  # m
+        m = p.random()
+        return m
 
     def ver_cred_2(self, r, s, pub_cred, m):
         (_, y_sign) = pub_cred

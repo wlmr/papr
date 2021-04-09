@@ -51,7 +51,7 @@ def iss_enroll(params, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain, id, 
     decrypt and use, as well as a signature on the pub_id
     """
     if not user_list.has(id, 0):
-        (_, p, g0, g1) = params
+        (_, p, g0, _) = params
         sigma_pub_id = sign(p, g0, x_sign, [id, pub_id])
         if user_list.add(params, (id, pub_id), sigma_pub_id):
             return sigma_pub_id, blind_issue_cmz(params, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain), user_list
@@ -83,7 +83,7 @@ def enroll(params, id, iparams, i_sk, x_sign, user_list):
 
 
 def cred(params, iparams, t_id, priv_id, i_sk):
-    sigma, pi_show = req_anon_auth(params, iparams, t_id, priv_id)
+    sigma, pi_show, _ = req_anon_auth(params, iparams, t_id, priv_id)
     iss_anon_auth(params, iparams, i_sk, sigma, pi_show)
 
 
@@ -182,13 +182,13 @@ def iss_cred_sign(params, iss_priv_key, new_pub_cred):
 
 def show_cred_1(params, privCred, sigma_i_pub_cred, m):
     (_, p, _, g1) = params
-    (x_encr, x_sign) = privCred
+    (_, x_sign) = privCred
     return sign(p, g1, x_sign, [m])
 
 
 def ver_cred_1(params, r, s, pub_cred, m):
     (G, p, g, _) = params
-    (y_encr, y_sign) = pub_cred
+    (_, y_sign) = pub_cred
     return verify(G, p, g, r, s, y_sign, [m])
 
 
