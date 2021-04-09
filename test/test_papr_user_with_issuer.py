@@ -39,23 +39,23 @@ from amac.credential_scheme import setup as setup_cmz
 #    
 #         for ((user, t_id, s_pub_id, pub_id), pub_cred) in zip(bootstrap_users, pub_creds_full):
 #    
-#             requester_commit = user.req_cred_data_dist_1()
-#             issuer_random = issuer.iss_cred_data_dist_1(pub_cred)
-#             requester_random, E_list, C_list, proof, group_generator = user.req_cred_data_dist_2(issuer_random, pub_creds)
-#             custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_creds, E_list, C_list, proof, group_generator, pub_cred)
+#             requester_commit = user.data_dist_1()
+#             issuer_random = issuer.data_dist_1(pub_cred)
+#             requester_random, E_list, C_list, proof, group_generator = user.data_dist_2(issuer_random, pub_creds)
+#             custodian_list = issuer.data_dist_2(requester_commit, requester_random, pub_creds, E_list, C_list, proof, group_generator, pub_cred)
 #    
 #             (_, p, _, _) = issuer.get_params()
 #    
 #             assert custodian_list is not None
 #    
 #             # Anonimous auth:
-#             sigma, pi_show, z = user.req_cred_anon_auth(t_id)
-#             assert issuer.iss_cred_anon_auth(sigma, pi_show)
+#             sigma, pi_show, z = user.anon_auth(t_id)
+#             assert issuer.anon_auth(sigma, pi_show)
 #             (u2, cl, _) = sigma
 #    
 #             # Proof of eq id:
-#             y, c, gamma = user.req_cred_eq_id(u2, group_generator, z, cl, C_list[0])
-#             assert issuer.iss_cred_eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
+#             y, c, gamma = user.eq_id(u2, group_generator, z, cl, C_list[0])
+#             assert issuer.eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
 #             # Fixme: message to user so that it knows that it can submit credentails (anonimously)
 #    
 #             priv_rev_tuple.append((pub_cred, E_list, custodian_list))

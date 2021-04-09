@@ -56,17 +56,17 @@ class Issuer():
         self.temp_creds[pub_cred] = []
 
     # anonymous authentication
-    def iss_cred_anon_auth(self, sigma, pi_show):
+    def anon_auth(self, sigma, pi_show):
         return show_verify_cmz(self.params, self.iparams, self.i_sk, sigma, pi_show)
 
     # Data distrubution
-    def iss_cred_data_dist_1(self, pub_cred):
+    def data_dist_1(self, pub_cred):
         (_, p, _, _) = self.params
         issuer_random = p.random()
         self.temp_creds[pub_cred] = {'issuer_random': issuer_random}
         return issuer_random
 
-    def iss_cred_data_dist_2(self, requester_commit, requester_random, pub_keys, escrow_shares, commits, proof, group_generator, pub_cred):
+    def data_dist_2(self, requester_commit, requester_random, pub_keys, escrow_shares, commits, proof, group_generator, pub_cred):
         (_, p, _, _) = self.params
         if data_distrubution_verify_commit(self.params, requester_commit, requester_random):
             custodians = data_distrubution_select(pub_keys, requester_random, self.temp_creds[pub_cred]['issuer_random'], self.n, p)
@@ -80,7 +80,7 @@ class Issuer():
             return None
 
     # Proof of equal identity
-    def iss_cred_eq_id(self, u, h, y, c, gamma, cl, c0):
+    def eq_id(self, u, h, y, c, gamma, cl, c0):
         """
         Third step of ReqCred, i.e. proof of equal identity.
         From Chaum et al.'s: "An Improved Protocol for Demonstrating Possession
@@ -96,7 +96,7 @@ class Issuer():
         return c == to_challenge(a + gamma + [cl + c0]) and lhs == rhs
 
     # Credential signing
-    def iss_cred_sign(self, pub_cred):
+    def cred_sign(self, pub_cred):
         (_, p, g0, _) = self.params
         escrow_shares = self.temp_creds[pub_cred]['escrow_shares']
         custodian_encr_keys = self.temp_creds[pub_cred]['custodians']

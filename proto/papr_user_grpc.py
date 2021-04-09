@@ -1,6 +1,6 @@
 
-from papr.papr_cred_iss_data_dist import data_distrubution_commit_encrypt_prove, data_distrubution_random_commit, \
-    data_distrubution_select, data_distrubution_verify_commit
+from papr.papr_cred_iss_data_dist import  data_distrubution_random_commit, \
+    data_distrubution_select
 from amac.credential_scheme import prepare_blind_obtain as prepare_blind_obtain_cmz
 from amac.credential_scheme import blind_obtain as blind_obtain_cmz
 from amac.credential_scheme import blind_show as blind_show_cmz
@@ -45,7 +45,7 @@ class User():
                                                 self.gamma, self.ciphertext)
     # anonymous authentication
 
-    def req_cred_anon_auth(self, t_id):
+    def anon_auth(self, t_id):
         """
         sigma = (u, Cm, Cu_prime)
         z is a random value used later in proof of equal identity
@@ -54,17 +54,17 @@ class User():
         return self.sigma, self.pi_show, self.z
 
     # Data distrubution
-    def req_cred_data_dist_1(self):
+    def data_dist_1(self):
         (commit, self.requester_random) = data_distrubution_random_commit(self.params)
         return commit
 
-    def req_cred_data_dist_2(self, issuer_random, pub_keys):
+    def data_dist_2(self, issuer_random, pub_keys):
         (_, p, _, _) = self.params
         selected_pub_keys = data_distrubution_select(pub_keys, self.requester_random, issuer_random, self.n, p)
         return self.requester_random, self.params, self.priv_id, selected_pub_keys, self.k, self.n
 
     # Proof of equal identity
-    def req_cred_eq_id(self, u, h, z, cl, c0):
+    def eq_id(self, u, h, z, cl, c0):
         """
         Third step of ReqCred, i.e. proof of equal identity.
         From Chaum et al.'s: "An Improved Protocol for Demonstrating Possession
@@ -83,7 +83,7 @@ class User():
         return y, c, gamma
 
     # Credential signing
-    def req_cred_sign(self):
+    def cred_sign(self):
         (_, p, _, g1) = self.params
         PrivCred = (p.random(), p.random())
         PubCred = (PrivCred[0] * g1, PrivCred[1] * g1)

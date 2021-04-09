@@ -48,23 +48,23 @@ class TestPaprMoney:
             t_id = customer.req_enroll_2(u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], c)
         assert ret is not None
 
-        pub_cred = customer.req_cred_sign()
+        pub_cred = customer.cred_sign()
         # Data dist
-        requester_commit = customer.req_cred_data_dist_1()
-        vendor_random = vendor.iss_cred_data_dist_1(pub_cred)
-        requester_random, E_list, C_list, proof, group_generator = customer.req_cred_data_dist_2(vendor_random, pub_keys)
-        custodian_list = vendor.iss_cred_data_dist_2(requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator, pub_cred)
+        requester_commit = customer.data_dist_1()
+        vendor_random = vendor.data_dist_1(pub_cred)
+        requester_random, E_list, C_list, proof, group_generator = customer.data_dist_2(vendor_random, pub_keys)
+        custodian_list = vendor.data_dist_2(requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator, pub_cred)
         assert custodian_list is not None
 
-        # Anonimous auth:
-        sigma, pi_show, z = customer.req_cred_anon_auth(t_id)
-        assert vendor.iss_cred_anon_auth(sigma, pi_show)
+        # Anonymous auth:
+        sigma, pi_show, z = customer.anon_auth(t_id)
+        assert vendor.anon_auth(sigma, pi_show)
 
         (u2, cl, _) = sigma
 
         # Proof of eq id:
-        y, c, gamma = customer.req_cred_eq_id(u2, group_generator, z, cl, C_list[0])
-        assert vendor.iss_cred_eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
+        y, c, gamma = customer.eq_id(u2, group_generator, z, cl, C_list[0])
+        assert vendor.eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
         # Fixme message to customer so that it knows that it can submit credentails (anonimously)
 
         signed_pub_cred = vendor.iss_cred_sign(pub_cred)

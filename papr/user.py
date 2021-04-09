@@ -52,7 +52,7 @@ class User():
         return self.u, self.u_prime
 
     # anonymous authentication
-    def req_cred_anon_auth(self, t_id):
+    def anon_auth(self, t_id):
         """
         sigma = (u, Cm, Cu_prime)
         z is a random value used later in proof of equal identity
@@ -61,14 +61,14 @@ class User():
         return self.sigma, self.pi_show, self.z
 
     # Data distrubution
-    def req_cred_data_dist_1(self):
+    def data_dist_1(self):
         '''
         Distribute data to custodians (part 1). Second part of credential issuance.
         '''
         (commit, self.requester_random) = data_distrubution_random_commit(self.params)
         return commit
 
-    def req_cred_data_dist_2(self, issuer_random, pub_keys):
+    def data_dist_2(self, issuer_random, pub_keys):
         '''
         Distribute data to custodians (part 2). Second part of credential issuance.
         '''
@@ -78,7 +78,7 @@ class User():
         return self.requester_random, E_list, C_list, proof, group_generator
 
     # Proof of equal identity
-    def req_cred_eq_id(self, u, h, z, cl, c0):
+    def eq_id(self, u, h, z, cl, c0):
         """
         Third step of ReqCred, i.e. proof of equal identity.
         From Chaum et al.'s: "An Improved Protocol for Demonstrating Possession
@@ -97,7 +97,7 @@ class User():
         return y, c, gamma
 
     # Credential signing
-    def req_cred_sign(self):
+    def cred_sign(self):
         """
         Generates a credential to be sent to the issuer for signing. 
         The credential consists of two key pairs: one for encryption and one for signature.

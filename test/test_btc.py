@@ -2,7 +2,6 @@ from bit.wallet import PrivateKeyTestnet
 from petlib.bn import Bn
 from papr.user import User
 from papr.issuer import Issuer
-# from petlib.pack import encode, decode
 from amac.credential_scheme import setup as setup_cmz
 from bit.format import bytes_to_wif
 from petlib.ec import EcPt
@@ -37,7 +36,7 @@ class TestBTC:
 
         user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n, btc_priv_key)
 
-        (_, this_should_be_btc_public_key) = user.req_cred_sign()
+        (_, this_should_be_btc_public_key) = user.cred_sign()
 
         # Convert to uncompressed format:
         wif = bytes_to_wif(btc_key.to_bytes(), compressed=False)
@@ -62,7 +61,7 @@ class TestBTC:
 
         user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n, btc_priv_key)
 
-        (_, this_should_be_btc_public_key) = user.req_cred_sign()
+        (_, this_should_be_btc_public_key) = user.cred_sign()
 
         # Convert to uncompressed format:
 
@@ -88,7 +87,7 @@ class TestBTC:
         # Convert private key to Bn format
         btc_priv_key = Bn.from_decimal(str(btc_key.to_int()))
         user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n, btc_priv_key)
-        (_, this_should_be_btc_public_key) = user.req_cred_sign()
+        (_, this_should_be_btc_public_key) = user.cred_sign()
 
         adr = btc_key.address
 

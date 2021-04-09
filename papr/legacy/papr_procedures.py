@@ -83,30 +83,30 @@ def enroll(params, id, iparams, i_sk, x_sign, user_list):
 
 
 def cred(params, iparams, t_id, priv_id, i_sk):
-    sigma, pi_show = req_cred_anon_auth(params, iparams, t_id, priv_id)
-    iss_cred_anon_auth(params, iparams, i_sk, sigma, pi_show)
+    sigma, pi_show = req_anon_auth(params, iparams, t_id, priv_id)
+    iss_anon_auth(params, iparams, i_sk, sigma, pi_show)
 
 
 # anonymous authentication
 
-def req_cred_anon_auth(params, iparams, t_id, priv_id):
+def req_anon_auth(params, iparams, t_id, priv_id):
     sigma, pi_show, z = blind_show_cmz(params, iparams, t_id, priv_id)
     return sigma, pi_show, z
 
 
-def iss_cred_anon_auth(params, iparams, i_sk, sigma, pi_show):
+def iss_anon_auth(params, iparams, i_sk, sigma, pi_show):
     return show_verify_cmz(params, iparams, i_sk, sigma, pi_show)
 
 
-def req_cred_data_dist_1(params):
+def req_data_dist_1(params):
     return data_distrubution_random_commit(params)
 
 
-def iss_cred_data_dist_1(params):
+def iss_data_dist_1(params):
     return data_distrubution_random_commit(params)
 
 
-def req_cred_eq_id(params, u, h, priv_id, z, cl, c0):
+def req_eq_id(params, u, h, priv_id, z, cl, c0):
     """
     Third step of ReqCred, i.e. proof of equal identity.
     From Chaum et al.'s: "An Improved Protocol for Demonstrating Possession
@@ -125,7 +125,7 @@ def req_cred_eq_id(params, u, h, priv_id, z, cl, c0):
     return y, c, gamma
 
 
-def iss_cred_eq_id(params, u, h, y, c, gamma, cl, c0):
+def iss_eq_id(params, u, h, y, c, gamma, cl, c0):
     """
     Third step of ReqCred, i.e. proof of equal identity.
     From Chaum et al.'s: "An Improved Protocol for Demonstrating Possession
@@ -142,11 +142,11 @@ def iss_cred_eq_id(params, u, h, y, c, gamma, cl, c0):
 
 
 # ----
-def req_cred_data_dist_2(params, issuer_commit, issuer_random):
+def req_data_dist_2(params, issuer_commit, issuer_random):
     return data_distrubution_verify_commit(params, issuer_commit, issuer_random)
 
 
-def iss_cred_data_dist_2(params, requester_commit, requester_random, issuer_random, pub_keys, n):
+def iss_data_dist_2(params, requester_commit, requester_random, issuer_random, pub_keys, n):
     (_, p, _, _) = params
     if data_distrubution_verify_commit(params, requester_commit, requester_random):
         return data_distrubution_select(pub_keys, requester_random, issuer_random, n, p)
@@ -154,13 +154,13 @@ def iss_cred_data_dist_2(params, requester_commit, requester_random, issuer_rand
         return None
 
 
-def req_cred_data_dist_3(params, requester_random, issuer_random, PrivID, pub_keys, k, n):
+def req_data_dist_3(params, requester_random, issuer_random, PrivID, pub_keys, k, n):
     (_, p, _, _) = params
     selected_pub_keys = data_distrubution_select(pub_keys, requester_random, issuer_random, n, p)
     return data_distrubution_commit_encrypt_prove(params, PrivID, selected_pub_keys, k, n)
 
 
-def iss_cred_data_dist_3(params, E_list, C_list, proof, custodian_list, group_generator):
+def iss_data_dist_3(params, E_list, C_list, proof, custodian_list, group_generator):
     (_, p, _, _) = params
     return data_distrubution_issuer_verify(E_list, C_list, proof, custodian_list, group_generator, p)
 

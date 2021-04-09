@@ -38,22 +38,22 @@ class User():
 
     def req_cred(self):
         (_, _, _, g1) = self.params
-        self.pub_cred = self.req_cred_sign_1()
-        sigma, pi_show, z = self.req_cred_anon_auth()
-        if not self.issuer.iss_cred_anon_auth(sigma, pi_show):
+        self.pub_cred = self.cred_sign_1()
+        sigma, pi_show, z = self.anon_auth()
+        if not self.issuer.anon_auth(sigma, pi_show):
             return False
-        commit = self.req_cred_data_dist_1()
+        commit = self.data_dist_1()
         cred_signing_keys_list = [y_s for (y_s, _) in self.issuer.cred_list.read(False)]
-        iss_random_value = self.issuer.iss_cred_data_dist_1(self.pub_cred)
-        requester_random, escrow_shares, commits, proof, group_generator = self.req_cred_data_dist_2(iss_random_value, cred_signing_keys_list)
-        custodian_list = self.issuer.iss_cred_data_dist_2(commit, requester_random, cred_signing_keys_list,
+        iss_random_value = self.issuer.data_dist_1(self.pub_cred)
+        requester_random, escrow_shares, commits, proof, group_generator = self.data_dist_2(iss_random_value, cred_signing_keys_list)
+        custodian_list = self.issuer.data_dist_2(commit, requester_random, cred_signing_keys_list,
                                                           escrow_shares, commits, proof, group_generator, self.pub_cred)
         if custodian_list is None:
             return False
         cl = self.priv_id * sigma[0] + z * g1
         c0 = commits[0]
-        y, c, gamma = self.req_cred_eq_id(sigma[0], group_generator, z, cl, c0)
-        if not self.issuer.iss_cred_eq_id(sigma[0], group_generator, y, c, gamma, cl, c0):
+        y, c, gamma = self.eq_id(sigma[0], group_generator, z, cl, c0)
+        if not self.issuer.eq_id(sigma[0], group_generator, y, c, gamma, cl, c0):
             return False
         self.sigma_pub_cred = self.issuer.iss_cred_sign(self.pub_cred)
         return True
@@ -64,7 +64,7 @@ class User():
         return self.issuer.ver_cred_2(*signature, self.pub_cred, m)
 
     # anonymous authentication
-    def req_cred_anon_auth(self):
+    def anon_auth(self):
         """
         sigma = (u, Cm, Cu_prime)
         z is a random value used later in proof of equal identity
@@ -73,18 +73,18 @@ class User():
         return self.sigma, self.pi_show, self.z
 
     # Data distrubution
-    def req_cred_data_dist_1(self):
+    def data_dist_1(self):
         (commit, self.requester_random) = __data_distrubution_random_commit(self.params)
         return commit
 
-    def req_cred_data_dist_2(self, issuer_random, pub_keys):
+    def data_dist_2(self, issuer_random, pub_keys):
         (_, p, _, _) = self.params
         selected_pub_keys = __data_distrubution_select(pub_keys, self.requester_random, issuer_random, self.n, p)
         E_list, C_list, proof, group_generator = __data_distrubution_commit_encrypt_prove(self.params, self.priv_id, selected_pub_keys, self.k, self.n)
         return self.requester_random, E_list, C_list, proof, group_generator
 
     # Proof of equal identity
-    def req_cred_eq_id(self, u, h, z, cl, c0):
+    def eq_id(self, u, h, z, cl, c0):
         """
         Third step of ReqCred, i.e. proof of equal identity.
         From Chaum et al.'s: "An Improved Protocol for Demonstrating Possession
@@ -106,13 +106,13 @@ class User():
         return y, c, gamma
 
     # Credential signing
-    def req_cred_sign_1(self):
+    def cred_sign_1(self):
         (_, p, _, g1) = self.params
         self.priv_cred = (p.random(), p.random())
         pub_cred = (self.priv_cred[0] * g1, self.priv_cred[1] * g1)
         return pub_cred
 
-    def req_cred_sign_2(self, sigma_pub_cred):
+    def cred_sign_2(self, sigma_pub_cred):
         self.sigma_y_e, self.sigma_y_s = sigma_pub_cred
 
     # Show/verify credential
