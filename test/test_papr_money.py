@@ -21,17 +21,17 @@ class TestPaprMoney:
     def test_customer_balance(self):
         k, n = 3, 10
         vendor = Vendor()
-        (y_sign, y_encr), iparams, _, _, _, _ = vendor.setup(3, 10)
-        customer = Customer("Josip Tito", vendor, vendor.get_params(), iparams, y_sign, y_encr, k, n)
+        params, (y_sign, y_encr), iparams, _, _, _, _ = vendor.setup(3, 10)
+        customer = Customer("Josip Tito", vendor, params, iparams, y_sign, y_encr, k, n)
         assert float(customer.get_balance("satoshi")) > 0.0
 
     def test_customer_persistence(self):
         k, n = 3, 10
         vendor = Vendor()
-        (y_sign, y_encr), iparams, _, _, _, _ = vendor.setup(3, 10)
-        customer = Customer("Josip Tito", vendor, vendor.get_params(), iparams, y_sign, y_encr, k, n)
+        params, (y_sign, y_encr), iparams, _, _, _, _ = vendor.setup(3, 10)
+        customer = Customer("Josip Tito", vendor, params, iparams, y_sign, y_encr, k, n)
         addr1 = customer.get_address()
-        customer2 = Customer("Josip Tito", vendor, vendor.get_params(), iparams, y_sign, y_encr, k, n)
+        customer2 = Customer("Josip Tito", vendor, params, iparams, y_sign, y_encr, k, n)
         addr2 = customer2.get_address()
         assert addr1 == addr2
 
@@ -39,8 +39,8 @@ class TestPaprMoney:
     def test_new_user_procedure(self):
         k, n = 3, 5
         vendor = Vendor()
-        (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list = vendor.setup(3, 10)
-        customer = Customer("Josip Tito", vendor, vendor.get_params(), iparams, y_sign, y_encr, k, n)
+        params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list = vendor.setup(3, 10)
+        customer = Customer("Josip Tito", vendor, params, iparams, y_sign, y_encr, k, n)
         name, pub_id, (u_sk, u_pk, c, pi) = customer.req_enroll_1(customer.name)
         ret = vendor.iss_enroll(u_pk['h'], c, pi, name, pub_id)
         if ret is not None:
@@ -48,7 +48,7 @@ class TestPaprMoney:
             t_id = customer.req_enroll_2(u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], c)
         assert ret is not None
 
-        pub_cred = customer.cred_sign()
+        pub_cred = customer.cred_sign_1()
         # Data dist
         requester_commit = customer.data_dist_1()
         vendor_random = vendor.data_dist_1(pub_cred)
@@ -67,14 +67,16 @@ class TestPaprMoney:
         assert vendor.eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
         # Fixme message to customer so that it knows that it can submit credentails (anonimously)
 
-        signed_pub_cred = vendor.iss_cred_sign(pub_cred)
+        (sigma_y_e, sigma_y_s) = vendor.cred_sign(pub_cred)
+        verify()
+
 
         assert cred_list.peek() == pub_cred
 
         # Cred usage:
         m = vendor.ver_cred_1()
-        (r, s) = customer.show_cred_1(m)
-        assert vendor.ver_cred_2(r, s, pub_cred, m)
+        sigma_pub_cred = customer.show_cred_1(m)
+        assert vendor.ver_cred_2(r, s, pub_cred, sigma_pub_cred, m)
 
     # Wasteful and slow test.
     # def test_send(self):
