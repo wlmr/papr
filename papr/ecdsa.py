@@ -1,4 +1,3 @@
-from petlib.ec import EcGroup, Bn
 from papr.utils import hash
 
 
@@ -26,42 +25,3 @@ def verify(G, p, g, r, s, pub_key, m: list):
         return False
     else:
         return False
-
-
-if __name__ == '__main__':
-    G = EcGroup(714)
-    p = G.order()
-    g = G.hash_to_point(b'g')
-    h = G.hash_to_point(b'h')
-    params = (G, p, g, h)
-    print("-----------------------------")
-    print("-----------------------------")
-    print("should work i.e. return true:")
-    print("-----------------------------")
-    print("-----------------------------")
-    pub_id = p.random() * g
-    pub_id_x, _ = pub_id.get_affine()
-    x = p.random()
-    y = x * g
-    r, s = sign(p, g, x, pub_id_x)
-    print(verify(G, p, g, r, s, y, pub_id_x))
-    print("-----------------------------------")
-    print("-----------------------------------")
-    print("should NOT work, i.e. return false:")
-    print("-----(wrong signing key)-----------")
-    print("-----------------------------------")
-    x = Bn.from_decimal("100")
-    r, s = sign(p, g, x, pub_id_x)
-    print(verify(G, p, g, r, s, y, pub_id_x))
-    print("-----------------------------------")
-    print("-----------------------------------")
-    print("should NOT work, i.e. return false:")
-    print("-----(changed message key)---------")
-    print("-----------------------------------")
-    pub_id = p.random() * g
-    pub_id_x, _ = pub_id.get_affine()
-    x = p.random()
-    y = x * g
-    r, s = sign(p, g, x, pub_id_x)
-    pub_id_x += 1
-    print(verify(G, p, g, r, s, y, pub_id_x))
