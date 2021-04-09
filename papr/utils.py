@@ -14,3 +14,8 @@ def pub_key_to_addr(pub_key):
     if isinstance(pub_key, EcPt):
         pub_key = pub_key.export()
     return bit.format.public_key_to_address(pub_key, version="test")
+
+
+def bit_privkey_to_petlib_bn(key):
+    return Bn.from_decimal(str(key.to_int()))
+

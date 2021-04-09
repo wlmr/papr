@@ -65,6 +65,7 @@ class TestBTC:
         (_, this_should_be_btc_public_key) = user.req_cred_sign()
 
         # Convert to uncompressed format:
+
         wif = bytes_to_wif(btc_key.to_bytes(), compressed=False)
         key2 = PrivateKeyTestnet(wif)
 
@@ -95,3 +96,16 @@ class TestBTC:
 
         assert adr == new_adr
         assert utils.pub_key_to_addr(this_should_be_btc_public_key) == adr
+
+        wif = bytes_to_wif(btc_key.to_bytes(), compressed=True)
+        key2 = PrivateKeyTestnet(wif)
+
+        public_key_in_ecpt_format = EcPt.from_binary(key2.public_key, G)
+
+        assert public_key_in_ecpt_format == this_should_be_btc_public_key
+
+
+
+        
+
+
