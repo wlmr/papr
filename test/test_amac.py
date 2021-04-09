@@ -3,7 +3,6 @@ from amac.credential_scheme import blind_issue, blind_obtain, blind_show, show_v
 
 
 class TestAmac():
-    
     def test_valid_procedure(self):
         params = setup(1)
         (G, p, g, h) = params
@@ -24,4 +23,3 @@ class TestAmac():
         c = p.from_decimal("100")
         pi_prepare_obtain = (c, response)
         assert blind_issue(params, iparams, i_sk, u_pk['h'], ciphertext, pi_prepare_obtain) is None
-

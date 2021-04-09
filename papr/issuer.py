@@ -146,8 +146,8 @@ def data_distrubution_issuer_verify(E_list, C_list, proof, pub_keys, group_gener
 
 
 def data_distrubution_verify_commit(params, c, r):
-    (_, _, _, G) = params
-    commit = r * G  # Is it ok to use G here?
+    (_, _, _, g1) = params
+    commit = r * g1  # Is it ok to use G here?
     return commit == c
 
 

@@ -228,10 +228,12 @@ def get_rev_data(PubCred, dummy_list):
 def data_distrubution_issuer_verify(E_list, C_list, proof, pub_keys, group_generator, p):
     return verify_encrypted_shares(E_list, C_list, pub_keys, proof, group_generator, p)
 
+
 def data_distrubution_verify_commit(params, c, r):
     (_, _, _, G) = params
     commit = r * G  # Is it ok to use G here?
     return commit == c
+
 
 def data_distrubution_select(public_credentials, u_random, i_random, n, p):
     selected_data_custodians = []
@@ -245,7 +247,6 @@ def data_distrubution_commit_encrypt_prove(params, PrivID, data_custodians_publi
     E_list, C_list, proof, group_generator = distribute_secret(data_custodians_public_credentials, PrivID, p, k, n, Gq)
     # Send to I
     return E_list, C_list, proof, group_generator
-
 
 
 def data_distrubution_random_commit(params):
