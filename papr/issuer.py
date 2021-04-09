@@ -14,9 +14,6 @@ class Issuer():
         self.temp_creds = {}
         self.res_list = {}
 
-    def get_params(self):
-        return self.params
-
     def setup(self, k, n):
         """
         k, n defines the PVSS-threshold scheme
@@ -36,7 +33,7 @@ class Issuer():
         [self.sys_list, self.user_list, self.cred_list, self.rev_list] = [Ledger(self.y_sign) for _ in range(4)]
         self.sys_list.add(self.params, crs, sign(p, g0, self.x_sign, [crs]))
         self.sys_list.add(self.params, i_pk, sign(p, g0, self.x_sign, [i_pk]))  # Note: Should we publish i_pk, or should it be y_sign, y_encr
-        return (self.y_sign, self.y_encr), self.iparams, self.sys_list, self.user_list, self.cred_list, self.rev_list  # , self.res_list
+        return self.params, (self.y_sign, self.y_encr), self.iparams, self.sys_list, self.user_list, self.cred_list, self.rev_list  # , self.res_list
 
     def iss_enroll(self, gamma, ciphertext, pi_prepare_obtain, id, pub_id):
         """
@@ -114,10 +111,14 @@ class Issuer():
         m = p.random()
         return m
 
-    def ver_cred_2(self, r, s, pub_cred, m):
-        (_, y_sign) = pub_cred
+    def ver_cred_2(self, sigma_m, pub_cred, sigma_pub_cred, m):
+        (y_e, y_s) = pub_cred
         (G, p, g0, _) = self.params
-        return verify(G, p, g0, r, s, y_sign, [m])
+        (sigma_y_e, sigma_y_s) = sigma_pub_cred
+        correct_sigma_y_e = verify(G, p, g0, *sigma_y_e, self.y_sign, [y_e])
+        correct_sigma_y_s = verify(G, p, g0, *sigma_y_s, self.y_sign, [y_s])
+        correct_sigma_m = verify(G, p, g0, *sigma_m, y_s, [m])
+        return correct_sigma_y_e and correct_sigma_y_s and correct_sigma_m
 
     # Revoke/restore
     def get_rev_data(self, pub_cred):
