@@ -103,9 +103,3 @@ class TestBTC:
         public_key_in_ecpt_format = EcPt.from_binary(key2.public_key, G)
 
         assert public_key_in_ecpt_format == this_should_be_btc_public_key
-
-
-
-        
-
-

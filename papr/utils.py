@@ -18,4 +18,3 @@ def pub_key_to_addr(pub_key):
 
 def bit_privkey_to_petlib_bn(key):
     return Bn.from_decimal(str(key.to_int()))
-
