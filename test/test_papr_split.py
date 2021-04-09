@@ -305,12 +305,10 @@ class TestPaprSplit:
         (k, n) = (3, 10)
         issuer = Issuer()
         (y_sign, y_encr), iparams, _, user_list, _, _ = issuer.setup(k, n)
-
         bootstrap_users = []
-     
         pub_creds_encr = []
         priv_rev_tuple = []
-        #pub_ids = []
+        # pub_ids = []
         for i in range(n):
             user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n)
             t_id, s_pub_id, pub_id = self.helper_enroll(str(i), user_list, issuer, user)

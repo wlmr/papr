@@ -1,6 +1,4 @@
 from pvss.pvss import participant_decrypt_and_prove
-from papr.papr_cred_iss_data_dist import data_distrubution_commit_encrypt_prove, data_distrubution_random_commit, \
-    data_distrubution_select
 from amac.credential_scheme import prepare_blind_obtain as prepare_blind_obtain_cmz
 from amac.credential_scheme import blind_obtain as blind_obtain_cmz
 from amac.credential_scheme import blind_show as blind_show_cmz
@@ -76,13 +74,13 @@ class User():
 
     # Data distrubution
     def req_cred_data_dist_1(self):
-        (commit, self.requester_random) = data_distrubution_random_commit(self.params)
+        (commit, self.requester_random) = __data_distrubution_random_commit(self.params)
         return commit
 
     def req_cred_data_dist_2(self, issuer_random, pub_keys):
         (_, p, _, _) = self.params
-        selected_pub_keys = data_distrubution_select(pub_keys, self.requester_random, issuer_random, self.n, p)
-        E_list, C_list, proof, group_generator = data_distrubution_commit_encrypt_prove(self.params, self.priv_id, selected_pub_keys, self.k, self.n)
+        selected_pub_keys = __data_distrubution_select(pub_keys, self.requester_random, issuer_random, self.n, p)
+        E_list, C_list, proof, group_generator = __data_distrubution_commit_encrypt_prove(self.params, self.priv_id, selected_pub_keys, self.k, self.n)
         return self.requester_random, E_list, C_list, proof, group_generator
 
     # Proof of equal identity
@@ -130,3 +128,26 @@ class User():
         '''
         S_i, decryption_proof = participant_decrypt_and_prove(self.params, self.priv_cred[0], s_e)
         self.issuer.res_list[pub_cred].append((S_i, decryption_proof))
+
+
+
+
+def __data_distrubution_select(public_credentials, u_random, i_random, n, p):
+    selected_data_custodians = []
+    for i in range(n):
+        selected_data_custodians.append(public_credentials[prng(u_random, i_random, i, p) % len(public_credentials)])
+    return selected_data_custodians
+
+def __data_distrubution_commit_encrypt_prove(params, PrivID, data_custodians_public_credentials, k, n):
+    (Gq, p, _, _) = params
+    E_list, C_list, proof, group_generator = pvss.distribute_secret(data_custodians_public_credentials, PrivID, p, k, n, Gq)
+    # Send to I
+    return E_list, C_list, proof, group_generator
+
+
+
+def __data_distrubution_random_commit(params):
+    (_, p, _, G) = params
+    r = p.random()
+    c = r * G  # Is it ok to use G here?
+    return (c, r)

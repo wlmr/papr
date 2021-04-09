@@ -1,12 +1,11 @@
-from pvss.pvss import reconstruct, verify_correct_decryption
-from papr.papr_cred_iss_data_dist import data_distrubution_issuer_verify, \
-    data_distrubution_select, data_distrubution_verify_commit
+from pvss.pvss import reconstruct, verify_correct_decryption, verify_encrypted_shares
 from amac.credential_scheme import setup as setup_cmz, cred_keygen as cred_keygen_cmz
 from amac.credential_scheme import blind_issue as blind_issue_cmz
 from amac.credential_scheme import show_verify as show_verify_cmz
 from amac.proofs import to_challenge
 from papr.ecdsa import sign, verify
 from papr.ledger import Ledger
+from papr.utils import prng
 
 
 class Issuer():
@@ -140,3 +139,20 @@ class Issuer():
                 return None
         return reconstruct(S_r, index_list, p)
         # Return pub_id
+
+
+def data_distrubution_issuer_verify(E_list, C_list, proof, pub_keys, group_generator, p):
+    return verify_encrypted_shares(E_list, C_list, pub_keys, proof, group_generator, p)
+
+
+def data_distrubution_verify_commit(params, c, r):
+    (_, _, _, G) = params
+    commit = r * G  # Is it ok to use G here?
+    return commit == c
+
+
+def data_distrubution_select(public_credentials, u_random, i_random, n, p):
+    selected_data_custodians = []
+    for i in range(n):
+        selected_data_custodians.append(public_credentials[prng(u_random, i_random, i, p) % len(public_credentials)])
+    return selected_data_custodians

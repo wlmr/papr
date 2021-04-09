@@ -18,3 +18,10 @@ def pub_key_to_addr(pub_key):
 
 def bit_privkey_to_petlib_bn(key):
     return Bn.from_decimal(str(key.to_int()))
+
+
+def prng(random_u, random_i, counter, p):
+    """
+    Psuedorandom number-generator.
+    """
+    return int(hash([random_u, random_i, counter]) % p)
