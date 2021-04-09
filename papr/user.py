@@ -3,7 +3,7 @@ from amac.credential_scheme import prepare_blind_obtain as prepare_blind_obtain_
 from amac.credential_scheme import blind_obtain as blind_obtain_cmz
 from amac.credential_scheme import blind_show as blind_show_cmz
 from amac.proofs import to_challenge
-from papr.ecdsa import sign
+from papr.ecdsa import sign, verify
 from papr.utils import prng
 
 
@@ -24,11 +24,13 @@ class User():
         self.y_sign = y_sign
         self.y_encr = y_encr
         self.k, self.n = (k, n)
+        (_, p, _, _) = params
         if x_sign is None:
-            (_, p, _, _) = params
             self.x_sign = p.random()
         else:
             self.x_sign = x_sign
+        self.x_encr = p.random()
+        self.priv_cred = (self.x_encr, self.x_sign)
 
     def req_enroll_1(self, id):
         """
@@ -97,25 +99,33 @@ class User():
         return y, c, gamma
 
     # Credential signing
-    def cred_sign(self):
+    def cred_sign_1(self):
         """
         Generates a credential to be sent to the issuer for signing.
         The credential consists of two key pairs: one for encryption and one for signature.
         priv_cred = (private encryption key, private signature key)
         """
-        (_, p, g0, _) = self.params
-        self.priv_cred = (p.random(),  self.x_sign)
-        pub_cred = (self.priv_cred[0] * g0, self.priv_cred[1] * g0)
-        return pub_cred
+        (_, _, g0, _) = self.params
+        self.pub_cred = (self.priv_cred[0] * g0, self.priv_cred[1] * g0)
+        return self.pub_cred
+
+    def cred_sign_2(self, sigma_pub_cred):
+        (G, p, g0, _) = self.params
+        (sigma_y_e, sigma_y_s) = sigma_pub_cred
+        y_e, y_s = self.pub_cred
+        if verify(G, p, g0, *sigma_y_e, self.y_sign, [y_e]) and verify(G, p, g0, *sigma_y_s, self.y_sign, [y_s]):
+            self.sigma_pub_cred = sigma_pub_cred
+            return True
+        return False
 
     # Show/verify credential
     def show_cred_1(self, m):  # Need this from issuer.
         '''
         Show credential. Used to prove that the user is a valid registered user.
         '''
-        (_, x_sign) = self.priv_cred
         (_, p, g0, _) = self.params
-        return sign(p, g0, x_sign, [m])
+        sigma_m = sign(p, g0, self.x_sign, [m])
+        return sigma_m, self.pub_cred, self.sigma_pub_cred
 
     # Revoke/restore
     def respond(self, s_e):
