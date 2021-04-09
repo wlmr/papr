@@ -6,7 +6,7 @@ from amac.credential_scheme import blind_issue as blind_issue_cmz
 from amac.credential_scheme import show_verify as show_verify_cmz
 from amac.proofs import to_challenge
 from papr.ecdsa import sign, verify
-from papr.papr_list import Papr_list
+from papr.ledger import Ledger
 
 
 class Issuer():
@@ -34,7 +34,7 @@ class Issuer():
         (self.iparams, self.i_sk) = cred_keygen_cmz(self.params)
         crs = ",".join([str(elem) for elem in [p.repr(), g0, g1, n, k, self.iparams['Cx0']]])
         i_pk = ",".join([str(x) for x in [self.y_sign, self.y_encr]])
-        [self.sys_list, self.user_list, self.cred_list, self.rev_list] = [Papr_list(self.y_sign) for _ in range(4)]
+        [self.sys_list, self.user_list, self.cred_list, self.rev_list] = [Ledger(self.y_sign) for _ in range(4)]
         self.sys_list.add(self.params, crs, sign(p, g0, self.x_sign, [crs]))
         self.sys_list.add(self.params, i_pk, sign(p, g0, self.x_sign, [i_pk]))  # Note: Should we publish i_pk, or should it be y_sign, y_encr
         return (self.y_sign, self.y_encr), self.iparams, self.sys_list, self.user_list, self.cred_list, self.rev_list  # , self.res_list
@@ -93,7 +93,7 @@ class Issuer():
         (G, _, _, g1) = self.params
         a = [u + h, g1]
         lhs = sum([y * a for y, a in zip(y, a)], G.infinite())
-        rhs = sum(gamma, G.infinite()) + (c * (cl + c0))
+        rhs = sum(gamma, G.infinite()) + (c * (cl + c0))  # G.infinite() is equivalent to 0 (additive identity on the curve group)
         return c == to_challenge(a + gamma + [cl + c0]) and lhs == rhs
 
     # Credential signing

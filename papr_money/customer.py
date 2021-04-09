@@ -1,4 +1,4 @@
-from papr.papr_user import User
+from papr.user import User
 from papr.utils import bit_privkey_to_petlib_bn
 from bit import PrivateKeyTestnet, wif_to_key
 
@@ -18,7 +18,7 @@ class Customer(User):
         wif_file.close()
         self.notify_vendor(vendor, self.key.public_key, self.key.address)
         x_sign = bit_privkey_to_petlib_bn(self.key._pk)
-        User.__init__(params, iparams, y_sign, y_encr, k, n, x_sign)
+        User.__init__(self, params, iparams, y_sign, y_encr, k, n, x_sign)
 
     def notify_vendor(self, vendor, pub_key, address):
         vendor.register_key(pub_key, address)

@@ -9,7 +9,7 @@ from amac.credential_scheme import blind_show as blind_show_cmz
 from amac.credential_scheme import show_verify as show_verify_cmz
 from amac.proofs import to_challenge
 from papr.ecdsa import sign, verify
-from papr.papr_list import Papr_list
+from papr.ledger import Ledger
 
 
 def setup(k, n):
@@ -26,7 +26,7 @@ def setup(k, n):
     (iparams, i_sk) = cred_keygen_cmz(params)
     crs = ",".join([str(elem) for elem in [p.repr(), g0, g1, n, k, iparams['Cx0']]])
     i_pk = ",".join([str(x) for x in [y_sign, y_encr]])
-    [sys_list, user_list, cred_list, rev_list, res_list] = [Papr_list(y_sign) for _ in range(5)]
+    [sys_list, user_list, cred_list, rev_list, res_list] = [Ledger(y_sign) for _ in range(5)]
 
     sys_list.add(params, crs, sign(p, g0, x_sign, [crs]))
     sys_list.add(params, i_pk, sign(p, g0, x_sign, [i_pk]))
@@ -197,7 +197,7 @@ def restore(params, proved_decrypted_shares, index_list, custodian_public_keys, 
     Restores public key given a set of at least k shares that's decrypted and proven, along with encrypted shares,
         custodian public keys and a list of which indexes are used for decryption
     '''
-    (_, p, g0, G) = params
+    (_, p, g0, _) = params
     S_r = []
     for ((S_i, decrypt_proof), Y_i, pub_key) in zip(proved_decrypted_shares, encrypted_shares, custodian_public_keys):
         S_r.append(S_i)

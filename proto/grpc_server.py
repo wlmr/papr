@@ -1,4 +1,4 @@
-from papr.papr_issuer import Issuer
+from papr.issuer import Issuer
 from concurrent import futures
 import grpc
 from petlib.pack import decode, encode

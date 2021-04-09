@@ -1,7 +1,7 @@
 from bit.wallet import PrivateKeyTestnet
 from petlib.bn import Bn
-from papr.papr_user import User
-from papr.papr_issuer import Issuer
+from papr.user import User
+from papr.issuer import Issuer
 # from petlib.pack import encode, decode
 from amac.credential_scheme import setup as setup_cmz
 from bit.format import bytes_to_wif

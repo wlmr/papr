@@ -1,25 +1,25 @@
 from papr.ecdsa import verify
 
 
-class Papr_list():
+class Ledger():
 
     def __init__(self, y_sign):
-        self.papr_list = []
+        self.ledger = []
         self.issuer_y_sign = y_sign
 
     def peek(self):
-        return self.papr_list[-1]
+        return self.ledger[-1]
 
     def read(self, index: int):
         if not index:
-            return self.papr_list
-        elif index in range(0, len(self.papr_list)):
-            return self.papr_list[index]
+            return self.ledger
+        elif index in range(0, len(self.ledger)):
+            return self.ledger[index]
         else:
             return None
 
     def has(self, id, index):
-        return id in [entry[index] for entry in self.papr_list]
+        return id in [entry[index] for entry in self.ledger]
 
     def add(self, params, entry, issue_signature):
         """
@@ -29,6 +29,6 @@ class Papr_list():
         (G, p, g, _) = params
         r, s = issue_signature
         if verify(G, p, g, r, s, self.issuer_y_sign, [*entry]):
-            self.papr_list.append(entry)
+            self.ledger.append(entry)
             return True
         return False

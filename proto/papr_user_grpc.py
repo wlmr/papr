@@ -12,7 +12,7 @@ import grpc
 
 from papr.papr_pb2 import iss_enroll_msg, iss_enroll_rsp
 from papr.papr_pb2_grpc import ConnectorStub
-from papr.papr_issuer import Issuer
+from papr.issuer import Issuer
 
 
 

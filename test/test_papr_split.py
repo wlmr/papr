@@ -1,5 +1,5 @@
-from papr.papr_user import User
-from papr.papr_issuer import Issuer
+from papr.user import User
+from papr.issuer import Issuer
 from papr.ecdsa import sign, verify
 import pvss.pvss as pvss
 # from petlib.pack import encode, decode
@@ -307,27 +307,27 @@ class TestPaprSplit:
         (y_sign, y_encr), iparams, _, user_list, _, _ = issuer.setup(k, n)
 
         bootstrap_users = []
-        pub_creds_full = []
-        pub_creds = []
+     
+        pub_creds_encr = []
         priv_rev_tuple = []
-        pub_ids = []
+        #pub_ids = []
         for i in range(n):
             user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n)
             t_id, s_pub_id, pub_id = self.helper_enroll(str(i), user_list, issuer, user)
-            bootstrap_users.append((user, t_id, s_pub_id, pub_id))
-            PubCred = user.req_cred_sign()
-            pub_creds_full.append(PubCred)
-            pub_creds.append(PubCred[0])
-            pub_ids.append(pub_id)
+            pub_cred = user.req_cred_sign()
+            bootstrap_users.append({"user": user, "t_id": t_id, "pub_id": pub_id, "pub_cred": pub_cred})
+            pub_creds_encr.append(pub_cred[0])
 
-        for ((user, t_id, s_pub_id, pub_id), pub_cred) in zip(bootstrap_users, pub_creds_full):
+        for dict_elem in bootstrap_users:
+            user = dict_elem['user']
+            t_id = dict_elem['t_id']
+            pub_id = dict_elem['pub_id']
+            pub_cred = dict_elem['pub_cred']
 
             requester_commit = user.req_cred_data_dist_1()
             issuer_random = issuer.iss_cred_data_dist_1(pub_cred)
-            requester_random, E_list, C_list, proof, group_generator = user.req_cred_data_dist_2(issuer_random, pub_creds)
-            custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_creds, E_list, C_list, proof, group_generator, pub_cred)
-
-            (_, p, _, _) = issuer.get_params()
+            requester_random, E_list, C_list, proof, group_generator = user.req_cred_data_dist_2(issuer_random, pub_creds_encr)
+            custodian_list = issuer.iss_cred_data_dist_2(requester_commit, requester_random, pub_creds_encr, E_list, C_list, proof, group_generator, pub_cred)
 
             assert custodian_list is not None
 
@@ -351,22 +351,22 @@ class TestPaprSplit:
 
         for (enc_share, cust_pub_key) in zip(E_list, cust_pub_keys):
             # Here cusodian sees there key and answers. In this test instead we look up the private key.
-            for (i, pub_k) in zip(range(len(pub_creds)), pub_creds):
+            for (i, pub_k) in zip(range(len(pub_creds_encr)), pub_creds_encr):
                 if pub_k == cust_pub_key:
                     # Here we skip reading from list, since we only test restore
-                    user = (bootstrap_users[i])[0]
+                    user = bootstrap_users[i]['user']
                     decoded_list.append(user.respond(enc_share))
                     indexes.append(i+1)
 
         answer = issuer.restore(decoded_list[:3], [1, 2, 3], cust_pub_keys[:3], E_list[:3])
         assert answer is not None
-        assert answer == pub_ids[0]
+        assert answer == bootstrap_users[0]['pub_id']
 
         # Test another order and other numbers for decryption.
         answer = issuer.restore([decoded_list[0], decoded_list[3], decoded_list[1]], [1, 4, 2], [
                                 cust_pub_keys[0], cust_pub_keys[3], cust_pub_keys[1]], [E_list[0], E_list[3], E_list[1]])
         assert answer is not None
-        assert answer == pub_ids[0]
+        assert answer == bootstrap_users[0]['pub_id']
 
         # [x] Enc shares empty. : Fixed
         # [ ] Index repeat sometimes?

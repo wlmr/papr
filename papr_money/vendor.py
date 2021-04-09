@@ -1,4 +1,4 @@
-from papr.papr_issuer import Issuer 
+from papr.issuer import Issuer
 from bit import PrivateKeyTestnet, wif_to_key
 from pickle import dump, load
 from json import dumps
@@ -22,6 +22,7 @@ class Vendor(Issuer):
         except EOFError:
             self.registry = {}  # swap to cred_list
         wif_file.close()
+        Issuer.__init__(self)
 
     def __del__(self):
         registry_file = open("data/vendor-registry", "wb")

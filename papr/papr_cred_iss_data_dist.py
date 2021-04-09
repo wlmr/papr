@@ -30,13 +30,7 @@ def data_distrubution_commit_encrypt_prove(params, PrivID, data_custodians_publi
 
 
 def data_distrubution_issuer_verify(E_list, C_list, proof, pub_keys, group_generator, p):
-    result = pvss.verify_encrypted_shares(E_list, C_list, pub_keys, proof, group_generator, p)
-    if result:
-        # Contrinue to "Proof of equal identity"
-        return True
-    else:
-        # Discard
-        return False
+    return pvss.verify_encrypted_shares(E_list, C_list, pub_keys, proof, group_generator, p)
 
 
 def prng(random_u, random_i, counter, p):

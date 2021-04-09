@@ -1,5 +1,5 @@
-from papr.papr_user_with_issuer import User
-from papr.papr_issuer import Issuer
+from papr.legacy.papr_user_with_issuer import User
+from papr.issuer import Issuer
 from papr.ecdsa import sign, verify
 import pvss.pvss as pvss
 # from petlib.pack import encode, decode
