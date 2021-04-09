@@ -81,7 +81,7 @@ class User():
         return y, c, gamma
 
     # Credential signing
-    def cred_sign(self):
+    def cred_sign_1(self):
         (_, p, _, g1) = self.params
         PrivCred = (p.random(), p.random())
         PubCred = (PrivCred[0] * g1, PrivCred[1] * g1)
@@ -125,7 +125,7 @@ if __name__ == '__main__':
     issuer = Issuer()
     id = "Abradolf Lincler"
     (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list = issuer.setup(3, 10)
-    user = User(issuer.get_params(), iparams, y_sign, y_encr, 3, 10)
+    user = User(params, iparams, y_sign, y_encr, 3, 10)
     user.req_enroll(id)
 
 

@@ -61,7 +61,7 @@ class User():
     def show_cred(self):
         m = self.issuer.ver_cred_1()
         signature = self.show_cred_1(m)
-        return self.issuer.ver_cred_2(*signature, self.pub_cred, m)
+        return self.issuer.ver_cred_2(*signature, self.pub_cred, self.sigma_pub_cred, m)
 
     # anonymous authentication
     def anon_auth(self):

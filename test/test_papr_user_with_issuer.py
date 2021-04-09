@@ -32,7 +32,7 @@ from amac.credential_scheme import setup as setup_cmz
 #             user = User(issuer)
 #             t_id, s_pub_id, pub_id = self.helper_enroll(str(i), user_list, issuer, user)
 #             bootstrap_users.append((user, t_id, s_pub_id, pub_id))
-#             PubCred = user.req_cred_sign()
+#             PubCred = user.req_cred_sign_1()
 #             pub_creds_full.append(PubCred)
 #             pub_creds.append(PubCred[0])
 #             pub_ids.append(pub_id)
@@ -44,7 +44,7 @@ from amac.credential_scheme import setup as setup_cmz
 #             requester_random, E_list, C_list, proof, group_generator = user.data_dist_2(issuer_random, pub_creds)
 #             custodian_list = issuer.data_dist_2(requester_commit, requester_random, pub_creds, E_list, C_list, proof, group_generator, pub_cred)
 #    
-#             (_, p, _, _) = issuer.get_params()
+#             (_, p, _, _) = params
 #    
 #             assert custodian_list is not None
 #    

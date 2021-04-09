@@ -24,9 +24,9 @@ class TestBTC:
     def test_curve_in_user(self):
         issuer = Issuer()
         (k, n) = (3, 10)
-        (y_sign, y_encr), iparams, _, _, _, _ = issuer.setup(k, n)
+        params, (y_sign, y_encr), iparams, _, _, _, _ = issuer.setup(k, n)
 
-        params = issuer.get_params()
+        
         (G, _, g0, _) = params
 
         btc_key = PrivateKeyTestnet()
@@ -34,9 +34,9 @@ class TestBTC:
         # Convert private key to Bn format
         btc_priv_key = Bn.from_decimal(str(btc_key.to_int()))
 
-        user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n, btc_priv_key)
+        user = User(params, iparams, y_sign, y_encr, k, n, btc_priv_key)
 
-        (_, this_should_be_btc_public_key) = user.cred_sign()
+        (_, this_should_be_btc_public_key) = user.cred_sign_1()
 
         # Convert to uncompressed format:
         wif = bytes_to_wif(btc_key.to_bytes(), compressed=False)
@@ -49,9 +49,9 @@ class TestBTC:
     def test_if_pubkey_is_same(self):
         issuer = Issuer()
         (k, n) = (3, 10)
-        (y_sign, y_encr), iparams, _, _, _, _ = issuer.setup(k, n)
+        params, (y_sign, y_encr), iparams, _, _, _, _ = issuer.setup(k, n)
 
-        params = issuer.get_params()
+        
         (G, _, g0, _) = params
 
         btc_key = PrivateKeyTestnet()
@@ -59,9 +59,9 @@ class TestBTC:
         # Convert private key to Bn format
         btc_priv_key = Bn.from_decimal(str(btc_key.to_int()))
 
-        user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n, btc_priv_key)
+        user = User(params, iparams, y_sign, y_encr, k, n, btc_priv_key)
 
-        (_, this_should_be_btc_public_key) = user.cred_sign()
+        (_, this_should_be_btc_public_key) = user.cred_sign_1()
 
         # Convert to uncompressed format:
 
@@ -77,17 +77,17 @@ class TestBTC:
     def test_pubkey_to_addr(self):
         issuer = Issuer()
         (k, n) = (3, 10)
-        (y_sign, y_encr), iparams, _, _, _, _ = issuer.setup(k, n)
+        params, (y_sign, y_encr), iparams, _, _, _, _ = issuer.setup(k, n)
 
-        params = issuer.get_params()
+        
         (G, _, g0, _) = params
 
         btc_key = PrivateKeyTestnet()
 
         # Convert private key to Bn format
         btc_priv_key = Bn.from_decimal(str(btc_key.to_int()))
-        user = User(issuer.get_params(), iparams, y_sign, y_encr, k, n, btc_priv_key)
-        (_, this_should_be_btc_public_key) = user.cred_sign()
+        user = User(params, iparams, y_sign, y_encr, k, n, btc_priv_key)
+        (_, this_should_be_btc_public_key) = user.cred_sign_1()
 
         adr = btc_key.address
 
