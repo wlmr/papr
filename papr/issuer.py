@@ -33,9 +33,6 @@ class Issuer():
         [self.sys_list, self.user_list, self.cred_list, self.rev_list] = [Ledger(self.y_sign) for _ in range(4)]
         retval1 = self.sys_list.add(self.params, crs, sign(p, g0, self.x_sign, [crs]))
         retval2 = self.sys_list.add(self.params, i_pk, sign(p, g0, self.x_sign, [i_pk]))  # Note: Should we publish i_pk, or should it be y_sign, y_encr
-        # print(retval1, crs)
-        # print(retval2, i_pk)
-        # print("sys_list: ", self.sys_list.read())
         return self.params, (self.y_sign, self.y_encr), self.iparams, self.sys_list, self.user_list, self.cred_list, self.rev_list  # , self.res_list
 
     def iss_enroll(self, gamma, ciphertext, pi_prepare_obtain, id, pub_id):
@@ -122,7 +119,7 @@ class Issuer():
         sigma_y_e = sign(p, g0, self.x_sign, [pub_cred[0]])
         sigma_y_s = sign(p, g0, self.x_sign, [pub_cred[1]])
         self.cred_list.add(self.params, pub_cred, sign(p, g0, self.x_sign, [pub_cred]))
-        self.res_list[pub_cred] = []
+        self.res_list[pub_cred] = {k:None for k in custodian_encr_keys}
         return (sigma_y_e, sigma_y_s)
 
     # Show/verify credential
@@ -153,20 +150,26 @@ class Issuer():
         '''
         self.ledger_add(self.rev_list, (pub_cred, self.rev_data[pub_cred]))
 
-    def restore(self, proved_decrypted_shares, index_list, custodian_public_keys, encrypted_shares):
+    def get_response(self, revoked_pub_cred, responder_pub_encryption_key, response):
+        self.res_list[revoked_pub_cred][responder_pub_encryption_key] = response
+
+    def restore(self, pub_cred):
         '''
         Restores public key given a set of at least k shares that's decrypted and proven, along with encrypted shares,
             custodian public keys and a list of which indexes are used for decryption
         '''
         (_, p, g0, _) = self.params
-        index_plus_1 = [i+1 for i in index_list]
         S_r = []
-        for ((S_i, decrypt_proof), Y_i, pub_key) in zip(proved_decrypted_shares, encrypted_shares, custodian_public_keys):
-            S_r.append(S_i)
-            if not verify_correct_decryption(S_i, Y_i, decrypt_proof, pub_key, p, g0):
+        (escrow_shares, custodian_encr_keys) = self.rev_data[pub_cred]
+        decrypted_shares = [(user_y_e, decrypted_share) for (user_y_e, decrypted_share) in self.res_list[pub_cred].items() if decrypted_share is not None]
+        if len(decrypted_shares) < self.k:
+            return None # Too few have answered
+        indices = [custodian_encr_keys.index(pub_key)+1 for pub_key, _ in decrypted_shares]
+        for index, (pub_key, (S_i, decryption_proof)) in zip(indices, decrypted_shares):
+            if not verify_correct_decryption(S_i, escrow_shares[index-1], decryption_proof, pub_key, p, g0):
                 return None
-        return reconstruct(S_r, index_plus_1, p)
-        # Return pub_id
+            S_r.append(S_i)
+        return reconstruct(S_r, indices, p)
 
     def ledger_add(self, ledger, entry):
         (_, p, g0, _) = self.params

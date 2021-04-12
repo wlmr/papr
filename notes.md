@@ -52,3 +52,6 @@ We chose to generate the cred in the beginning of the credential issuance proced
 as to be able to link the user's incoming comms to the issuer by its credential. 
 The credential is ofcourse not accepted as valid until the whole credential issuance procedure has been sucessfully executed.
 
+### List entries
+#### rev_list
+(pub_cred, self.rev_data[pub_cred]) where rev_data[pub_cred] = (escrow_shares, custodians_encr_public_key)

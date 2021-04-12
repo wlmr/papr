@@ -3,7 +3,7 @@ from papr.issuer import Issuer
 from papr.ecdsa import sign, verify
 import pvss.pvss as pvss
 from amac.credential_scheme import setup as setup_cmz
-# import pytest
+import pytest
 
 
 class TestPaprSplit:
@@ -224,27 +224,37 @@ class TestPaprSplit:
         assert len(decoded_list) == len(just_k_random_index)
 
         answer = issuer.restore(decoded_list, just_k_random_index, cust_pub_keys, enc_shares)
+        # answer2 = self.helper_revoke(rev_list, pub_cred, just_k_random_index, params, priv_keys, issuer)
+        # print("ans2TYPE" + str(type(answer2)))
         assert answer is not None
         assert answer == pub_id
+        # assert answer == answer2
 
-    def helper_revoke(self, rev_list, pub_cred, indexes, params):
+    def helper_revoke(self, rev_list, pub_cred, indexes, params, priv_keys, issuer):
         revocation_list = rev_list.read()
         for rev_obj in revocation_list:
             if rev_obj[0] == pub_cred:
                 (custodians, escrow_shares) = rev_obj[1]
+               
                 decoded_list = []
+                cust_pub_keys = []
+                enc_shares = []
                 for index in indexes:
+                    cust_pub_keys.append(custodians[index])
+                    enc_shares.append(escrow_shares[index])
                     # Here custodian sees there key and answers. In this test instead we look up the private key.
                     for (i, pub_k) in zip(range(len(custodians)), custodians):
                         if pub_k == custodians[index]:
                             # Here we skip reading from list, since we only test restore
-                            decoded_list.append(pvss.participant_decrypt_and_prove(params, priv_keys[i], escrow_shares))
+                            decoded_list.append(pvss.participant_decrypt_and_prove(params, priv_keys[i], escrow_shares[index]))
                             break
-                return issuer.restore(decoded_list, indexes, custodians, escrow_shares)
+                import pdb; pdb.set_trace()
+                return issuer.restore(decoded_list, indexes, cust_pub_keys, enc_shares)
             break
-
+        
         # Else:
-        assert False , "pub_cred not revoced"
+        
+        assert False , "pub_cred not revoked"
 
 
     def test_sign_verify(self):
@@ -257,10 +267,11 @@ class TestPaprSplit:
         r, s = sign(p, g0, x_sign, [m])
         assert verify(G, p, g0, r, s, y_sign, [m])
 
+    @pytest.mark.run_these_please
     def test_bootstrap(self):
         (k, n) = (3, 10)
         issuer = Issuer()
-        params, (y_sign, y_encr), iparams, _, user_list, _, _ = issuer.setup(k, n)
+        params, (y_sign, y_encr), iparams, _, user_list, cred_list, rev_list = issuer.setup(k, n)
         (G, p, g0, _) = params
         bootstrap_users = []
         pub_creds_encr = []
@@ -297,33 +308,43 @@ class TestPaprSplit:
             assert issuer.eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
             # Fixme: message to user so that it knows that it can submit credentails (anonimously)
 
+            # Cred signing:
+            sigma_pub_cred = issuer.cred_sign(pub_cred)
+            assert user.cred_sign_2(sigma_pub_cred)
+            (sigma_y_e, sigma_y_s) = sigma_pub_cred
+            assert verify(G, p, g0, *sigma_y_e, y_sign, [pub_cred[0]])
+            assert verify(G, p, g0, *sigma_y_s, y_sign, [pub_cred[1]])
+            assert cred_list.peek() == pub_cred
+
+            # User authentication:
+            m = issuer.ver_cred_1()
+            sigma_m, pub_cred_new, sigma_pub_cred = user.show_cred_1(m)
+            assert issuer.ver_cred_2(sigma_m, pub_cred_new, sigma_pub_cred, m)
+
             priv_rev_tuple.append((pub_cred, E_list, custodian_list))
 
-        (pub_cred, E_list, cust_pub_keys) = priv_rev_tuple[0]
+        #(pub_cred, E_list, cust_pub_keys) = priv_rev_tuple[0]
+
+        issuer.get_rev_data(bootstrap_users[0]['pub_cred'])
+
+        # assert rev_list.peek() == (pub_cred, (E_list, custodian_list))
+
 
         decoded_list = []
 
-        indexes = []
+        # Users polling rev_list and answering if applicable
+        for dict_elem in bootstrap_users:
+            user = dict_elem['user']
+            pub_cred = dict_elem['pub_cred']
+            responses = user.curl_rev_list(rev_list)
+            for (pub_cred_revoked, (pub_cred_answerer, response)) in responses:
+                issuer.get_response(pub_cred_revoked, pub_cred_answerer, response)
 
-        for (enc_share, cust_pub_key) in zip(E_list, cust_pub_keys):
-            # Here cusodian sees there key and answers. In this test instead we look up the private key.
-            for (i, pub_k) in zip(range(len(pub_creds_encr)), pub_creds_encr):
-                if pub_k == cust_pub_key:
-                    # Here we skip reading from list, since we only test restore
-                    user = bootstrap_users[i]['user']
-                    decoded_list.append(user.respond(enc_share))
-                    indexes.append(i+1)
-
-        answer = issuer.restore(decoded_list[:3], [0, 1, 2], cust_pub_keys[:3], E_list[:3])
+        answer = issuer.restore(bootstrap_users[0]['pub_cred'])
         assert answer is not None
         assert answer == bootstrap_users[0]['pub_id']
 
-        # Test another order and other numbers for decryption.
-        answer = issuer.restore([decoded_list[0], decoded_list[3], decoded_list[1]], [0, 3, 1], [
-                                cust_pub_keys[0], cust_pub_keys[3], cust_pub_keys[1]], [E_list[0], E_list[3], E_list[1]])
-        assert answer is not None
-        assert answer == bootstrap_users[0]['pub_id']
-
+        
         # [x] Enc shares empty. : Fixed
         # [ ] Index repeat sometimes?
         # [ ] verify correct decryption fail, called in issuer.restore

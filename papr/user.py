@@ -127,13 +127,14 @@ class User():
         sigma_m = sign(p, g0, self.x_sign, [m])
         return sigma_m, self.pub_cred, self.sigma_pub_cred
 
+
     # Revoke/restore
     def respond(self, s_e):
         '''
         Responds with decrypted share upon request from L_rev list
         '''
         (x_encr, _) = self.priv_cred
-        return participant_decrypt_and_prove(self.params, x_encr, s_e)
+        return self.pub_cred[0], participant_decrypt_and_prove(self.params, x_encr, s_e) 
 
     def curl_sys_list(self, issuer):
         return issuer.sys_list.read()
@@ -141,11 +142,16 @@ class User():
     def curl_user_list(self, issuer):
         return issuer.user_list.read()
 
-    def curl_cred_list(self, issuer):
-        return issuer.cred_list.read()
+    def curl_cred_list(self, cred_list):
+        return cred_list.read()
 
-    def curl_rev_list(self, issuer):
-        return issuer.rev_list.read()
+    def curl_rev_list(self, rev_list):
+        res = []
+        for (pub_cred, (escrow_shares, encryption_keys)) in rev_list.read():
+            if self.pub_cred[0] in encryption_keys:
+                s_e = escrow_shares[encryption_keys.index(self.pub_cred[0])]
+                res.append((pub_cred, self.respond(s_e)))
+        return res
 
 
 def data_distrubution_select(public_credentials, u_random, i_random, n, p):
