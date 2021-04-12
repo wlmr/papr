@@ -159,12 +159,13 @@ class Issuer():
             custodian public keys and a list of which indexes are used for decryption
         '''
         (_, p, g0, _) = self.params
+        index_plus_1 = [i+1 for i in index_list]
         S_r = []
         for ((S_i, decrypt_proof), Y_i, pub_key) in zip(proved_decrypted_shares, encrypted_shares, custodian_public_keys):
             S_r.append(S_i)
             if not verify_correct_decryption(S_i, Y_i, decrypt_proof, pub_key, p, g0):
                 return None
-        return reconstruct(S_r, index_list, p)
+        return reconstruct(S_r, index_plus_1, p)
         # Return pub_id
 
     def ledger_add(self, ledger, entry):

@@ -134,7 +134,7 @@ class TestPaprSplit:
 
         assert len(decoded_list) == len(just_k_random_index)
 
-        answer = issuer.restore(decoded_list, [2, 5, 8], cust_pub_keys, enc_shares)
+        answer = issuer.restore(decoded_list, just_k_random_index, cust_pub_keys, enc_shares)
         assert answer is not None
         assert answer == my_pub_key
 
@@ -223,7 +223,7 @@ class TestPaprSplit:
 
         assert len(decoded_list) == len(just_k_random_index)
 
-        answer = issuer.restore(decoded_list, [2, 5, 8], cust_pub_keys, enc_shares)
+        answer = issuer.restore(decoded_list, just_k_random_index, cust_pub_keys, enc_shares)
         assert answer is not None
         assert answer == pub_id
 
@@ -314,12 +314,12 @@ class TestPaprSplit:
                     decoded_list.append(user.respond(enc_share))
                     indexes.append(i+1)
 
-        answer = issuer.restore(decoded_list[:3], [1, 2, 3], cust_pub_keys[:3], E_list[:3])
+        answer = issuer.restore(decoded_list[:3], [0, 1, 2], cust_pub_keys[:3], E_list[:3])
         assert answer is not None
         assert answer == bootstrap_users[0]['pub_id']
 
         # Test another order and other numbers for decryption.
-        answer = issuer.restore([decoded_list[0], decoded_list[3], decoded_list[1]], [1, 4, 2], [
+        answer = issuer.restore([decoded_list[0], decoded_list[3], decoded_list[1]], [0, 3, 1], [
                                 cust_pub_keys[0], cust_pub_keys[3], cust_pub_keys[1]], [E_list[0], E_list[3], E_list[1]])
         assert answer is not None
         assert answer == bootstrap_users[0]['pub_id']
