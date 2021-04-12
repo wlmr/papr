@@ -33,6 +33,9 @@ class Issuer():
         [self.sys_list, self.user_list, self.cred_list, self.rev_list] = [Ledger(self.y_sign) for _ in range(4)]
         self.sys_list.add(self.params, crs, sign(p, g0, self.x_sign, [crs]))
         self.sys_list.add(self.params, i_pk, sign(p, g0, self.x_sign, [i_pk]))  # Note: Should we publish i_pk, or should it be y_sign, y_encr
+        print(crs)
+        print(i_pk)
+        print(self.sys_list.read())
         return self.params, (self.y_sign, self.y_encr), self.iparams, self.sys_list, self.user_list, self.cred_list, self.rev_list  # , self.res_list
 
     def iss_enroll(self, gamma, ciphertext, pi_prepare_obtain, id, pub_id):
@@ -50,20 +53,33 @@ class Issuer():
         return None
 
     def iss_cred(self, pub_cred):
+        """
+        Initiates the credential issuance procedure for pub_cred to be accepted as valid.
+        """        
         self.temp_creds[pub_cred] = []
 
     # anonymous authentication
     def anon_auth(self, sigma, pi_show):
+        """
+        Verifies the proof of knowledge provided by the user.
+        If this returns true the Issuer accepts that User knows the attribute committed to (priv_id).
+        """
         return show_verify_cmz(self.params, self.iparams, self.i_sk, sigma, pi_show)
 
     # Data distrubution
     def data_dist_1(self, pub_cred):
+        """
+        Selects a random number to commit.
+        """
         (_, p, _, _) = self.params
         issuer_random = p.random()
         self.temp_creds[pub_cred] = {'issuer_random': issuer_random}
         return issuer_random
 
     def data_dist_2(self, requester_commit, requester_random, pub_keys, escrow_shares, commits, proof, group_generator, pub_cred):
+        """
+        Distributes shares of pub_id to a random set of n users.
+        """
         (_, p, _, _) = self.params
         if data_distrubution_verify_commit(self.params, requester_commit, requester_random):
             custodians = data_distrubution_select(pub_keys, requester_random, self.temp_creds[pub_cred]['issuer_random'], self.n, p)
@@ -94,6 +110,10 @@ class Issuer():
 
     # Credential signing
     def cred_sign(self, pub_cred):
+        """
+        Adds pub_cred to cred_list, in effect giving the pub_cred its blessing,
+        and making it an official pub_cred. Also returns signatures on the pub_cred to the user.
+        """
         (_, p, g0, _) = self.params
         escrow_shares = self.temp_creds[pub_cred]['escrow_shares']
         custodian_encr_keys = self.temp_creds[pub_cred]['custodians']
@@ -107,11 +127,17 @@ class Issuer():
 
     # Show/verify credential
     def ver_cred_1(self):
+        """
+        Generates a message, m, to be signed by a pub_cred wishing to authenticate themself.
+        """
         (_, p, _, _) = self.params
         m = p.random()
         return m
 
     def ver_cred_2(self, sigma_m, pub_cred, sigma_pub_cred, m):
+        """
+        Verifying both the recieved signature on m and the signature on pub_cred.
+        """
         (y_e, y_s) = pub_cred
         (G, p, g0, _) = self.params
         (sigma_y_e, sigma_y_s) = sigma_pub_cred
@@ -123,7 +149,7 @@ class Issuer():
     # Revoke/restore
     def get_rev_data(self, pub_cred):
         '''
-        Publishes to L_rev the request to revoce the privacy corresponging to PubCred
+        Publishes to rev_list the request to revoke the privacy corresponding to PubCred
         '''
         (_, p, g0, _) = self.params
         self.rev_list.add(self.params, (pub_cred, self.rev_data[pub_cred]), sign(p, g0, self.x_sign, (pub_cred, self.rev_data[pub_cred])))
@@ -149,7 +175,7 @@ def data_distrubution_issuer_verify(E_list, C_list, proof, pub_keys, group_gener
 
 def data_distrubution_verify_commit(params, c, r):
     (_, _, _, g1) = params
-    commit = r * g1  # Is it ok to use G here?
+    commit = r * g1
     return commit == c
 
 

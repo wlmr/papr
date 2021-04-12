@@ -135,6 +135,18 @@ class User():
         (x_encr, _) = self.priv_cred
         return participant_decrypt_and_prove(self.params, x_encr, s_e)
 
+    def curl_sys_list(self, issuer):
+        return issuer.sys_list.read()
+
+    def curl_user_list(self, issuer):
+        return issuer.user_list.read()
+
+    def curl_cred_list(self, issuer):
+        return issuer.cred_list.read()
+
+    def curl_rev_list(self, issuer):
+        return issuer.rev_list.read()
+
 
 def data_distrubution_select(public_credentials, u_random, i_random, n, p):
     selected_data_custodians = []

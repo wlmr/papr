@@ -2,9 +2,7 @@ from papr.user import User
 from papr.issuer import Issuer
 from papr.ecdsa import sign, verify
 import pvss.pvss as pvss
-# from petlib.pack import encode, decode
 from amac.credential_scheme import setup as setup_cmz
-# from papr.papr_cred_iss_data_dist import prng
 import pytest
 
 
@@ -91,10 +89,9 @@ class TestPaprSplit:
         (k, n) = (3, 10)
         issuer = Issuer()
         params, (y_sign, y_encr), iparams, _, _, _, _ = issuer.setup(k, n)
-
-        
         priv_keys = []
         pub_keys = []
+
         for i in range(n*2):
             (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
@@ -153,46 +150,43 @@ class TestPaprSplit:
         user = User(params, iparams, y_sign, y_encr, k, n)
         id = "Id text"
 
-        # Enroll:
+        # User Enrollment:
         _, pub_id, (u_sk, u_pk, c, pi_prepare_obtain) = user.req_enroll_1(id)
         ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id)
         if ret is not None:
             _, u, e_u_prime, pi_issue, biparams = ret
             t_id = user.req_enroll_2(u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], c)
         assert ret is not None  # : "user already exists"
-
-        # ret = self.helper_enroll(id, issuer, user)
-        # assert ret is not None
-        # t_id, s_pub_id, pub_id = ret
-
+        
+        # Credential Issuance
         pub_cred = user.cred_sign_1()
-        # Data dist
+        
+        # Anonymous authentication:
+        sigma, pi_show, z = user.anon_auth(t_id)
+        assert issuer.anon_auth(sigma, pi_show)
+
+        # Data distribution
         requester_commit = user.data_dist_1()
         issuer_random = issuer.data_dist_1(pub_cred)
         requester_random, E_list, C_list, proof, group_generator = user.data_dist_2(issuer_random, pub_keys)
         custodian_list = issuer.data_dist_2(requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator, pub_cred)
         assert custodian_list is not None
 
-        # Anonymous auth:
-        sigma, pi_show, z = user.anon_auth(t_id)
-        assert issuer.anon_auth(sigma, pi_show)
-
+        # Proof of equal identity:
         (u2, cl, _) = sigma
-
-        # Proof of eq id:
         y, c, gamma = user.eq_id(u2, group_generator, z, cl, C_list[0])
-        assert issuer.eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
-        # Fixme message to user so that it knows that it can submit credentails (anonimously)
+        eq_id_proof_is_correct = issuer.eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
+        assert eq_id_proof_is_correct
 
+        # Cred signing:
         sigma_pub_cred = issuer.cred_sign(pub_cred)
         assert user.cred_sign_2(sigma_pub_cred)
         (sigma_y_e, sigma_y_s) = sigma_pub_cred
         assert verify(G, p, g0, *sigma_y_e, y_sign, [pub_cred[0]])
         assert verify(G, p, g0, *sigma_y_s, y_sign, [pub_cred[1]])
-
         assert cred_list.peek() == pub_cred
 
-        # Cred usage:
+        # User authentication:
         m = issuer.ver_cred_1()
         sigma_m, pub_cred_new, sigma_pub_cred = user.show_cred_1(m)
         assert issuer.ver_cred_2(sigma_m, pub_cred_new, sigma_pub_cred, m)
@@ -202,6 +196,7 @@ class TestPaprSplit:
 
         assert rev_list.peek() == (pub_cred, (E_list, custodian_list))
 
+        # In this testcase all users have the ability to answer. Here we select 3 random users 
         just_k_random_index = [1, 4, 7]
 
         decoded_list = []
@@ -213,7 +208,7 @@ class TestPaprSplit:
             cust_pub_keys.append(custodian_pub_key)
             enc_share = E_list[index]
             enc_shares.append(enc_share)
-            # Here cusodian sees there key and answers. In this test instead we look up the private key.
+            # Here custodian sees there key and answers. In this test instead we look up the private key.
             for (i, pub_k) in zip(range(len(pub_keys)), pub_keys):
                 if pub_k == custodian_pub_key:
                     # Here we skip reading from list, since we only test restore
@@ -225,6 +220,21 @@ class TestPaprSplit:
         answer = issuer.restore(decoded_list, [2, 5, 8], cust_pub_keys, enc_shares)
         assert answer is not None
         assert answer == pub_id
+
+ #   def helper_revoke(rev_list, pub_cred, indexes):
+ #       revocation_list = rev_list.read()
+ #       for rev_obj in revocation_list:
+ #           if rev_obj[0] == pub_cred:
+ #               (custodians, escrow_shares) = rev_obj[1]
+  #              for
+#
+#
+#
+#                break
+
+        # Else:
+        assert False , "pub_cred not revoced"
+
 
     def test_sign_verify(self):
         params = setup_cmz(1)
