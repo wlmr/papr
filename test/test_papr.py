@@ -19,7 +19,7 @@ class TestPapr:
         _, (r, s), _, pub_id, user_list = ret
         print(f"user_list.peek():   {user_list.peek()}\n")
         assert user_list.has("Bertrand Russel", 0)
-        assert verify(G, p, g0, r, s, y_sign, (id, pub_id))
+        assert verify(G, p, g0, r, s, y_sign, [(id, pub_id)])
 
     def test_eq_id(self):
         id = "Bertrand Russel"

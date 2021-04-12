@@ -52,7 +52,7 @@ def iss_enroll(params, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain, id, 
     """
     if not user_list.has(id, 0):
         (_, p, g0, _) = params
-        sigma_pub_id = sign(p, g0, x_sign, [id, pub_id])
+        sigma_pub_id = sign(p, g0, x_sign, [(id, pub_id)])
         if user_list.add(params, (id, pub_id), sigma_pub_id):
             return sigma_pub_id, blind_issue_cmz(params, iparams, i_sk, gamma, ciphertext, pi_prepare_obtain), user_list
     return None

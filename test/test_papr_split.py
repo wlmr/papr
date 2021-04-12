@@ -3,10 +3,16 @@ from papr.issuer import Issuer
 from papr.ecdsa import sign, verify
 import pvss.pvss as pvss
 from amac.credential_scheme import setup as setup_cmz
-import pytest
+# import pytest
 
 
 class TestPaprSplit:
+
+    def test_ledger(self):
+        issuer = Issuer()
+        ret = issuer.setup(3, 4)
+        assert len(issuer.sys_list.read()) == 2
+
 
     def helper_enroll(self, id, issuer, user):
         """
@@ -34,7 +40,7 @@ class TestPaprSplit:
         print(f"user_list.peek():   {user_list.peek()}\n")
         assert user_list.has("Ettan", 0)
         (G, p, g0, _) = params
-        assert verify(G, p, g0, r, s, y_sign, (id, pub_id))
+        assert verify(G, p, g0, r, s, y_sign, [(id, pub_id)])
 
     def test_eq_id(self):
         issuer = Issuer()
@@ -221,16 +227,21 @@ class TestPaprSplit:
         assert answer is not None
         assert answer == pub_id
 
- #   def helper_revoke(rev_list, pub_cred, indexes):
- #       revocation_list = rev_list.read()
- #       for rev_obj in revocation_list:
- #           if rev_obj[0] == pub_cred:
- #               (custodians, escrow_shares) = rev_obj[1]
-  #              for
-#
-#
-#
-#                break
+    def helper_revoke(self, rev_list, pub_cred, indexes, params):
+        revocation_list = rev_list.read()
+        for rev_obj in revocation_list:
+            if rev_obj[0] == pub_cred:
+                (custodians, escrow_shares) = rev_obj[1]
+                decoded_list = []
+                for index in indexes:
+                    # Here custodian sees there key and answers. In this test instead we look up the private key.
+                    for (i, pub_k) in zip(range(len(custodians)), custodians):
+                        if pub_k == custodians[index]:
+                            # Here we skip reading from list, since we only test restore
+                            decoded_list.append(pvss.participant_decrypt_and_prove(params, priv_keys[i], escrow_shares))
+                            break
+                return issuer.restore(decoded_list, indexes, custodians, escrow_shares)
+            break
 
         # Else:
         assert False , "pub_cred not revoced"
@@ -258,7 +269,7 @@ class TestPaprSplit:
         for i in range(n):
             user = User(params, iparams, y_sign, y_encr, k, n)
             t_id, sigma_pub_id, pub_id = self.helper_enroll(str(i), issuer, user)
-            assert verify(G, p, g0, *sigma_pub_id, y_sign, [str(i), pub_id])
+            assert verify(G, p, g0, *sigma_pub_id, y_sign, [(str(i), pub_id)])
             pub_cred = user.cred_sign_1()
             bootstrap_users.append({"user": user, "t_id": t_id, "pub_id": pub_id, "pub_cred": pub_cred})
             pub_creds_encr.append(pub_cred[0])

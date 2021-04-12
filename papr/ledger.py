@@ -10,8 +10,8 @@ class Ledger():
     def peek(self):
         return self.ledger[-1]
 
-    def read(self, index: int):
-        if not index:
+    def read(self, index: int = None):
+        if index is None:
             return self.ledger
         elif index in range(0, len(self.ledger)):
             return self.ledger[index]
@@ -28,7 +28,7 @@ class Ledger():
         """
         (G, p, g, _) = params
         r, s = issue_signature
-        if verify(G, p, g, r, s, self.issuer_y_sign, [*entry]):
+        if verify(G, p, g, r, s, self.issuer_y_sign, [entry]):
             self.ledger.append(entry)
             return True
         return False
