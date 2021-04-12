@@ -10,8 +10,10 @@ class TestPaprSplit:
 
     def test_ledger(self):
         issuer = Issuer()
-        ret = issuer.setup(3, 4)
+        params, y, iparams, sys_list, _, _, _ = issuer.setup(3, 4)
         assert len(issuer.sys_list.read()) == 2
+        issuer.ledger_add(issuer.sys_list, "JAMAN")
+        assert len(sys_list.read()) == 3
 
 
     def helper_enroll(self, id, issuer, user):
@@ -253,8 +255,7 @@ class TestPaprSplit:
             break
         
         # Else:
-        
-        assert False , "pub_cred not revoked"
+        assert False, "pub_cred not revoked"
 
 
     def test_sign_verify(self):
