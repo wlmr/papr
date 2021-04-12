@@ -31,8 +31,8 @@ class Issuer():
         crs = ",".join([str(elem) for elem in [p.repr(), g0, g1, n, k, self.iparams['Cx0']]])
         i_pk = ",".join([str(x) for x in [self.y_sign, self.y_encr]])
         [self.sys_list, self.user_list, self.cred_list, self.rev_list] = [Ledger(self.y_sign) for _ in range(4)]
-        retval1 = self.sys_list.add(self.params, crs, sign(p, g0, self.x_sign, [crs]))
-        retval2 = self.sys_list.add(self.params, i_pk, sign(p, g0, self.x_sign, [i_pk]))  # Note: Should we publish i_pk, or should it be y_sign, y_encr
+        self.ledger_add(self.sys_list, crs)
+        self.ledger_add(self.sys_list, i_pk)
         # print(retval1, crs)
         # print(retval2, i_pk)
         # print("sys_list: ", self.sys_list.read())
@@ -46,7 +46,7 @@ class Issuer():
         if not self.user_list.has(id, 0):
             (_, p, g0, _) = self.params
             sigma_pub_id = sign(p, g0, self.x_sign, [(id, pub_id)])
-            if self.user_list.add(self.params, (id, pub_id), sigma_pub_id):
+            if self.ledger_add(self.user_list, (id, pub_id)):
                 u, e_u_prime, pi_issue, biparams = blind_issue_cmz(self.params, self.iparams,
                                                                    self.i_sk, gamma, ciphertext, pi_prepare_obtain)
                 return sigma_pub_id, u, e_u_prime, pi_issue, biparams
@@ -55,7 +55,7 @@ class Issuer():
     def iss_cred(self, pub_cred):
         """
         Initiates the credential issuance procedure for pub_cred to be accepted as valid.
-        """        
+        """
         self.temp_creds[pub_cred] = []
 
     # anonymous authentication
@@ -121,7 +121,7 @@ class Issuer():
         self.rev_data[pub_cred] = (escrow_shares, custodian_encr_keys)
         sigma_y_e = sign(p, g0, self.x_sign, [pub_cred[0]])
         sigma_y_s = sign(p, g0, self.x_sign, [pub_cred[1]])
-        self.cred_list.add(self.params, pub_cred, sign(p, g0, self.x_sign, [pub_cred]))
+        self.ledger_add(self.cred_list, pub_cred)
         self.res_list[pub_cred] = []
         return (sigma_y_e, sigma_y_s)
 
@@ -170,7 +170,7 @@ class Issuer():
 
     def ledger_add(self, ledger, entry):
         (_, p, g0, _) = self.params
-        ledger.add(self.params, entry, sign(p, g0, self.x_sign, [entry]))
+        return ledger.add(self.params, entry, sign(p, g0, self.x_sign, [entry]))
 
 
 def data_distrubution_issuer_verify(E_list, C_list, proof, pub_keys, group_generator, p):

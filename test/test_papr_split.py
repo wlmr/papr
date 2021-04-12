@@ -234,7 +234,7 @@ class TestPaprSplit:
                 (custodians, escrow_shares) = rev_obj[1]
                 decoded_list = []
                 for index in indexes:
-                    # Here custodian sees there key and answers. In this test instead we look up the private key.
+                    # Here custodian sees their key and answers. In this test instead we look up the private key.
                     for (i, pub_k) in zip(range(len(custodians)), custodians):
                         if pub_k == custodians[index]:
                             # Here we skip reading from list, since we only test restore
@@ -244,7 +244,7 @@ class TestPaprSplit:
             break
 
         # Else:
-        assert False , "pub_cred not revoced"
+        assert False, "pub_cred not revoked"
 
 
     def test_sign_verify(self):
