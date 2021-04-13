@@ -8,7 +8,10 @@ class Ledger():
         self.issuer_y_sign = y_sign
 
     def peek(self):
-        return self.ledger[-1]
+        if len(self.ledger) > 0:
+            return self.ledger[-1]
+        else:
+            return None
 
     def read(self, index: int = None):
         if index is None:

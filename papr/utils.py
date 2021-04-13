@@ -20,11 +20,11 @@ def bit_privkey_to_petlib_bn(key):
     return Bn.from_decimal(str(key.to_int()))
 
 
-def prng(random_u, random_i, counter, p):
+def prng(u_random, i_random, counter, p):
     """
     Psuedorandom number-generator.
     """
-    return int(hash([random_u, random_i, counter]) % p)
+    return int(hash([u_random, i_random, counter]) % p)
 
 def gen_list_of_random_numbers(u_random, i_random, length, p, max_number):
     answerlist = []
