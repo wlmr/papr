@@ -6,7 +6,8 @@ from amac.proofs import to_challenge
 from papr.ecdsa import sign, verify
 from papr.utils import prng
 from petlib.bn import Bn
-from petlib.ec import EcPt
+from petlib.ec import EcPt, EcGroup
+from binascii import unhexlify
 
 
 class User():
@@ -21,6 +22,7 @@ class User():
         5. k and n to define the PVSS-parameters,
         6. potential predefined private authentication key (for its credential generation later on).
         """
+        self.G = EcGroup(714)
         self.params = params
         self.iparams = iparams
         self.y_sign = y_sign
@@ -129,7 +131,6 @@ class User():
         sigma_m = sign(p, g0, self.x_sign, [m])
         return sigma_m, self.pub_cred, self.sigma_pub_cred
 
-
     # Revoke/restore
     def respond(self, s_e):
         '''
@@ -138,14 +139,22 @@ class User():
         (x_encr, _) = self.priv_cred
         return self.pub_cred[0], participant_decrypt_and_prove(self.params, x_encr, s_e) 
 
-    def curl_sys_list(self, issuer):
-        [crs, i_pk] = issuer.sys_list.read()
+    def curl_sys_list(self, sys_list):
+        res = sys_list.read()
+        if res == []:
+            return False
+        [crs, i_pk] = res
         crs, i_pk = crs.split(","), i_pk.split(",")
         [p_str, g0_str, g1_str, n_str, k_str, cx0_str] = crs
         [y_sign_str, y_encr_str] = i_pk
         self.p = Bn.from_decimal(p_str)
-        # self.g0 = 
-
+        self.g0 = unpack_ecpt(g0_str, self.G)
+        self.g1 = unpack_ecpt(g1_str, self.G)
+        self.n, self.k = int(n_str), int(k_str)
+        self.iparams['Cx0'] = unpack_ecpt(cx0_str, self.G)
+        self.y_sign = unpack_ecpt(y_sign_str, self.G)
+        self.y_encr = unpack_ecpt(y_encr_str, self.G)
+        return True
 
     def curl_user_list(self, issuer):
         return issuer.user_list.read()
@@ -160,6 +169,10 @@ class User():
                 s_e = escrow_shares[encryption_keys.index(self.pub_cred[0])]
                 res.append((pub_cred, self.respond(s_e)))
         return res
+
+
+def unpack_ecpt(ecpt_str, G):
+    return EcPt.from_binary(unhexlify(ecpt_str), G)
 
 
 def data_distrubution_select(public_credentials, u_random, i_random, n, p):
