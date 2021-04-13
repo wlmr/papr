@@ -4,7 +4,7 @@ from amac.credential_scheme import blind_obtain as blind_obtain_cmz
 from amac.credential_scheme import blind_show as blind_show_cmz
 from amac.proofs import to_challenge
 from papr.ecdsa import sign, verify
-from papr.utils import prng, gen_list_of_random_numbers
+from papr.utils import data_distribution_select
 from petlib.bn import Bn
 from petlib.ec import EcPt, EcGroup
 from binascii import unhexlify
@@ -71,7 +71,7 @@ class User():
         '''
         Distribute data to custodians (part 1). Second part of credential issuance.
         '''
-        (commit, self.requester_random) = data_distrubution_random_commit(self.params)
+        (commit, self.requester_random) = data_distribution_random_commit(self.params)
         return commit
 
     def data_dist_2(self, issuer_random, pub_keys):
@@ -79,8 +79,8 @@ class User():
         Distribute data to custodians (part 2). Second part of credential issuance.
         '''
         (_, p, _, _) = self.params
-        selected_pub_keys = data_distrubution_select(pub_keys, self.requester_random, issuer_random, self.n, p)
-        E_list, C_list, proof, group_generator = data_distrubution_commit_encrypt_prove(self.params, self.priv_id, selected_pub_keys, self.k, self.n)
+        selected_pub_keys = data_distribution_select(pub_keys, self.requester_random, issuer_random, self.n, p, self.pub_cred)
+        E_list, C_list, proof, group_generator = data_distribution_commit_encrypt_prove(self.params, self.priv_id, selected_pub_keys, self.k, self.n)
         return self.requester_random, E_list, C_list, proof, group_generator
 
     # Proof of equal identity
@@ -175,24 +175,14 @@ def unpack_ecpt(ecpt_str, G):
     return EcPt.from_binary(unhexlify(ecpt_str), G)
 
 
-def data_distrubution_select(public_credentials, u_random, i_random, n, p):
-    selected_data_custodians = []
-
-    index_list = gen_list_of_random_numbers(u_random, i_random, n, p, len(public_credentials))
-    for index in index_list:
-        selected_data_custodians.append(public_credentials[index])
-
-    return selected_data_custodians
-
-
-def data_distrubution_commit_encrypt_prove(params, PrivID, data_custodians_public_credentials, k, n):
+def data_distribution_commit_encrypt_prove(params, PrivID, data_custodians_public_credentials, k, n):
     (Gq, p, _, _) = params
     E_list, C_list, proof, group_generator = distribute_secret(data_custodians_public_credentials, PrivID, p, k, n, Gq)
     # Send to I
     return E_list, C_list, proof, group_generator
 
 
-def data_distrubution_random_commit(params):
+def data_distribution_random_commit(params):
     (_, p, _, G) = params
     r = p.random()
     c = r * G  # Is it ok to use G here?

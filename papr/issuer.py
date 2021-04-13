@@ -7,7 +7,7 @@ from papr.ecdsa import sign, verify
 from papr.ledger import Ledger
 from papr.utils import prng
 from binascii import hexlify
-from papr.utils import gen_list_of_random_numbers
+from papr.utils import data_distribution_select
 
 
 class Issuer():
@@ -82,7 +82,7 @@ class Issuer():
         """
         (_, p, _, _) = self.params
         if data_distrubution_verify_commit(self.params, requester_commit, requester_random):
-            custodians = data_distrubution_select(pub_keys, requester_random, self.temp_creds[pub_cred]['issuer_random'], self.n, p)
+            custodians = data_distribution_select(pub_keys, requester_random, self.temp_creds[pub_cred]['issuer_random'], self.n, p, pub_cred)
             if data_distrubution_issuer_verify(escrow_shares, commits, proof, custodians, group_generator, p):
                 self.temp_creds[pub_cred]['custodians'] = custodians
                 self.temp_creds[pub_cred]['escrow_shares'] = escrow_shares
@@ -193,11 +193,3 @@ def data_distrubution_verify_commit(params, c, r):
     return commit == c
 
 
-def data_distrubution_select(public_credentials, u_random, i_random, n, p):
-    selected_data_custodians = []
-
-    index_list = gen_list_of_random_numbers(u_random, i_random, n, p, len(public_credentials))
-    for index in index_list:
-        selected_data_custodians.append(public_credentials[index])
-
-    return selected_data_custodians

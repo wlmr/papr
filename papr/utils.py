@@ -22,21 +22,24 @@ def bit_privkey_to_petlib_bn(key):
 
 def prng(u_random, i_random, counter, p):
     """
-    Psuedorandom number-generator.
+    Pseudorandom number-generator.
     """
     return int(hash([u_random, i_random, counter]) % p)
 
-def gen_list_of_random_numbers(u_random, i_random, length, p, max_number):
-    answerlist = []
-    if length > max_number:
+
+def data_distribution_select(public_credentials, u_random, i_random, n, p, pub_cred):
+    selected_data_custodians = []
+    public_credentials_left = public_credentials.copy()
+    
+    if pub_cred[0] in public_credentials_left:
+        public_credentials_left.remove(pub_cred[0])
+    
+    if n > len(public_credentials_left):
         return None
-    else:
-        i = 0
-        while True:
-            rnd = prng(u_random, i_random, i, p) % max_number
-            if rnd not in answerlist:
-                answerlist.append(rnd)
-                if len(answerlist) == length:
-                    return answerlist
-            i += 1
-            
+
+    for i in range(n):
+        index = prng(u_random, i_random, n, p) % len(public_credentials_left)
+        public_credential = public_credentials_left.pop(index)
+        selected_data_custodians.append(public_credential)
+
+    return selected_data_custodians

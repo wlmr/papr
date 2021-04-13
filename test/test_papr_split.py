@@ -278,7 +278,7 @@ class TestPaprSplit:
         pub_creds_encr = []
 
         # generate pub_creds for each user
-        for i in range(n):
+        for i in range(n+1):
             user = User(params, iparams, y_sign, y_encr, k, n)
             t_id, sigma_pub_id, pub_id = self.helper_enroll(str(i), issuer, user)
             assert verify(G, p, g0, *sigma_pub_id, y_sign, [(str(i), pub_id)])
@@ -299,6 +299,7 @@ class TestPaprSplit:
             custodian_list = issuer.data_dist_2(requester_commit, requester_random, pub_creds_encr, E_list, C_list, proof, group_generator, pub_cred)
 
             assert custodian_list is not None
+            assert pub_cred[0] not in custodian_list 
 
             # Anonymous auth:
             sigma, pi_show, z = user.anon_auth(t_id)
@@ -353,7 +354,7 @@ class TestPaprSplit:
         pub_creds_encr = []
 
         # generate pub_creds for each user
-        for i in range(n):
+        for i in range(n+1):
             user = User(params, iparams, y_sign, y_encr, k, n)
             t_id, sigma_pub_id, pub_id = self.helper_enroll(str(i), issuer, user)
             assert verify(G, p, g0, *sigma_pub_id, y_sign, [(str(i), pub_id)])
