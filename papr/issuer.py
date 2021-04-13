@@ -6,7 +6,7 @@ from amac.proofs import to_challenge
 from papr.ecdsa import sign, verify
 from papr.ledger import Ledger
 from papr.utils import prng
-
+from binascii import hexlify, unhexlify
 
 class Issuer():
     def __init__(self):
@@ -28,14 +28,12 @@ class Issuer():
         (self.x_sign, self.x_encr) = (p.random(), p.random())
         (self.y_sign, self.y_encr) = (self.x_sign * g0, self.x_encr * g0)
         (self.iparams, self.i_sk) = cred_keygen_cmz(self.params)
-        crs = ",".join([str(elem) for elem in [p.repr(), g0.export(), g1.export(), n, k, self.iparams['Cx0'].export()]])
+        [g0_str, g1_str, cx0_str] = [pack_ecpt(ecpt) for ecpt in [g0, g1, self.iparams['Cx0']]]
+        crs = ",".join([str(elem) for elem in [p.repr(), g0_str, g1_str, n, k, cx0_str]])
         i_pk = ",".join([str(x) for x in [self.y_sign, self.y_encr]])
         [self.sys_list, self.user_list, self.cred_list, self.rev_list] = [Ledger(self.y_sign) for _ in range(4)]
         self.ledger_add(self.sys_list, crs)
         self.ledger_add(self.sys_list, i_pk)
-        # print(retval1, crs)
-        # print(retval2, i_pk)
-        # print("sys_list: ", self.sys_list.read())
         return self.params, (self.y_sign, self.y_encr), self.iparams, self.sys_list, self.user_list, self.cred_list, self.rev_list  # , self.res_list
 
     def iss_enroll(self, gamma, ciphertext, pi_prepare_obtain, id, pub_id):
@@ -177,6 +175,10 @@ class Issuer():
     def ledger_add(self, ledger, entry):
         (_, p, g0, _) = self.params
         return ledger.add(self.params, entry, sign(p, g0, self.x_sign, [entry]))
+
+
+def pack_ecpt(ecpt):
+    return hexlify(ecpt.export()).decode("utf8")
 
 
 def data_distrubution_issuer_verify(E_list, C_list, proof, pub_keys, group_generator, p):
