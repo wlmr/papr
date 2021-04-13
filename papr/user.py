@@ -137,7 +137,7 @@ class User():
         Responds with decrypted share upon request from L_rev list
         '''
         (x_encr, _) = self.priv_cred
-        return self.pub_cred[0], participant_decrypt_and_prove(self.params, x_encr, s_e) 
+        return self.pub_cred[0], participant_decrypt_and_prove(self.params, x_encr, s_e)
 
     def curl_sys_list(self, sys_list):
         res = sys_list.read()
@@ -183,7 +183,6 @@ def data_distrubution_select(public_credentials, u_random, i_random, n, p):
         selected_data_custodians.append(public_credentials[index])
 
     return selected_data_custodians
-
 
 
 def data_distrubution_commit_encrypt_prove(params, PrivID, data_custodians_public_credentials, k, n):

@@ -6,7 +6,7 @@ from amac.proofs import to_challenge
 from papr.ecdsa import sign, verify
 from papr.ledger import Ledger
 from papr.utils import prng
-from binascii import hexlify, unhexlify
+from binascii import hexlify
 from papr.utils import gen_list_of_random_numbers
 
 
@@ -122,7 +122,7 @@ class Issuer():
         sigma_y_e = sign(p, g0, self.x_sign, [pub_cred[0]])
         sigma_y_s = sign(p, g0, self.x_sign, [pub_cred[1]])
         self.ledger_add(self.cred_list, pub_cred)
-        self.res_list[pub_cred] = {k:None for k in custodian_encr_keys}
+        self.res_list[pub_cred] = {k: None for k in custodian_encr_keys}
         return (sigma_y_e, sigma_y_s)
 
     # Show/verify credential
@@ -166,7 +166,7 @@ class Issuer():
         (escrow_shares, custodian_encr_keys) = self.rev_data[pub_cred]
         decrypted_shares = [(user_y_e, decrypted_share) for (user_y_e, decrypted_share) in self.res_list[pub_cred].items() if decrypted_share is not None]
         if len(decrypted_shares) < self.k:
-            return None # Too few have answered
+            return None  # Too few have answered
         indices = [custodian_encr_keys.index(pub_key)+1 for pub_key, _ in decrypted_shares]
         for index, (pub_key, (S_i, decryption_proof)) in zip(indices, decrypted_shares):
             if not verify_correct_decryption(S_i, escrow_shares[index-1], decryption_proof, pub_key, p, g0):
