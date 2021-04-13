@@ -5,6 +5,8 @@ from amac.credential_scheme import blind_show as blind_show_cmz
 from amac.proofs import to_challenge
 from papr.ecdsa import sign, verify
 from papr.utils import prng
+from petlib.bn import Bn
+from petlib.ec import EcPt
 
 
 class User():
@@ -137,7 +139,13 @@ class User():
         return self.pub_cred[0], participant_decrypt_and_prove(self.params, x_encr, s_e) 
 
     def curl_sys_list(self, issuer):
-        return issuer.sys_list.read()
+        [crs, i_pk] = issuer.sys_list.read()
+        crs, i_pk = crs.split(","), i_pk.split(",")
+        [p_str, g0_str, g1_str, n_str, k_str, cx0_str] = crs
+        [y_sign_str, y_encr_str] = i_pk
+        self.p = Bn.from_decimal(p_str)
+        # self.g0 = 
+
 
     def curl_user_list(self, issuer):
         return issuer.user_list.read()
@@ -159,6 +167,7 @@ def data_distrubution_select(public_credentials, u_random, i_random, n, p):
     for i in range(n):
         selected_data_custodians.append(public_credentials[prng(u_random, i_random, i, p) % len(public_credentials)])
     return selected_data_custodians
+
 
 
 def data_distrubution_commit_encrypt_prove(params, PrivID, data_custodians_public_credentials, k, n):

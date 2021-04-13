@@ -276,8 +276,8 @@ class TestPaprSplit:
         (G, p, g0, _) = params
         bootstrap_users = []
         pub_creds_encr = []
-        priv_rev_tuple = []
-        # pub_ids = []
+
+        # generate pub_creds for each user
         for i in range(n):
             user = User(params, iparams, y_sign, y_encr, k, n)
             t_id, sigma_pub_id, pub_id = self.helper_enroll(str(i), issuer, user)
@@ -286,6 +286,7 @@ class TestPaprSplit:
             bootstrap_users.append({"user": user, "t_id": t_id, "pub_id": pub_id, "pub_cred": pub_cred})
             pub_creds_encr.append(pub_cred[0])
 
+        # distribute pub_id for each user
         for dict_elem in bootstrap_users:
             user = dict_elem['user']
             t_id = dict_elem['t_id']
@@ -299,7 +300,7 @@ class TestPaprSplit:
 
             assert custodian_list is not None
 
-            # Anonimous auth:
+            # Anonymous auth:
             sigma, pi_show, z = user.anon_auth(t_id)
             assert issuer.anon_auth(sigma, pi_show)
             (u2, cl, _) = sigma
@@ -322,16 +323,10 @@ class TestPaprSplit:
             sigma_m, pub_cred_new, sigma_pub_cred = user.show_cred_1(m)
             assert issuer.ver_cred_2(sigma_m, pub_cred_new, sigma_pub_cred, m)
 
-            priv_rev_tuple.append((pub_cred, E_list, custodian_list))
+        pub_cred = bootstrap_users[0]['pub_cred']
+        issuer.get_rev_data(pub_cred)
 
-        #(pub_cred, E_list, cust_pub_keys) = priv_rev_tuple[0]
-
-        issuer.get_rev_data(bootstrap_users[0]['pub_cred'])
-
-        # assert rev_list.peek() == (pub_cred, (E_list, custodian_list))
-
-
-        decoded_list = []
+        assert rev_list.peek() is not None
 
         # Users polling rev_list and answering if applicable
         for dict_elem in bootstrap_users:
@@ -349,3 +344,76 @@ class TestPaprSplit:
         # [x] Enc shares empty. : Fixed
         # [ ] Index repeat sometimes?
         # [ ] verify correct decryption fail, called in issuer.restore
+
+
+    def bootstrap_procedure(self, k, n, issuer):
+        params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list = issuer.setup(k, n)
+        (G, p, g0, _) = params
+        bootstrap_users = []
+        pub_creds_encr = []
+
+        # generate pub_creds for each user
+        for i in range(n):
+            user = User(params, iparams, y_sign, y_encr, k, n)
+            t_id, sigma_pub_id, pub_id = self.helper_enroll(str(i), issuer, user)
+            assert verify(G, p, g0, *sigma_pub_id, y_sign, [(str(i), pub_id)])
+            pub_cred = user.cred_sign_1()
+            bootstrap_users.append({"user": user, "t_id": t_id, "pub_id": pub_id, "pub_cred": pub_cred})
+            pub_creds_encr.append(pub_cred[0])
+
+        # distribute pub_id for each user
+        for dict_elem in bootstrap_users:
+            user = dict_elem['user']
+            t_id = dict_elem['t_id']
+            pub_id = dict_elem['pub_id']
+            pub_cred = dict_elem['pub_cred']
+
+            requester_commit = user.data_dist_1()
+            issuer_random = issuer.data_dist_1(pub_cred)
+            requester_random, E_list, C_list, proof, group_generator = user.data_dist_2(issuer_random, pub_creds_encr)
+            custodian_list = issuer.data_dist_2(requester_commit, requester_random, pub_creds_encr, E_list, C_list, proof, group_generator, pub_cred)
+
+            assert custodian_list is not None
+
+            # Anonymous auth:
+            sigma, pi_show, z = user.anon_auth(t_id)
+            assert issuer.anon_auth(sigma, pi_show)
+            (u2, cl, _) = sigma
+
+            # Proof of eq id:
+            y, c, gamma = user.eq_id(u2, group_generator, z, cl, C_list[0])
+            assert issuer.eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
+            # Fixme: message to user so that it knows that it can submit credentails (anonymously)
+
+            # Cred signing:
+            sigma_pub_cred = issuer.cred_sign(pub_cred)
+            assert user.cred_sign_2(sigma_pub_cred)
+            (sigma_y_e, sigma_y_s) = sigma_pub_cred
+            assert verify(G, p, g0, *sigma_y_e, y_sign, [pub_cred[0]])
+            assert verify(G, p, g0, *sigma_y_s, y_sign, [pub_cred[1]])
+
+            # User authentication:
+            m = issuer.ver_cred_1()
+            sigma_m, pub_cred_new, sigma_pub_cred = user.show_cred_1(m)
+            issuer.ver_cred_2(sigma_m, pub_cred_new, sigma_pub_cred, m)
+        return issuer, sys_list, user_list, cred_list, rev_list
+
+
+        def revoke_procedure(pub_cred_to_revoke):
+            
+            issuer.get_rev_data(pub_cred_to_revoke)
+
+            assert rev_list.peek() is not None
+
+            # Users polling rev_list and answering if applicable
+            for dict_elem in bootstrap_users:
+                user = dict_elem['user']
+                pub_cred_to_revoke = dict_elem['pub_cred']
+                responses = user.curl_rev_list(rev_list)
+                for (pub_cred_revoked, (pub_cred_answerer, response)) in responses:
+                    issuer.get_response(pub_cred_revoked, pub_cred_answerer, response)
+
+            answer = issuer.restore(bootstrap_users[0]['pub_cred'])
+            assert answer is not None
+            assert answer == bootstrap_users[0]['pub_id']
+        

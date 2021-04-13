@@ -28,7 +28,7 @@ class Issuer():
         (self.x_sign, self.x_encr) = (p.random(), p.random())
         (self.y_sign, self.y_encr) = (self.x_sign * g0, self.x_encr * g0)
         (self.iparams, self.i_sk) = cred_keygen_cmz(self.params)
-        crs = ",".join([str(elem) for elem in [p.repr(), g0, g1, n, k, self.iparams['Cx0']]])
+        crs = ",".join([str(elem) for elem in [p.repr(), g0.export(), g1.export(), n, k, self.iparams['Cx0'].export()]])
         i_pk = ",".join([str(x) for x in [self.y_sign, self.y_encr]])
         [self.sys_list, self.user_list, self.cred_list, self.rev_list] = [Ledger(self.y_sign) for _ in range(4)]
         self.ledger_add(self.sys_list, crs)
