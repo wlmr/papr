@@ -15,7 +15,6 @@ class TestPaprSplit:
         issuer.ledger_add(issuer.sys_list, "JAMAN")
         assert len(sys_list.read()) == 3
 
-
     def helper_enroll(self, id, issuer, user):
         """
         Complete Enrollment procedure. Inputs:
@@ -165,10 +164,10 @@ class TestPaprSplit:
             _, u, e_u_prime, pi_issue, biparams = ret
             t_id = user.req_enroll_2(u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], c)
         assert ret is not None  # : "user already exists"
-        
+
         # Credential Issuance
         pub_cred = user.cred_sign_1()
-        
+
         # Anonymous authentication:
         sigma, pi_show, z = user.anon_auth(t_id)
         assert issuer.anon_auth(sigma, pi_show)
@@ -204,7 +203,7 @@ class TestPaprSplit:
 
         assert rev_list.peek() == (pub_cred, (E_list, custodian_list))
 
-        # In this testcase all users have the ability to answer. Here we select 3 random users 
+        # In this testcase all users have the ability to answer. Here we select 3 random users
         just_k_random_index = [1, 4, 7]
 
         decoded_list = []
@@ -237,7 +236,7 @@ class TestPaprSplit:
         for rev_obj in revocation_list:
             if rev_obj[0] == pub_cred:
                 (custodians, escrow_shares) = rev_obj[1]
-               
+
                 decoded_list = []
                 cust_pub_keys = []
                 enc_shares = []
@@ -250,13 +249,13 @@ class TestPaprSplit:
                             # Here we skip reading from list, since we only test restore
                             decoded_list.append(pvss.participant_decrypt_and_prove(params, priv_keys[i], escrow_shares[index]))
                             break
-                import pdb; pdb.set_trace()
+                import pdb
+                pdb.set_trace()
                 return issuer.restore(decoded_list, indexes, cust_pub_keys, enc_shares)
             break
-        
+
         # Else:
         assert False, "pub_cred not revoked"
-
 
     def test_sign_verify(self):
         params = setup_cmz(1)
@@ -299,7 +298,7 @@ class TestPaprSplit:
             custodian_list = issuer.data_dist_2(requester_commit, requester_random, pub_creds_encr, E_list, C_list, proof, group_generator, pub_cred)
 
             assert custodian_list is not None
-            assert pub_cred[0] not in custodian_list 
+            assert pub_cred[0] not in custodian_list
 
             # Anonymous auth:
             sigma, pi_show, z = user.anon_auth(t_id)
@@ -341,11 +340,9 @@ class TestPaprSplit:
         assert answer is not None
         assert answer == bootstrap_users[0]['pub_id']
 
-        
         # [x] Enc shares empty. : Fixed
         # [ ] Index repeat sometimes?
         # [ ] verify correct decryption fail, called in issuer.restore
-
 
     def bootstrap_procedure(self, k, n, issuer):
         params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list = issuer.setup(k, n)
@@ -399,9 +396,8 @@ class TestPaprSplit:
             issuer.ver_cred_2(sigma_m, pub_cred_new, sigma_pub_cred, m)
         return issuer, sys_list, user_list, cred_list, rev_list
 
-
         def revoke_procedure(pub_cred_to_revoke):
-            
+
             issuer.get_rev_data(pub_cred_to_revoke)
 
             assert rev_list.peek() is not None
@@ -417,4 +413,3 @@ class TestPaprSplit:
             answer = issuer.restore(bootstrap_users[0]['pub_cred'])
             assert answer is not None
             assert answer == bootstrap_users[0]['pub_id']
-        

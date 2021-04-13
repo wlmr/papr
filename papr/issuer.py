@@ -191,5 +191,3 @@ def data_distrubution_verify_commit(params, c, r):
     (_, _, _, g1) = params
     commit = r * g1
     return commit == c
-
-
