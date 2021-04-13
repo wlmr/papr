@@ -7,6 +7,8 @@ from papr.ecdsa import sign, verify
 from papr.ledger import Ledger
 from papr.utils import prng
 from binascii import hexlify, unhexlify
+from papr.utils import gen_list_of_random_numbers
+
 
 class Issuer():
     def __init__(self):
@@ -193,6 +195,9 @@ def data_distrubution_verify_commit(params, c, r):
 
 def data_distrubution_select(public_credentials, u_random, i_random, n, p):
     selected_data_custodians = []
-    for i in range(n):
-        selected_data_custodians.append(public_credentials[prng(u_random, i_random, i, p) % len(public_credentials)])
+
+    index_list = gen_list_of_random_numbers(u_random, i_random, n, p, len(public_credentials))
+    for index in index_list:
+        selected_data_custodians.append(public_credentials[index])
+
     return selected_data_custodians
