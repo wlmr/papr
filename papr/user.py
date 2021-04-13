@@ -4,7 +4,7 @@ from amac.credential_scheme import blind_obtain as blind_obtain_cmz
 from amac.credential_scheme import blind_show as blind_show_cmz
 from amac.proofs import to_challenge
 from papr.ecdsa import sign, verify
-from papr.utils import prng
+from papr.utils import prng, gen_list_of_random_numbers
 
 
 class User():
@@ -156,8 +156,11 @@ class User():
 
 def data_distrubution_select(public_credentials, u_random, i_random, n, p):
     selected_data_custodians = []
-    for i in range(n):
-        selected_data_custodians.append(public_credentials[prng(u_random, i_random, i, p) % len(public_credentials)])
+
+    index_list = gen_list_of_random_numbers(u_random, i_random, n, p, len(public_credentials))
+    for index in index_list:
+        selected_data_custodians.append(public_credentials[index])
+
     return selected_data_custodians
 
 
