@@ -98,7 +98,7 @@ class TestPaprSplit:
 
         # Bootstrap
         issuer, sys_list, user_list, cred_list, rev_list, users, pub_creds, pub_ids = self.bootstrap_procedure(k, n, issuer)
- 
+
         # Select one user for testing
         user = users[0]
         pub_cred = pub_creds[0]
@@ -251,7 +251,6 @@ class TestPaprSplit:
             users.append(user)
             pub_ids.append(pub_id)
             pub_creds.append(pub_cred)
-                      
 
         # distribute pub_id for each user
         for dict_elem in bootstrap_users:
@@ -267,7 +266,6 @@ class TestPaprSplit:
 
             assert custodian_list is not None
             assert pub_cred[0] not in custodian_list  # Verify that we are not a custodian of ourself
-
 
             # Anonymous auth:
             sigma, pi_show, z = user.anon_auth(t_id)
