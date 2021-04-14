@@ -92,106 +92,17 @@ class TestPaprSplit:
         custodian_list = issuer.data_dist_2(requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator, pub_cred)
         assert custodian_list is not None
 
-    def test_restore(self):
-        (k, n) = (3, 10)
-        issuer = Issuer()
-        params, (y_sign, y_encr), iparams, _, _, _, _ = issuer.setup(k, n)
-        priv_keys = []
-        pub_keys = []
-
-        for i in range(n*2):
-            (x_i, y_i) = pvss.helper_generate_key_pair(params)
-            priv_keys.append(x_i)
-            pub_keys.append(y_i)
-
-        user = User(params, iparams, y_sign, y_encr, k, n)
-        _, my_pub_key, _ = user.req_enroll_1('This is just here so that priv_id is generated')
-        pub_cred = user.cred_sign_1()
-        requester_commit = user.data_dist_1()
-        issuer_random = issuer.data_dist_1(pub_cred)
-
-        requester_random, E_list, C_list, proof, group_generator = user.data_dist_2(issuer_random, pub_keys)
-
-        custodian_list = issuer.data_dist_2(requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator, pub_cred)
-        assert custodian_list is not None
-
-        just_k_random_index = [1, 4, 7]
-
-        decoded_list = []
-        cust_pub_keys = []
-        enc_shares = []
-
-        for index in just_k_random_index:
-            custodian_pub_key = custodian_list[index]
-            cust_pub_keys.append(custodian_pub_key)
-            enc_share = E_list[index]
-            enc_shares.append(enc_share)
-            # Here cusodian sees there key and answers. In this test instead we look up the private key.
-            for (i, pub_k) in zip(range(len(pub_keys)), pub_keys):
-                if pub_k == custodian_pub_key:
-                    # Here we skip reading from list, since we only test restore
-                    decoded_list.append(pvss.participant_decrypt_and_prove(params, priv_keys[i], enc_share))
-                    break
-
-        assert len(decoded_list) == len(just_k_random_index)
-
-        answer = issuer.restore(decoded_list, just_k_random_index, cust_pub_keys, enc_shares)
-        assert answer is not None
-        assert answer == my_pub_key
-
     def test_full(self):
         (k, n) = (3, 10)
         issuer = Issuer()
-        params, (y_sign, y_encr), iparams, _, _, cred_list, rev_list = issuer.setup(k, n)
 
-        # Fake other users pub/priv keys
-        (G, p, g0, _) = params
-        priv_keys = []
-        pub_keys = []
-        for _ in range(n*2):
-            (x_i, y_i) = pvss.helper_generate_key_pair(params)
-            priv_keys.append(x_i)
-            pub_keys.append(y_i)
-
-        # Note: take from L_sys instead??
-        user = User(params, iparams, y_sign, y_encr, k, n)
-        id = "Id text"
-
-        # User Enrollment:
-        _, pub_id, (u_sk, u_pk, c, pi_prepare_obtain) = user.req_enroll_1(id)
-        ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id)
-        if ret is not None:
-            _, u, e_u_prime, pi_issue, biparams = ret
-            t_id = user.req_enroll_2(u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], c)
-        assert ret is not None  # : "user already exists"
-
-        # Credential Issuance
-        pub_cred = user.cred_sign_1()
-
-        # Anonymous authentication:
-        sigma, pi_show, z = user.anon_auth(t_id)
-        assert issuer.anon_auth(sigma, pi_show)
-
-        # Data distribution
-        requester_commit = user.data_dist_1()
-        issuer_random = issuer.data_dist_1(pub_cred)
-        requester_random, E_list, C_list, proof, group_generator = user.data_dist_2(issuer_random, pub_keys)
-        custodian_list = issuer.data_dist_2(requester_commit, requester_random, pub_keys, E_list, C_list, proof, group_generator, pub_cred)
-        assert custodian_list is not None
-
-        # Proof of equal identity:
-        (u2, cl, _) = sigma
-        y, c, gamma = user.eq_id(u2, group_generator, z, cl, C_list[0])
-        eq_id_proof_is_correct = issuer.eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
-        assert eq_id_proof_is_correct
-
-        # Cred signing:
-        sigma_pub_cred = issuer.cred_sign(pub_cred)
-        assert user.cred_sign_2(sigma_pub_cred)
-        (sigma_y_e, sigma_y_s) = sigma_pub_cred
-        assert verify(G, p, g0, *sigma_y_e, y_sign, [pub_cred[0]])
-        assert verify(G, p, g0, *sigma_y_s, y_sign, [pub_cred[1]])
-        assert cred_list.peek() == pub_cred
+        # Bootstrap
+        issuer, sys_list, user_list, cred_list, rev_list, users, pub_creds, pub_ids = self.bootstrap_procedure(k, n, issuer)
+ 
+        # Select one user for testing
+        user = users[0]
+        pub_cred = pub_creds[0]
+        pub_id = pub_ids[0]
 
         # User authentication:
         m = issuer.ver_cred_1()
@@ -199,37 +110,10 @@ class TestPaprSplit:
         assert issuer.ver_cred_2(sigma_m, pub_cred_new, sigma_pub_cred, m)
 
         # Reconstruction
-        issuer.get_rev_data(pub_cred)
+        answer = self.revoke_procedure(issuer, rev_list, users, pub_cred)
 
-        assert rev_list.peek() == (pub_cred, (E_list, custodian_list))
-
-        # In this testcase all users have the ability to answer. Here we select 3 random users
-        just_k_random_index = [1, 4, 7]
-
-        decoded_list = []
-        cust_pub_keys = []
-        enc_shares = []
-
-        for index in just_k_random_index:
-            custodian_pub_key = custodian_list[index]
-            cust_pub_keys.append(custodian_pub_key)
-            enc_share = E_list[index]
-            enc_shares.append(enc_share)
-            # Here custodian sees there key and answers. In this test instead we look up the private key.
-            for (i, pub_k) in zip(range(len(pub_keys)), pub_keys):
-                if pub_k == custodian_pub_key:
-                    # Here we skip reading from list, since we only test restore
-                    decoded_list.append(pvss.participant_decrypt_and_prove(params, priv_keys[i], enc_share))
-                    break
-
-        assert len(decoded_list) == len(just_k_random_index)
-
-        answer = issuer.restore(decoded_list, just_k_random_index, cust_pub_keys, enc_shares)
-        # answer2 = self.helper_revoke(rev_list, pub_cred, just_k_random_index, params, priv_keys, issuer)
-        # print("ans2TYPE" + str(type(answer2)))
         assert answer is not None
         assert answer == pub_id
-        # assert answer == answer2
 
     def helper_revoke(self, rev_list, pub_cred, indexes, params, priv_keys, issuer):
         revocation_list = rev_list.read()
@@ -298,7 +182,7 @@ class TestPaprSplit:
             custodian_list = issuer.data_dist_2(requester_commit, requester_random, pub_creds_encr, E_list, C_list, proof, group_generator, pub_cred)
 
             assert custodian_list is not None
-            assert pub_cred[0] not in custodian_list
+            assert pub_cred[0] not in custodian_list  # Verify that we are not a custodian of ourself
 
             # Anonymous auth:
             sigma, pi_show, z = user.anon_auth(t_id)
@@ -341,7 +225,7 @@ class TestPaprSplit:
         assert answer == bootstrap_users[0]['pub_id']
 
         # [x] Enc shares empty. : Fixed
-        # [ ] Index repeat sometimes?
+        # [x] Index repeat sometimes?
         # [ ] verify correct decryption fail, called in issuer.restore
 
     def bootstrap_procedure(self, k, n, issuer):
@@ -349,6 +233,10 @@ class TestPaprSplit:
         (G, p, g0, _) = params
         bootstrap_users = []
         pub_creds_encr = []
+
+        users = []
+        pub_ids = []
+        pub_creds = []
 
         # generate pub_creds for each user
         for i in range(n+1):
@@ -358,6 +246,12 @@ class TestPaprSplit:
             pub_cred = user.cred_sign_1()
             bootstrap_users.append({"user": user, "t_id": t_id, "pub_id": pub_id, "pub_cred": pub_cred})
             pub_creds_encr.append(pub_cred[0])
+
+            # For external tests
+            users.append(user)
+            pub_ids.append(pub_id)
+            pub_creds.append(pub_cred)
+                      
 
         # distribute pub_id for each user
         for dict_elem in bootstrap_users:
@@ -372,6 +266,8 @@ class TestPaprSplit:
             custodian_list = issuer.data_dist_2(requester_commit, requester_random, pub_creds_encr, E_list, C_list, proof, group_generator, pub_cred)
 
             assert custodian_list is not None
+            assert pub_cred[0] not in custodian_list  # Verify that we are not a custodian of ourself
+
 
             # Anonymous auth:
             sigma, pi_show, z = user.anon_auth(t_id)
@@ -390,26 +286,24 @@ class TestPaprSplit:
             assert verify(G, p, g0, *sigma_y_e, y_sign, [pub_cred[0]])
             assert verify(G, p, g0, *sigma_y_s, y_sign, [pub_cred[1]])
 
-            # User authentication:
-            m = issuer.ver_cred_1()
-            sigma_m, pub_cred_new, sigma_pub_cred = user.show_cred_1(m)
-            issuer.ver_cred_2(sigma_m, pub_cred_new, sigma_pub_cred, m)
-        return issuer, sys_list, user_list, cred_list, rev_list
+        return issuer, sys_list, user_list, cred_list, rev_list, users, pub_creds, pub_ids
 
-        def revoke_procedure(pub_cred_to_revoke):
+    def revoke_procedure(self, issuer, rev_list, users, pub_cred_to_revoke):
 
-            issuer.get_rev_data(pub_cred_to_revoke)
+        issuer.get_rev_data(pub_cred_to_revoke)
 
-            assert rev_list.peek() is not None
+        assert rev_list.peek() is not None
 
-            # Users polling rev_list and answering if applicable
-            for dict_elem in bootstrap_users:
-                user = dict_elem['user']
-                pub_cred_to_revoke = dict_elem['pub_cred']
-                responses = user.curl_rev_list(rev_list)
-                for (pub_cred_revoked, (pub_cred_answerer, response)) in responses:
-                    issuer.get_response(pub_cred_revoked, pub_cred_answerer, response)
+        # Users polling rev_list and answering if applicable
+        for user in users:
+            # user = dict_elem['user']
+            # pub_cred_to_revoke = dict_elem['pub_cred']
+            responses = user.curl_rev_list(rev_list)
+            for (pub_cred_revoked, (pub_cred_answerer, response)) in responses:
+                issuer.get_response(pub_cred_revoked, pub_cred_answerer, response)
 
-            answer = issuer.restore(bootstrap_users[0]['pub_cred'])
-            assert answer is not None
-            assert answer == bootstrap_users[0]['pub_id']
+        # answer = issuer.restore(bootstrap_users[0]['pub_cred'])
+        # assert answer is not None
+        # assert answer == bootstrap_users[0]['pub_id']
+
+        return issuer.restore(pub_cred_to_revoke)
