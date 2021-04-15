@@ -134,7 +134,7 @@ class Issuer():
         m = p.random()
         return m
 
-    def ver_cred_2(self, sigma_m, pub_cred, sigma_pub_cred, m):
+    def ver_cred_2(self, pub_cred, sigma_pub_cred, m, sigma_m):
         """
         Verifying both the recieved signature on m and the signature on pub_cred.
         """

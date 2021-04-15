@@ -60,8 +60,8 @@ class User():
 
     def show_cred(self):
         m = self.issuer.ver_cred_1()
-        signature = self.show_cred_1(m)
-        return self.issuer.ver_cred_2(*signature, self.pub_cred, self.sigma_pub_cred, m)
+        sigma_m, pub_cred, sigma_pub_cred = self.show_cred_1(m)
+        return self.issuer.ver_cred_2(self.pub_cred, self.sigma_pub_cred, m, sigma_m)
 
     # anonymous authentication
     def anon_auth(self):
@@ -130,20 +130,18 @@ class User():
         self.issuer.res_list[pub_cred].append((S_i, decryption_proof))
 
 
-
-
 def __data_distrubution_select(public_credentials, u_random, i_random, n, p):
     selected_data_custodians = []
     for i in range(n):
         selected_data_custodians.append(public_credentials[prng(u_random, i_random, i, p) % len(public_credentials)])
     return selected_data_custodians
 
+
 def __data_distrubution_commit_encrypt_prove(params, PrivID, data_custodians_public_credentials, k, n):
     (Gq, p, _, _) = params
     E_list, C_list, proof, group_generator = pvss.distribute_secret(data_custodians_public_credentials, PrivID, p, k, n, Gq)
     # Send to I
     return E_list, C_list, proof, group_generator
-
 
 
 def __data_distrubution_random_commit(params):
