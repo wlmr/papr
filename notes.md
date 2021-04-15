@@ -53,5 +53,12 @@ as to be able to link the user's incoming comms to the issuer by its credential.
 The credential is ofcourse not accepted as valid until the whole credential issuance procedure has been sucessfully executed.
 
 ### List entries
+#### sys_list
+[crs, i_pk] where crs and i_pk are strings
+#### user_list
+(id, pub_id) where pub_id is EcPt and id is a string
+#### cred_list
+pub_cred = (y_e, y_s) = (y_encr, y_sign)
 #### rev_list
 (pub_cred, self.rev_data[pub_cred]) where rev_data[pub_cred] = (escrow_shares, custodians_encr_public_key)
+dict.items()
