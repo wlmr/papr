@@ -106,8 +106,8 @@ class TestPaprSplit:
 
         # User authentication:
         m = issuer.ver_cred_1()
-        sigma_m, pub_cred_new, sigma_pub_cred = user.show_cred_1(m)
-        assert issuer.ver_cred_2(sigma_m, pub_cred_new, sigma_pub_cred, m)
+        sigma_m, pub_cred, sigma_pub_cred = user.show_cred_1(m)
+        assert issuer.ver_cred_2(pub_cred, sigma_pub_cred, m, sigma_m)
 
         # Reconstruction
         answer = self.revoke_procedure(issuer, rev_list, users, pub_cred)
@@ -115,31 +115,97 @@ class TestPaprSplit:
         assert answer is not None
         assert answer == pub_id
 
-    def helper_revoke(self, rev_list, pub_cred, indexes, params, priv_keys, issuer):
-        revocation_list = rev_list.read()
-        for rev_obj in revocation_list:
-            if rev_obj[0] == pub_cred:
-                (custodians, escrow_shares) = rev_obj[1]
+    
+    def test_revoke(self):
+        (k, n) = (3, 10)
+        issuer = Issuer()
 
-                decoded_list = []
-                cust_pub_keys = []
-                enc_shares = []
-                for index in indexes:
-                    cust_pub_keys.append(custodians[index])
-                    enc_shares.append(escrow_shares[index])
-                    # Here custodian sees there key and answers. In this test instead we look up the private key.
-                    for (i, pub_k) in zip(range(len(custodians)), custodians):
-                        if pub_k == custodians[index]:
-                            # Here we skip reading from list, since we only test restore
-                            decoded_list.append(pvss.participant_decrypt_and_prove(params, priv_keys[i], escrow_shares[index]))
+        # Bootstrap
+        issuer, sys_list, user_list, cred_list, rev_list, users, pub_creds, pub_ids = self.bootstrap_procedure(k, n, issuer)
+
+        # Select one user for testing
+        user = users[0]
+        pub_cred_to_revoke = pub_creds[0]
+        pub_id = pub_ids[0]
+
+        # User authentication:
+        m = issuer.ver_cred_1()
+        sigma_m, pub_cred, sigma_pub_cred = user.show_cred_1(m)
+        assert issuer.ver_cred_2(pub_cred, sigma_pub_cred, m, sigma_m)
+
+        # Reconstruction
+
+        wanted_number_of_answers = 3
+        issuer.get_rev_data(pub_cred_to_revoke)
+
+        assert rev_list.peek() is not None
+
+        # Users polling rev_list and answering if applicable
+        number_of_answers = 0
+        break_now = False
+        for user in users:
+            responses = user.curl_rev_list(rev_list)
+            for (pub_cred_revoked, (pub_cred_answerer, response)) in responses:
+                issuer.get_response(pub_cred_revoked, pub_cred_answerer, response)
+
+                if wanted_number_of_answers is not None:
+                    if pub_cred_revoked == pub_cred_to_revoke:
+                        number_of_answers += 1 
+                        if number_of_answers == wanted_number_of_answers:
+                            break_now = True
                             break
-                import pdb
-                pdb.set_trace()
-                return issuer.restore(decoded_list, indexes, cust_pub_keys, enc_shares)
-            break
+            if break_now:
+                break
+        answer = issuer.restore(pub_cred_to_revoke)
 
-        # Else:
-        assert False, "pub_cred not revoked"
+        assert answer is not None
+        assert answer == pub_id
+
+    def test_revoke_too_few(self):
+        (k, n) = (3, 10)
+        issuer = Issuer()
+
+        # Bootstrap
+        issuer, sys_list, user_list, cred_list, rev_list, users, pub_creds, pub_ids = self.bootstrap_procedure(k, n, issuer)
+
+        # Select one user for testing
+        user = users[0]
+        pub_cred_to_revoke = pub_creds[0]
+        pub_id = pub_ids[0]
+
+        # User authentication:
+        m = issuer.ver_cred_1()
+        sigma_m, pub_cred, sigma_pub_cred = user.show_cred_1(m)
+        assert issuer.ver_cred_2(pub_cred, sigma_pub_cred, m, sigma_m)
+
+        # Reconstruction
+
+        wanted_number_of_answers = 2
+        issuer.get_rev_data(pub_cred_to_revoke)
+
+        assert rev_list.peek() is not None
+
+        # Users polling rev_list and answering if applicable
+        number_of_answers = 0
+        break_now = False
+        for user in users:
+            responses = user.curl_rev_list(rev_list)
+            for (pub_cred_revoked, (pub_cred_answerer, response)) in responses:
+                issuer.get_response(pub_cred_revoked, pub_cred_answerer, response)
+
+                if wanted_number_of_answers is not None:
+                    if pub_cred_revoked == pub_cred_to_revoke:
+                        number_of_answers += 1 
+                        if number_of_answers == wanted_number_of_answers:
+                            break_now = True
+                            break
+            if break_now:
+                break
+
+        answer = issuer.restore(pub_cred_to_revoke)
+
+        assert answer is None
+        
 
     def test_sign_verify(self):
         params = setup_cmz(1)
@@ -204,8 +270,8 @@ class TestPaprSplit:
 
             # User authentication:
             m = issuer.ver_cred_1()
-            sigma_m, pub_cred_new, sigma_pub_cred = user.show_cred_1(m)
-            assert issuer.ver_cred_2(sigma_m, pub_cred_new, sigma_pub_cred, m)
+            sigma_m, pub_cred, sigma_pub_cred = user.show_cred_1(m)
+            assert issuer.ver_cred_2(pub_cred, sigma_pub_cred, m, sigma_m)
 
         pub_cred = bootstrap_users[0]['pub_cred']
         issuer.get_rev_data(pub_cred)
@@ -299,6 +365,7 @@ class TestPaprSplit:
             responses = user.curl_rev_list(rev_list)
             for (pub_cred_revoked, (pub_cred_answerer, response)) in responses:
                 issuer.get_response(pub_cred_revoked, pub_cred_answerer, response)
+
 
         # answer = issuer.restore(bootstrap_users[0]['pub_cred'])
         # assert answer is not None
