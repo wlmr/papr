@@ -41,7 +41,7 @@ class TestPaprMoney:
         vendor = Vendor()
         sys_list, user_list, cred_list, rev_list, customers, pub_creds, pub_ids = self.bootstrap_procedure(k, n, vendor)
         self.authentication_procedure(customers[0], vendor)
-        pub_id_revealed = self.revoke_procedure(vendor, rev_list, customers, pub_creds[0]) 
+        pub_id_revealed = self.revoke_procedure(vendor, rev_list, customers, pub_creds[0])
 
         for id, pub_id in user_list.read():
             if pub_id_revealed == pub_id:

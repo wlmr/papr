@@ -30,14 +30,14 @@ def prng(u_random, i_random, counter, p):
 def data_distribution_select(public_credentials, u_random, i_random, n, p, pub_cred):
     selected_data_custodians = []
     public_credentials_left = public_credentials.copy()
-    
+
     if pub_cred[0] in public_credentials_left:
         public_credentials_left.remove(pub_cred[0])
-    
+
     if n > len(public_credentials_left):
         return None
 
-    for i in range(n):
+    for _ in range(n):
         index = prng(u_random, i_random, n, p) % len(public_credentials_left)
         public_credential = public_credentials_left.pop(index)
         selected_data_custodians.append(public_credential)

@@ -5,7 +5,6 @@ from amac.credential_scheme import show_verify as show_verify_cmz
 from amac.proofs import to_challenge
 from papr.ecdsa import sign, verify
 from papr.ledger import Ledger
-from papr.utils import prng
 from binascii import hexlify
 from papr.utils import data_distribution_select
 

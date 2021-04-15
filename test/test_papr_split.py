@@ -115,7 +115,6 @@ class TestPaprSplit:
         assert answer is not None
         assert answer == pub_id
 
-    
     def test_revoke(self):
         (k, n) = (3, 10)
         issuer = Issuer()
@@ -171,15 +170,13 @@ class TestPaprSplit:
         # Select one user for testing
         user = users[0]
         pub_cred_to_revoke = pub_creds[0]
-        pub_id = pub_ids[0]
-
+        
         # User authentication:
         m = issuer.ver_cred_1()
         sigma_m, pub_cred, sigma_pub_cred = user.show_cred_1(m)
         assert issuer.ver_cred_2(pub_cred, sigma_pub_cred, m, sigma_m)
 
         # Reconstruction
-
         wanted_number_of_answers = 2
         issuer.get_rev_data(pub_cred_to_revoke)
 
