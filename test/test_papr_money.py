@@ -28,7 +28,7 @@ class TestPaprMoney:
         ans = customer.send(pub_key_to_addr(pub_creds[0][1]), 1, 'satoshi', vendor)
         assert ans is not None
 
-    def test_transaction_to_unregisted_user(self):
+    def test_transaction_to_unregistered_user(self):
         not_registered_pub_addr = PrivateKeyTestnet().address
         k, n = 2, 3
         vendor = Vendor()

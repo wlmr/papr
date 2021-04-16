@@ -56,7 +56,7 @@ class TestPaprSplit:
         _, _, C_list, _, group_generator = user.data_dist_2(issuer_random, pub_keys)
         return C_list, group_generator
 
-    def test_data_distrubution(self):
+    def test_data_distribution(self):
         (k, n) = (3, 10)
         issuer = Issuer()
         params, (y_sign, y_encr), iparams, _, _, _, _ = issuer.setup(k, n)
@@ -244,7 +244,7 @@ class TestPaprSplit:
             # Proof of eq id:
             y, c, gamma = user.eq_id(u2, group_generator, z, cl, C_list[0])
             assert issuer.eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
-            # Fixme: message to user so that it knows that it can submit credentails (anonimously)
+            # Fixme: message to user so that it knows that it can submit credentails (anonymously)
 
             # Cred signing:
             sigma_pub_cred = issuer.cred_sign(pub_cred)

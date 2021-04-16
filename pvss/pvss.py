@@ -50,7 +50,7 @@ def verify_encrypted_shares(encrypted_shares: encrypted_shares_type, commitments
 
 def reconstruct(decrypted_list: decrypted_shares_list_type, index_list: index_list_type, p) -> Bn:
     '''
-    Recontructs (secret * G) given at least k decrypted shares, along with their indexes (starting from 1!) as the respective public keys was originaly
+    Reconstructs (secret * G) given at least k decrypted shares, along with their indexes (starting from 1!) as the respective public keys was originally
         sent into distrubute_secret.
     '''
     assert len(decrypted_list) == len(index_list)
@@ -60,11 +60,11 @@ def reconstruct(decrypted_list: decrypted_shares_list_type, index_list: index_li
 def verify_decryption_proof(proof_of_decryption: single_proof_type, decrypted_share: decrypted_share_type, encrypted_share: encrypted_share_type,
                             pub_key: pub_keys_type, p, g0) -> bool:
     '''
-    Verifyes that a participant has correctly decrypted their share
+    Verifies that a participant has correctly decrypted their share
     '''
     return verify_correct_decryption(decrypted_share, encrypted_share, proof_of_decryption, pub_key, p, g0)
 
-# __DEPRICATED__
+# __DEPRECATED__
 
 
 def gen_proof(params, k, n, secret, pub_keys):
@@ -142,7 +142,7 @@ def __get_encrypted_shares(pub_keys: pub_keys_type, shares: list[share_type]) ->
 
 def decode(S_list, index_list, p):
     '''
-    Calulates secret from participants decrypted shares
+    Calculates secret from participants decrypted shares
     '''
     assert len(S_list) == len(index_list)
 
@@ -175,7 +175,7 @@ def verify_correct_decryption(S_i, Y_i, decrypt_proof, pub_key, p, G):
 
 def batch_verify_correct_decryption(proved_decryptions, Y_list, pub_keys, p, G):
     '''
-    Verify all paricipants decryption of shares
+    Verify all participants decryption of shares
     '''
     for ((S_i, decrypt_proof), Y_i, pub_key) in zip(proved_decryptions, Y_list, pub_keys):
         if verify_correct_decryption(S_i, Y_i, decrypt_proof, pub_key, p, G) is False:

@@ -66,7 +66,7 @@ class User():
         self.sigma, self.pi_show, self.z = blind_show_cmz(self.params, self.iparams, t_id, self.priv_id)
         return self.sigma, self.pi_show, self.z
 
-    # Data distrubution
+    # Data distribution
     def data_dist_1(self):
         '''
         Distribute data to custodians (part 1). Second part of credential issuance.
@@ -169,6 +169,8 @@ class User():
                 s_e = escrow_shares[encryption_keys.index(self.pub_cred[0])]
                 res.append((pub_cred, self.respond(s_e)))
         return res
+
+
 
 
 def unpack_ecpt(ecpt_str, G):
