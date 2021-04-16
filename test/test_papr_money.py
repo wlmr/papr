@@ -16,17 +16,26 @@ class TestPaprMoney:
         for pub_cred in cred_list.read():
             assert vendor.registry[pub_key_to_addr(pub_cred[1])] == pub_cred[1]
 
+    @pytest.mark.skip(reason="Disable since it spends money on every run.")
     def test_transaction(self):
         k, n = 2, 3
         vendor = Vendor()
         params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, customers, pub_creds, pub_ids = self.bootstrap_procedure(k, n, vendor)
         customer = Customer("Josip Tito", vendor, params, iparams, y_sign, y_encr, k, n)
         assert float(customer.get_balance("satoshi")) > 0.0
+        import pdb; pdb.set_trace()
+        ans = customer.send(pub_key_to_addr(pub_creds[0][1]), 1, 'satoshi', vendor)
+        assert ans is not None
 
-
-
-    #def test_transaction_to_unregisted_user(self):
-    #    pub_addr = PrivateKeyTestnet().address()
+    def test_transaction_to_unregisted_user(self):
+        not_registered_pub_addr = PrivateKeyTestnet().address
+        k, n = 2, 3
+        vendor = Vendor()
+        params, (y_sign, y_encr), iparams, _, _, _, _ = vendor.setup(2, 3)
+        customer = Customer("Josip Tito", vendor, params, iparams, y_sign, y_encr, k, n)
+        
+        assert float(customer.get_balance("satoshi")) > 0.0
+        assert customer.send(not_registered_pub_addr, 1, 'satoshi', vendor) is None
        
     def test_vendor_persistence(self):
         vendor = Vendor()

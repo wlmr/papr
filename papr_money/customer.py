@@ -27,6 +27,8 @@ class Customer(User):
         if vendor.is_valid_address(address):
             output = [(address, amount, currency)]
             return self.key.send(output)
+        else:
+            return None
 
     def get_address(self):
         return self.key.address

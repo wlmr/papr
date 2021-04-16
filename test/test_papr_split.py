@@ -93,7 +93,7 @@ class TestPaprSplit:
         assert custodian_list is not None
 
     def test_full(self):
-        (k, n) = (3, 10)
+        (k, n) = (51, 100)
         issuer = Issuer()
 
         # Bootstrap
@@ -116,7 +116,7 @@ class TestPaprSplit:
         assert answer == pub_id
 
     def test_revoke(self):
-        (k, n) = (3, 10)
+        (k, n) = (3, 4)
         issuer = Issuer()
 
         # Bootstrap
@@ -161,7 +161,7 @@ class TestPaprSplit:
         assert answer == pub_id
 
     def test_revoke_too_few(self):
-        (k, n) = (3, 10)
+        (k, n) = (3, 4)
         issuer = Issuer()
 
         # Bootstrap
