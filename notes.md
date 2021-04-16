@@ -19,6 +19,7 @@ with the previously used secret key, i.e. γ=l^d, and then use d again so as to 
 [ ] Same custodian can be selected twice
 [ ] You can select yourself as custodian (in bootstrap at least)
 [ ] rename group_generator to h
+[ ] Bootstrap scale exponentially. See if this can be fixed
 ---
 from root:
 ```
@@ -62,3 +63,5 @@ pub_cred = (y_e, y_s) = (y_encr, y_sign)
 #### rev_list
 (pub_cred, self.rev_data[pub_cred]) where rev_data[pub_cred] = (escrow_shares, custodians_encr_public_key)
 dict.items()
+
+
