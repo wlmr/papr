@@ -24,6 +24,7 @@ class Vendor(Issuer):
             self.registry = {}  # swap to cred_list
         wif_file.close()
         Issuer.__init__(self)
+        # self.hashes = {self.sys_list: 0, self.user_list: 0, self.cred_list: 0, self.rev_list: 0} # TODO: continue on this thought
 
     def __del__(self):
         registry_file = open("data/vendor-registry", "wb")
@@ -42,8 +43,9 @@ class Vendor(Issuer):
         return self.key.send(output)
 
     def publish_hash(self, ledger):
-        b = dumps(ledger).encode("utf-8")
+        b = dumps([ledger, self.hashes[ledger]]).encode("utf-8")
         m = sha256(b).hexdigest()
+        self.hashes[ledger]: m
         self.txnid = self.key.send([(self.key.address, 1, "satoshi")], message=m, message_is_hex=True)
 
     def get_address(self):

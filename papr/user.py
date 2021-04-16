@@ -171,6 +171,11 @@ class User():
         return res
 
 
+def check_hash(i_hash, ledger):
+    b = dumps(ledger).encode("utf-8")
+    m = sha256(b).hexdigest()
+    return m == i_hash
+    self.txnid = self.key.send([(self.key.address, 1, "satoshi")], message=m, message_is_hex=True)
 
 
 def unpack_ecpt(ecpt_str, G):
