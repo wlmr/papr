@@ -1,7 +1,7 @@
 # notes
 
 ## TODO
-[x] ask about whether the engamal-encryption for some reason has to be encrypted
+[x] ask about whether the elgamal-encryption for some reason has to be encrypted
 with the previously used secret key, i.e. γ=l^d, and then use d again so as to create
 γ^d
 [x] make the issuance procedure take a Bn instead of bytes message
@@ -9,12 +9,12 @@ with the previously used secret key, i.e. γ=l^d, and then use d again so as to 
 [x] make sure the signature of pub_id is checkable by y_sign
 [x] make ecdsa use hash that can hash any object 
 [x] make parent_list that all others inherit from
-[ ] fix testfiles
+[ ] fix test files
 [ ] investigate if to remove z from return values of blind_show. 
     It is only there for eq_id. Not even sure it is supposed to use that z tho
-[ ] Data distrubution: Save custodian_list in relation to user (alternativly save parameters needed to recreate)
-[ ] Data distrubution: Save issuer random value in relation on user (can be disgarded later if custodian_list is saved)
-[ ] Make sure issuer knows who it recieves revoke responses from 
+[ ] Data distribution: Save custodian_list in relation to user (alternatively save parameters needed to recreate)
+[ ] Data distribution: Save issuer random value in relation on user (can be discarded later if custodian_list is saved)
+[ ] Make sure issuer knows who it receives revoke responses from 
 [x] Bootstrap
 [ ] Same custodian can be selected twice
 [ ] You can select yourself as custodian (in bootstrap at least)
@@ -51,7 +51,7 @@ https://testnet-faucet.mempool.co/
 ### Credential issuance
 We chose to generate the cred in the beginning of the credential issuance procedure,
 as to be able to link the user's incoming comms to the issuer by its credential. 
-The credential is ofcourse not accepted as valid until the whole credential issuance procedure has been sucessfully executed.
+The credential is of course not accepted as valid until the whole credential issuance procedure has been successfully executed.
 
 ### List entries
 #### sys_list

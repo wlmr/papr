@@ -65,7 +65,7 @@ class Issuer():
         """
         return show_verify_cmz(self.params, self.iparams, self.i_sk, sigma, pi_show)
 
-    # Data distrubution
+    # Data distribution
     def data_dist_1(self, pub_cred):
         """
         Selects a random number to commit.
@@ -80,9 +80,9 @@ class Issuer():
         Distributes shares of pub_id to a random set of n users.
         """
         (_, p, _, _) = self.params
-        if data_distrubution_verify_commit(self.params, requester_commit, requester_random):
+        if data_distribution_verify_commit(self.params, requester_commit, requester_random):
             custodians = data_distribution_select(pub_keys, requester_random, self.temp_creds[pub_cred]['issuer_random'], self.n, p, pub_cred)
-            if data_distrubution_issuer_verify(escrow_shares, commits, proof, custodians, group_generator, p):
+            if data_distribution_issuer_verify(escrow_shares, commits, proof, custodians, group_generator, p):
                 self.temp_creds[pub_cred]['custodians'] = custodians
                 self.temp_creds[pub_cred]['escrow_shares'] = escrow_shares
                 return custodians
@@ -135,7 +135,7 @@ class Issuer():
 
     def ver_cred_2(self, pub_cred, sigma_pub_cred, m, sigma_m):
         """
-        Verifying both the recieved signature on m and the signature on pub_cred.
+        Verifying both the received signature on m and the signature on pub_cred.
         """
         (y_e, y_s) = pub_cred
         (G, p, g0, _) = self.params
@@ -182,11 +182,11 @@ def pack_ecpt(ecpt):
     return hexlify(ecpt.export()).decode("utf8")
 
 
-def data_distrubution_issuer_verify(E_list, C_list, proof, pub_keys, group_generator, p):
+def data_distribution_issuer_verify(E_list, C_list, proof, pub_keys, group_generator, p):
     return verify_encrypted_shares(E_list, C_list, pub_keys, proof, group_generator, p)
 
 
-def data_distrubution_verify_commit(params, c, r):
+def data_distribution_verify_commit(params, c, r):
     (_, _, _, g1) = params
     commit = r * g1
     return commit == c
