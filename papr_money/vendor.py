@@ -3,6 +3,7 @@ from bit import PrivateKeyTestnet, wif_to_key
 from pickle import dump, load
 from json import dumps
 from hashlib import sha256
+from papr.utils import pub_key_to_addr
 
 
 class Vendor(Issuer):
@@ -29,12 +30,13 @@ class Vendor(Issuer):
         dump(self.registry, registry_file)
         registry_file.close()
 
-    def register_key(self, pub_key, address):
-        self.registry[address] = pub_key
-
+    def cred_sign(self, pub_cred):
+        self.registry[pub_key_to_addr(pub_cred[1])] = pub_cred[1]
+        return super().cred_sign(pub_cred)
+    
     def is_valid_address(self, address):
-        return address in self.registry.keys()  # TODO: make registry correspond to cred_list
-
+        return address in self.registry
+    
     def send(self, address, amount, currency):
         output = [(address, amount, currency)]
         return self.key.send(output)
@@ -49,3 +51,4 @@ class Vendor(Issuer):
 
     def get_balance(self, currency):
         return self.key.balance_as(currency)
+

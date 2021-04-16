@@ -16,12 +16,12 @@ class Customer(User):
             self.key = PrivateKeyTestnet()
             wif_file.write(self.key.to_wif())
         wif_file.close()
-        self.notify_vendor(vendor, self.key.public_key, self.key.address)
+        # self.notify_vendor(vendor, self.key.public_key, self.key.address)
         x_sign = bit_privkey_to_petlib_bn(self.key._pk)
         User.__init__(self, params, iparams, y_sign, y_encr, k, n, x_sign)
 
-    def notify_vendor(self, vendor, pub_key, address):
-        vendor.register_key(pub_key, address)
+    # def notify_vendor(self, vendor, pub_key, address):
+    #     vendor.register_key(pub_key, address)
 
     def send(self, address, amount, currency, vendor):
         if vendor.is_valid_address(address):

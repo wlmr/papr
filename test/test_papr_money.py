@@ -2,10 +2,32 @@ from papr_money.vendor import Vendor
 from papr_money.customer import Customer
 from papr.ecdsa import verify
 import pytest
-
+from papr.utils import pub_key_to_addr
+from bit import PrivateKeyTestnet
 
 class TestPaprMoney:
 
+    def test_registry(self):
+        k, n = 2, 3
+        vendor = Vendor()
+        params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, customers, pub_creds, pub_ids = self.bootstrap_procedure(k, n, vendor)
+        
+        assert cred_list.peek() is not None
+        for pub_cred in cred_list.read():
+            assert vendor.registry[pub_key_to_addr(pub_cred[1])] == pub_cred[1]
+
+    def test_transaction(self):
+        k, n = 2, 3
+        vendor = Vendor()
+        params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, customers, pub_creds, pub_ids = self.bootstrap_procedure(k, n, vendor)
+        customer = Customer("Josip Tito", vendor, params, iparams, y_sign, y_encr, k, n)
+        assert float(customer.get_balance("satoshi")) > 0.0
+
+
+
+    #def test_transaction_to_unregisted_user(self):
+    #    pub_addr = PrivateKeyTestnet().address()
+       
     def test_vendor_persistence(self):
         vendor = Vendor()
         vendor.registry['address1'] = 'pubkey1'
@@ -39,14 +61,15 @@ class TestPaprMoney:
     def test_new_user_procedure(self):
         k, n = 3, 5
         vendor = Vendor()
-        sys_list, user_list, cred_list, rev_list, customers, pub_creds, pub_ids = self.bootstrap_procedure(k, n, vendor)
+        params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, customers, pub_creds, pub_ids = self.bootstrap_procedure(k, n, vendor)
         self.authentication_procedure(customers[0], vendor)
-        pub_id_revealed = self.revoke_procedure(vendor, rev_list, customers, pub_creds[0])
-
+        pub_id_revealed = self.revoke_procedure(vendor, rev_list, customers, pub_creds[3])
         for id, pub_id in user_list.read():
             if pub_id_revealed == pub_id:
                 print(id)
-                assert id == "0"
+                assert id == "3"
+
+
 
     def enroll_procedure(self, id, vendor, customer):
         """
@@ -125,7 +148,7 @@ class TestPaprMoney:
             assert verify(G, p, g0, *sigma_y_e, y_sign, [pub_cred[0]])
             assert verify(G, p, g0, *sigma_y_s, y_sign, [pub_cred[1]])
 
-        return sys_list, user_list, cred_list, rev_list, users, pub_creds, pub_ids
+        return params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, users, pub_creds, pub_ids
 
     def revoke_procedure(self, issuer, rev_list, customers, pub_cred_to_revoke):
         issuer.get_rev_data(pub_cred_to_revoke)
