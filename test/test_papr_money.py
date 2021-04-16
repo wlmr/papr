@@ -168,9 +168,4 @@ class TestPaprMoney:
             responses = customer.curl_rev_list(rev_list)
             for (pub_cred_revoked, (pub_cred_answerer, response)) in responses:
                 issuer.get_response(pub_cred_revoked, pub_cred_answerer, response)
-
-        # answer = issuer.restore(bootstrap_users[0]['pub_cred'])
-        # assert answer is not None
-        # assert answer == bootstrap_users[0]['pub_id']
-
         return issuer.restore(pub_cred_to_revoke)
