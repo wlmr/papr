@@ -15,27 +15,12 @@ class TestPaprSplit:
         issuer.ledger_add(issuer.sys_list, "JAMAN")
         assert len(sys_list.read()) == 3
 
-    def helper_enroll(self, id, issuer, user):
-        """
-        Complete Enrollment procedure. Inputs:
-        id: real identity, i_sk: issuer's secret key for CMZ,
-        x_sign: issuer's secret signature key, user_list: the list of users (ID: pub_ID) as described in PAPR.
-        """
-        id, pub_id, (u_sk, u_pk, c, pi_prepare_obtain) = user.req_enroll_1(id)
-        ret = issuer.iss_enroll(u_pk['h'], c, pi_prepare_obtain, id, pub_id)
-        if ret is not None:
-            s_pub_id, u, e_u_prime, pi_issue, biparams = ret
-            t_id = user.req_enroll_2(u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], c)
-            return t_id, s_pub_id, pub_id
-        print("user already exists")
-        return None
-
     def test_enroll(self):
         issuer = Issuer()
         id = "Ettan"
         params, (y_sign, y_encr), iparams, _, user_list, _, _ = issuer.setup(3, 10)
         user = User(params, iparams, y_sign, y_encr, 3, 10)
-        ret = self.helper_enroll(id, issuer, user)
+        ret = enroll_procedure(id, issuer, user)
         assert ret is not None
         _, (r, s), pub_id = ret
         print(f"user_list.peek():   {user_list.peek()}\n")
@@ -48,7 +33,7 @@ class TestPaprSplit:
         id = "Bertrand Russel"
         params, (_, _), iparams, _, user_list, _, _ = issuer.setup(3, 10)
         user = User(params, iparams, _, _, 3, 10)
-        ret = self.helper_enroll(id, issuer, user)
+        ret = enroll_procedure(id, issuer, user)
         assert ret is not None
         t_id, _, _ = ret
         (u, cl, _), _, z = user.anon_auth(t_id)
@@ -93,11 +78,14 @@ class TestPaprSplit:
         assert custodian_list is not None
 
     def test_full(self):
-        (k, n) = (51, 100)
+        (k, n) = (3, 10)
         issuer = Issuer()
 
         # Bootstrap
-        issuer, sys_list, user_list, cred_list, rev_list, users, pub_creds, pub_ids = self.bootstrap_procedure(k, n, issuer)
+        params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, users, pub_creds, pub_ids = bootstrap_procedure(k, n, issuer)
+        for i in range(10):
+            user = User(params, iparams, y_sign, y_encr, k, n)
+            enroll_procedure("extra"+str(i), issuer, user)
 
         # Select one user for testing
         user = users[0]
@@ -110,7 +98,7 @@ class TestPaprSplit:
         assert issuer.ver_cred_2(pub_cred, sigma_pub_cred, m, sigma_m)
 
         # Reconstruction
-        answer = self.revoke_procedure(issuer, rev_list, users, pub_cred)
+        answer = revoke_procedure(issuer, rev_list, users, pub_cred)
 
         assert answer is not None
         assert answer == pub_id
@@ -120,7 +108,7 @@ class TestPaprSplit:
         issuer = Issuer()
 
         # Bootstrap
-        issuer, sys_list, user_list, cred_list, rev_list, users, pub_creds, pub_ids = self.bootstrap_procedure(k, n, issuer)
+        params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, users, pub_creds, pub_ids = bootstrap_procedure(k, n, issuer)
 
         # Select one user for testing
         user = users[0]
@@ -165,7 +153,7 @@ class TestPaprSplit:
         issuer = Issuer()
 
         # Bootstrap
-        issuer, sys_list, user_list, cred_list, rev_list, users, pub_creds, pub_ids = self.bootstrap_procedure(k, n, issuer)
+        params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, users, pub_creds, pub_ids = bootstrap_procedure(k, n, issuer)
 
         # Select one user for testing
         user = users[0]
@@ -226,7 +214,7 @@ class TestPaprSplit:
         # generate pub_creds for each user
         for i in range(n+1):
             user = User(params, iparams, y_sign, y_encr, k, n)
-            t_id, sigma_pub_id, pub_id = self.helper_enroll(str(i), issuer, user)
+            t_id, sigma_pub_id, pub_id = enroll_procedure(str(i), issuer, user)
             assert verify(G, p, g0, *sigma_pub_id, y_sign, [(str(i), pub_id)])
             pub_cred = user.cred_sign_1()
             bootstrap_users.append({"user": user, "t_id": t_id, "pub_id": pub_id, "pub_cred": pub_cred})
