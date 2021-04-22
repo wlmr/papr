@@ -203,7 +203,7 @@ class TestPaprSplit:
         r, s = sign(p, g0, x_sign, [m])
         assert verify(G, p, g0, r, s, y_sign, [m])
 
-    @pytest.mark.run_these_please
+    # @pytest.mark.run_these_please
     def test_bootstrap(self):
         (k, n) = (3, 10)
         issuer = Issuer()
