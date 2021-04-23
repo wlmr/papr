@@ -75,13 +75,13 @@ class Issuer():
         self.temp_creds[pub_cred] = {'issuer_random': issuer_random}
         return issuer_random
 
-    def data_dist_2(self, requester_commit, requester_random, pub_keys, escrow_shares, commits, proof, group_generator, pub_cred):
+    def data_dist_2(self, user_commit, user_rnd, pub_creds_encr, escrow_shares, commits, proof, group_generator, pub_cred):
         """
         Distributes shares of pub_id to a random set of n users.
         """
         (_, p, _, _) = self.params
-        if data_distribution_verify_commit(self.params, requester_commit, requester_random):
-            custodians = data_distribution_select(pub_keys, requester_random, self.temp_creds[pub_cred]['issuer_random'], self.n, p, pub_cred)
+        if data_distribution_verify_commit(self.params, user_commit, user_rnd):
+            custodians = data_distribution_select(pub_creds_encr, user_rnd, self.temp_creds[pub_cred]['issuer_random'], self.n, p, pub_cred)
             if data_distribution_issuer_verify(escrow_shares, commits, proof, custodians, group_generator, p):
                 self.temp_creds[pub_cred]['custodians'] = custodians
                 self.temp_creds[pub_cred]['escrow_shares'] = escrow_shares
@@ -152,8 +152,8 @@ class Issuer():
         '''
         self.ledger_add(self.rev_list, (pub_cred, self.rev_data[pub_cred]))
 
-    def get_response(self, revoked_pub_cred, responder_pub_encryption_key, response):
-        self.res_list[revoked_pub_cred][responder_pub_encryption_key] = response
+    def get_response(self, revoked_pub_cred, responder_pub_encr_key, response):
+        self.res_list[revoked_pub_cred][responder_pub_encr_key] = response
 
     def restore(self, pub_cred):
         '''
