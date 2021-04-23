@@ -44,6 +44,9 @@ class TestPaprSplit:
         assert issuer.eq_id(u, h, y, c, gamma, cl, c0)
 
     def helper_data_dist_to_get_h(self, k, n, params, user, issuer):
+        '''
+        This is only used to make testing of equal identity possible without a full test of data distrubution
+        '''
         priv_keys = []
         pub_keys = []
         for _ in range(n*2):
