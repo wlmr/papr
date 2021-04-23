@@ -3,3 +3,6 @@ version: '3'
 services:
   python:
     build: . 
+
+  bitcoin-testnet:
+    build: bitcoin-testnet-box/.
