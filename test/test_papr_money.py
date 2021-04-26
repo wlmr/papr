@@ -5,6 +5,7 @@ import pytest
 from papr.utils import pub_key_to_addr
 from bit import PrivateKeyTestnet
 from test.procedures import bootstrap_procedure, enroll_procedure, authentication_procedure, revoke_procedure
+from bit.network import NetworkAPI
 
 class TestPaprMoney:
 
@@ -29,12 +30,20 @@ class TestPaprMoney:
         assert ans is not None
 
     def test_transaction_to_unregistered_user(self):
+        node = NetworkAPI.connect_to_node(user='admin1', password='123', host='localhost', port='19001', use_https=False, testnet=True)
+        
         not_registered_pub_addr = PrivateKeyTestnet().address
+
+        node.importaddress(not_registered_pub_addr, "unreg_addr", True)
+        
         k, n = 2, 3
         vendor = Vendor()
         params, (y_sign, y_encr), iparams, _, _, _, _ = vendor.setup(2, 3)
         customer = Customer("Josip Tito", vendor, params, iparams, y_sign, y_encr, k, n)
-        
+
+        node.importaddress(customer.get_address(), "test_addr", True)
+ 
+
         assert float(customer.get_balance("satoshi")) > 0.0
         assert customer.send(not_registered_pub_addr, 1, 'satoshi', vendor) is None
        
