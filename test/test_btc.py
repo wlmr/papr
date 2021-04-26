@@ -11,7 +11,7 @@ from bit.network import NetworkAPI
 
 class TestBTC:
     def test_correct_curve(self):
-        node = NetworkAPI.connect_to_node(user='admin1', password='123', host='papr_bitcoin-testnet_1.papr_default', port='19001', use_https=False, testnet=True)
+        node = NetworkAPI.connect_to_node(user='admin1', password='123', host='localhost', port='19001', use_https=False, testnet=True)
         
         btc_key = PrivateKeyTestnet()
         node.importaddress(btc_key.address, "test_addr", True)
