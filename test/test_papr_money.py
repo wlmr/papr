@@ -9,6 +9,16 @@ from bit.network import NetworkAPI
 
 class TestPaprMoney:
 
+    @pytest.fixture(autouse=True)
+    def run_before_and_after_tests(tmpdir):
+        """Runs code befora and after each test"""
+        # Setup
+        node = NetworkAPI.connect_to_node(user='admin1', password='123', host='localhost', port='19001', use_https=False, testnet=True)
+
+        yield  # Run a test
+        # Teardown 
+
+
     def test_registry(self):
         k, n = 2, 3
         vendor = Vendor()
@@ -30,19 +40,12 @@ class TestPaprMoney:
         assert ans is not None
 
     def test_transaction_to_unregistered_user(self):
-        node = NetworkAPI.connect_to_node(user='admin1', password='123', host='localhost', port='19001', use_https=False, testnet=True)
-        
         not_registered_pub_addr = PrivateKeyTestnet().address
 
-        node.importaddress(not_registered_pub_addr, "unreg_addr", True)
-        
         k, n = 2, 3
         vendor = Vendor()
         params, (y_sign, y_encr), iparams, _, _, _, _ = vendor.setup(2, 3)
         customer = Customer("Josip Tito", vendor, params, iparams, y_sign, y_encr, k, n)
-
-        node.importaddress(customer.get_address(), "test_addr", True)
- 
 
         assert float(customer.get_balance("satoshi")) > 0.0
         assert customer.send(not_registered_pub_addr, 1, 'satoshi', vendor) is None
@@ -58,9 +61,11 @@ class TestPaprMoney:
         assert pubkey1 == vendor.key.public_key
         assert vendor.registry['address1'] == 'pubkey1'
 
-    @pytest.mark.skip(reason="Disable since github actions creates a new wallet every run. Therefore the wallet will always be empty.")
+    # @pytest.mark.skip(reason="Disable since github actions creates a new wallet every run. Therefore the wallet will always be empty.")
     # NOTE: give Tito more coins if this test fails
     def test_customer_balance(self):
+        # node = NetworkAPI.connect_to_node(user='admin1', password='123', host='localhost', port='19001', use_https=False, testnet=True)
+        
         k, n = 3, 10
         vendor = Vendor()
         params, (y_sign, y_encr), iparams, _, _, _, _ = vendor.setup(3, 10)
