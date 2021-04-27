@@ -40,5 +40,7 @@ jobs:
       env:
         PYTHONPATH: "."
       run: |
-        ./bitcoin-testnet-box/setup.py
+        cd /home/runner/work/papr/papr/bitcoin-testnet-box/
+        ./setup.py
+        cd /home/runner/work/papr/papr/
         pytest
