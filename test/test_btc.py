@@ -31,7 +31,6 @@ class TestBTC:
         (k, n) = (3, 10)
         params, (y_sign, y_encr), iparams, _, _, _, _ = issuer.setup(k, n)
 
-        
         (G, _, g0, _) = params
 
         btc_key = PrivateKeyTestnet()
@@ -56,7 +55,6 @@ class TestBTC:
         (k, n) = (3, 10)
         params, (y_sign, y_encr), iparams, _, _, _, _ = issuer.setup(k, n)
 
-        
         (G, _, g0, _) = params
 
         btc_key = PrivateKeyTestnet()
@@ -84,7 +82,6 @@ class TestBTC:
         (k, n) = (3, 10)
         params, (y_sign, y_encr), iparams, _, _, _, _ = issuer.setup(k, n)
 
-        
         (G, _, g0, _) = params
 
         btc_key = PrivateKeyTestnet()

@@ -6,17 +6,17 @@ from hashlib import sha256
 from papr.utils import pub_key_to_addr
 
 
-class Vendor(Issuer):
+class Bank(Issuer):
     def __init__(self):
         try:
-            wif_file = open("data/vendor-key", "r")
+            wif_file = open("data/bank-key", "r")
             wif = wif_file.read()
             self.key = wif_to_key(wif)
-            registry_file = open("data/vendor-registry", "rb")
+            registry_file = open("data/bank-registry", "rb")
             self.registry = load(registry_file)
             registry_file.close()
         except FileNotFoundError:
-            wif_file = open("data/vendor-key", "w")
+            wif_file = open("data/bank-key", "w")
             self.key = PrivateKeyTestnet()
             wif_file.write(self.key.to_wif())
             self.registry = {}  # swap to cred_list
@@ -27,17 +27,20 @@ class Vendor(Issuer):
         self.hashes = {'sys_list': [0], 'user_list': [0], "cred_list": [0], "rev_list": [0]}  # TODO: continue on this thought
 
     def __del__(self):
-        registry_file = open("data/vendor-registry", "wb")
+        registry_file = open("data/bank-registry", "wb")
         dump(self.registry, registry_file)
         registry_file.close()
 
     def cred_sign(self, pub_cred):
+        """
+        Overloading users cred_sign to also fill up registry dictionary
+        """
         self.registry[pub_key_to_addr(pub_cred[1])] = pub_cred[1]
         return super().cred_sign(pub_cred)
-    
+
     def is_valid_address(self, address):
         return address in self.registry
-    
+
     def send(self, address, amount, currency):
         output = [(address, amount, currency)]
         return self.key.send(output)
@@ -53,4 +56,3 @@ class Vendor(Issuer):
 
     def get_balance(self, currency):
         return self.key.balance_as(currency)
-

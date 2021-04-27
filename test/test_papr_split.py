@@ -44,6 +44,9 @@ class TestPaprSplit:
         assert issuer.eq_id(u, h, y, c, gamma, cl, c0)
 
     def helper_data_dist_to_get_h(self, k, n, params, user, issuer):
+        '''
+        This is only used to make testing of equal identity possible without a full test of data distrubution
+        '''
         priv_keys = []
         pub_keys = []
         for _ in range(n*2):
@@ -138,7 +141,7 @@ class TestPaprSplit:
 
                 if wanted_number_of_answers is not None:
                     if pub_cred_revoked == pub_cred_to_revoke:
-                        number_of_answers += 1 
+                        number_of_answers += 1
                         if number_of_answers == wanted_number_of_answers:
                             break_now = True
                             break
@@ -159,7 +162,7 @@ class TestPaprSplit:
         # Select one user for testing
         user = users[0]
         pub_cred_to_revoke = pub_creds[0]
-        
+
         # User authentication:
         m = issuer.ver_cred_1()
         sigma_m, pub_cred, sigma_pub_cred = user.show_cred_1(m)
@@ -181,7 +184,7 @@ class TestPaprSplit:
 
                 if wanted_number_of_answers is not None:
                     if pub_cred_revoked == pub_cred_to_revoke:
-                        number_of_answers += 1 
+                        number_of_answers += 1
                         if number_of_answers == wanted_number_of_answers:
                             break_now = True
                             break
@@ -191,7 +194,6 @@ class TestPaprSplit:
         answer = issuer.restore(pub_cred_to_revoke)
 
         assert answer is None
-        
 
     def test_sign_verify(self):
         params = setup_cmz(1)

@@ -16,10 +16,14 @@ with the previously used secret key, i.e. γ=l^d, and then use d again so as to 
 [ ] Data distribution: Save issuer random value in relation on user (can be discarded later if custodian_list is saved)
 [ ] Make sure issuer knows who it receives revoke responses from 
 [x] Bootstrap
-[ ] Same custodian can be selected twice
-[ ] You can select yourself as custodian (in bootstrap at least)
+[x] Same custodian can be selected twice
+[x] You can select yourself as custodian (in bootstrap at least)
 [ ] rename group_generator to h
 [ ] Bootstrap scale exponentially. See if this can be fixed
+[ ] anon auth takes t_id as argument -- even though the user could hold this value in self
+[ ] investigate how to best use case sensitivity
+[ ] Use self hosted bitcoin testnet if possible, otherwise investigate if regtest can be used instead
+[ ] Implement more tests for customer with issuer
 ---
 from root:
 ```
@@ -48,6 +52,10 @@ https://testnet-faucet.mempool.co/
 
 
 ## notes on implementation
+
+### Blockchain
+Currently our implementation provides no support for blockchain based lists on the PAPR-level. Blockchain support is introduced first in PAPR-money 
+
 ### Credential issuance
 We chose to generate the cred in the beginning of the credential issuance procedure,
 as to be able to link the user's incoming comms to the issuer by its credential. 
