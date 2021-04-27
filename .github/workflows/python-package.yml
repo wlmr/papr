@@ -38,4 +38,9 @@ jobs:
       env:
         PYTHONPATH: "."
       run: |
+        cd bitcoin-testnet-box
+        ./setup.py
+        cd -
+        cd ..
+        cd ..
         pytest

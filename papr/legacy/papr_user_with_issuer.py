@@ -4,6 +4,8 @@ from amac.credential_scheme import blind_obtain as blind_obtain_cmz
 from amac.credential_scheme import blind_show as blind_show_cmz
 from amac.proofs import to_challenge
 from papr.ecdsa import sign
+from papr.utils import prng
+import pvss.pvss as pvss
 
 
 class User():

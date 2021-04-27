@@ -7,10 +7,15 @@ from bit.format import bytes_to_wif
 from petlib.ec import EcPt
 import papr.utils as utils
 
+from bit.network import NetworkAPI
 
 class TestBTC:
     def test_correct_curve(self):
+        node = NetworkAPI.connect_to_node(user='admin1', password='123', host='localhost', port='19001', use_https=False, testnet=True)
+        
         btc_key = PrivateKeyTestnet()
+        node.importaddress(btc_key.address, "test_addr", True)
+
         (G, _, g0, _) = setup_cmz(3)
 
         priv_cred = Bn.from_decimal(str(btc_key.to_int()))
