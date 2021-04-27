@@ -37,10 +37,10 @@ class Bank(Issuer):
         """
         self.registry[pub_key_to_addr(pub_cred[1])] = pub_cred[1]
         return super().cred_sign(pub_cred)
-    
+
     def is_valid_address(self, address):
         return address in self.registry
-    
+
     def send(self, address, amount, currency):
         output = [(address, amount, currency)]
         return self.key.send(output)
@@ -56,4 +56,3 @@ class Bank(Issuer):
 
     def get_balance(self, currency):
         return self.key.balance_as(currency)
-

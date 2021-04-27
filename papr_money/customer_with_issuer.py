@@ -31,4 +31,3 @@ class Customer(User):
 
     def get_balance(self, currency: str):
         return self.key.get_balance(currency)
-

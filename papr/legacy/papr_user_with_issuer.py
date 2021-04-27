@@ -47,7 +47,7 @@ class User():
         iss_random_value = self.issuer.data_dist_1(self.pub_cred)
         requester_random, escrow_shares, commits, proof, group_generator = self.data_dist_2(iss_random_value, cred_signing_keys_list)
         custodian_list = self.issuer.data_dist_2(commit, requester_random, cred_signing_keys_list,
-                                                          escrow_shares, commits, proof, group_generator, self.pub_cred)
+                                                 escrow_shares, commits, proof, group_generator, self.pub_cred)
         if custodian_list is None:
             return False
         cl = self.priv_id * sigma[0] + z * g1

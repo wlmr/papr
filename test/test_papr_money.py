@@ -6,13 +6,14 @@ from papr.utils import pub_key_to_addr
 from bit import PrivateKeyTestnet
 from test.procedures import bootstrap_procedure, enroll_procedure, authentication_procedure, revoke_procedure
 
+
 class TestPaprMoney:
 
     def test_registry(self):
         k, n = 2, 3
         bank = Bank()
         params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, customers, pub_creds, pub_ids = bootstrap_procedure(k, n, bank)
-        
+
         assert cred_list.peek() is not None
         for pub_cred in cred_list.read():
             assert bank.registry[pub_key_to_addr(pub_cred[1])] == pub_cred[1]
@@ -34,10 +35,10 @@ class TestPaprMoney:
         bank = Bank()
         params, (y_sign, y_encr), iparams, _, _, _, _ = bank.setup(2, 3)
         customer = Customer("Josip Tito", bank, params, iparams, y_sign, y_encr, k, n)
-        
+
         assert float(customer.get_balance("satoshi")) > 0.0
         assert customer.send(not_registered_pub_addr, 1, 'satoshi', bank) is None
-       
+
     def test_bank_persistence(self):
         bank = Bank()
         bank.registry['address1'] = 'pubkey1'
