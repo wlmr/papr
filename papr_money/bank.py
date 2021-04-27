@@ -26,10 +26,10 @@ class Bank(Issuer):
         Issuer.__init__(self)
         self.hashes = {'sys_list': [0], 'user_list': [0], "cred_list": [0], "rev_list": [0]}  # TODO: continue on this thought
 
-    def __del__(self):
-        registry_file = open("data/bank-registry", "wb")
-        dump(self.registry, registry_file)
-        registry_file.close()
+    # def __del__(self):
+    #     registry_file = open("data/bank-registry", "wb")
+    #     dump(self.registry, registry_file)
+    #     registry_file.close()
 
     def cred_sign(self, pub_cred):
         """
