@@ -4,7 +4,7 @@ from bit import PrivateKeyTestnet, wif_to_key
 
 
 class Customer(User):
-    def __init__(self, name: str, vendor, params, iparams, y_sign, y_encr, k, n):
+    def __init__(self, name: str, bank, params, iparams, y_sign, y_encr, k, n):
         name = name.replace(' ', '-').lower()
         self.name = name
         try:
@@ -19,8 +19,8 @@ class Customer(User):
         x_sign = bit_privkey_to_petlib_bn(self.key._pk)
         User.__init__(self, params, iparams, y_sign, y_encr, k, n, x_sign)
 
-    def send(self, address, amount, currency, vendor):
-        if vendor.is_valid_address(address):
+    def send(self, address, amount, currency, bank):
+        if bank.is_valid_address(address):
             output = [(address, amount, currency)]
             return self.key.send(output)
         else:

@@ -1,14 +1,14 @@
-from papr_money.vendor import Vendor
+from papr_money.bank import Bank
 from papr_money.customer_with_issuer import Customer
 from papr.ecdsa import sign, verify
 
 
 class TestCustomerWithIssuer:
     def test_enroll(self):
-        vendor = Vendor()
+        bank = Bank()
         real_id = "first!"
-        params, (y_sign, y_encr), iparams, _, user_list, _, _ = vendor.setup(3, 10)
-        user = Customer(real_id, vendor)
+        params, (y_sign, y_encr), iparams, _, user_list, _, _ = bank.setup(3, 10)
+        user = Customer(real_id, bank)
         ret = user.req_enroll()
 
         assert ret is not None
