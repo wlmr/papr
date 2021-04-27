@@ -12,6 +12,8 @@ class UserWithIssuer(User):
         self.y_sign = self.issuer.y_sign
         self.y_encr = self.issuer.y_encr
         self.k, self.n = self.issuer.k, self.issuer.n
+        self.is_enrolled = False
+        self.has_cred = False
         super().__init__(self.params, self.iparams, self.y_sign, self.y_encr, self.k, self.n, x_sign)
 
     def req_enroll(self):
@@ -20,11 +22,15 @@ class UserWithIssuer(User):
         if ret is not None:
             sigma_pub_id, u, e_u_prime, pi_issue, biparams = ret
             self.t_id = self.req_enroll_2(u_sk, u, e_u_prime, pi_issue, biparams, u_pk['h'], c)
+            self.is_enrolled = True
             return self.t_id, sigma_pub_id, pub_id
-        print("user already exists")
+        print(f"{self.real_id} is already enrolled.")
         return None
 
     def req_cred(self):
+        if self.has_cred:
+            print(f"{self.real_id} already has cred")
+            return None
         pub_cred = self.cred_sign_1()
         self.issuer.iss_cred(pub_cred)
         sigma, pi, z = self.anon_auth(self.t_id)
@@ -44,6 +50,7 @@ class UserWithIssuer(User):
         sigma_pub_cred = self.issuer.cred_sign(pub_cred)
         if not self.cred_sign_2(sigma_pub_cred):
             return None
+        self.has_cred = True
         return True
 
     def show_cred(self):
