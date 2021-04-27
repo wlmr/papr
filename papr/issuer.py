@@ -150,7 +150,7 @@ class Issuer():
         '''
         Publishes to rev_list the request to revoke the privacy corresponding to PubCred
         '''
-        self.ledger_add(self.rev_list, (pub_cred, self.rev_data[pub_cred]))
+        return self.ledger_add(self.rev_list, (pub_cred, self.rev_data[pub_cred]))
 
     def get_response(self, revoked_pub_cred, responder_pub_encr_key, response):
         self.res_list[revoked_pub_cred][responder_pub_encr_key] = response
