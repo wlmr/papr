@@ -1,0 +1,1 @@
+python3 get_all_public_keys.py | while read line ; do bitcoin-cli -rpcport=19001 -rpcpassword=123 -rpcuser=admin1 -named sendtoaddress address=$line amount=0.00005 fee_rate=25 ; done
