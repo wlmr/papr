@@ -33,7 +33,7 @@ def run():
     customers = customers + [Customer("customer" + str(i), bank) for i in range(n+1, nbr_of_customers)]
     for c in customers:
         customer_queue.put(PrioritizedCustomer(time.perf_counter(), c))
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=2) as executor:
         [executor.submit(customer_thread_run) for _ in range(executor._max_workers-1)]
         executor.submit(run_bank_thread)
 
