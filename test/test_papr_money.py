@@ -1,5 +1,6 @@
 from papr_money.bank import Bank
 from papr_money.customer import Customer
+from papr_money.customer_with_issuer import Customer as CustomerWithIssuer
 from papr.ecdsa import verify
 import pytest
 from papr.utils import pub_key_to_addr
@@ -10,14 +11,14 @@ from bit.network import NetworkAPI
 
 class TestPaprMoney:
 
-    @pytest.fixture(autouse=True)
-    def run_before_and_after_tests(tmpdir):
-        """Runs code befora and after each test"""
-        # Setup
-        node = NetworkAPI.connect_to_node(user='admin1', password='123', host='localhost', port='19001', use_https=False, testnet=True)
+    # @pytest.fixture(autouse=True)
+    # def run_before_and_after_tests(tmpdir):
+    #     """Runs code befora and after each test"""
+    #     # Setup
+    #     node = NetworkAPI.connect_to_node(user='admin1', password='123', host='localhost', port='19001', use_https=False, testnet=True)
 
-        yield  # Run a test
-        # Teardown 
+    #     yield  # Run a test
+    #     # Teardown 
 
 
     def test_registry(self):
@@ -29,15 +30,21 @@ class TestPaprMoney:
         for pub_cred in cred_list.read():
             assert bank.registry[pub_key_to_addr(pub_cred[1])] == pub_cred[1]
 
-    @pytest.mark.skip(reason="Disable since it spends money on every run.")
+    # @pytest.mark.skip(reason="Disable since it spends money on every run.")
     def test_transaction(self):
         k, n = 2, 3
+        node = NetworkAPI.connect_to_node(user='admin1', password='123', host='localhost', port='19001', use_https=False, testnet=True)
         bank = Bank()
         params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, customers, pub_creds, pub_ids = bootstrap_procedure(k, n, bank)
-        customer = Customer("Josip Tito", bank, params, iparams, y_sign, y_encr, k, n)
+        customer = CustomerWithIssuer("Josip Tito", bank)
+        another_pub_cred = cred_list.peek()
+        another_pub_addr = pub_key_to_addr(another_pub_cred[1])
+
+        node.importaddress(customer.get_address(), "test_addr", True)
+        node.importaddress(another_pub_addr, "recieve_addr2", True)
         assert float(customer.get_balance("satoshi")) > 0.0
-        import pdb; pdb.set_trace()
-        ans = customer.send(pub_key_to_addr(pub_creds[0][1]), 1, 'satoshi', bank)
+        
+        ans = customer.send(another_pub_addr, 1, 'btc')
         assert ans is not None
 
     def test_transaction_to_unregistered_user(self):
