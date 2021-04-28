@@ -44,8 +44,10 @@ class TestPaprMoney:
         node.importaddress(another_pub_addr, "recieve_addr2", True)
         assert float(customer.get_balance("satoshi")) > 0.0
         
-        ans = customer.send(another_pub_addr, 1, 'btc')
+        ans = customer.send(another_pub_addr, 0.00000001, 'btc')
+        # print(ans)
         assert ans is not None
+        assert node.get_balance(another_pub_addr) > 0
 
     def test_transaction_to_unregistered_user(self):
         not_registered_pub_addr = PrivateKeyTestnet().address
