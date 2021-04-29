@@ -4,9 +4,9 @@ from bit import PrivateKeyTestnet, wif_to_key
 
 
 class Customer(User):
-    def __init__(self, name: str, bank):
-        name = name.replace(' ', '-').lower()
-        self.name = name
+    def __init__(self, name: str, bank, login_interval=1):
+        self.name = name.replace(' ', '-').lower()
+        self.login_interval = login_interval
         try:
             wif_file = open(f"data/customer_keys/{name}-key", "r")
             wif = wif_file.read()
