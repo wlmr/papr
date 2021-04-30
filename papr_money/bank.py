@@ -26,9 +26,7 @@ class Bank(Issuer):
                 G = EcGroup(714)
                 byte_dict = load(file)
                 self.registry = {address: EcPt.from_binary(byte_string, G) for address, byte_string in byte_dict.items()}
-        except FileNotFoundError:
-            self.registry = {}
-        except EOFError:
+        except (FileNotFoundError, EOFError):
             self.registry = {}
 
     def __del__(self):
