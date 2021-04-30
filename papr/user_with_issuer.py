@@ -64,6 +64,7 @@ class UserWithIssuer(User):
 
     def curl_rev_list(self):
         for (pub_cred, (escrow_shares, encryption_keys)) in self.issuer.rev_list.read():
-            if self.pub_cred[0] in encryption_keys:
-                s_e = escrow_shares[encryption_keys.index(self.pub_cred[0])]
-                self.issuer.get_response(pub_cred, self.pub_cred[0], self.respond(s_e))
+            for i in range(len(encryption_keys)):
+                if self.pub_cred[0] == encryption_keys[i]:
+                    s_e = escrow_shares[i]
+                    self.issuer.get_response(pub_cred, self.pub_cred[0], self.respond(s_e))
