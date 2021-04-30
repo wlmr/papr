@@ -73,3 +73,5 @@ pub_cred = (y_e, y_s) = (y_encr, y_sign)
 dict.items()
 
 
+## Command to verify a transaction
+bitcoin-cli -rpcport=19001 -rpcpassword=123 -rpcuser=admin1 -named gettransaction txid=581b61ff1bcfa05e6812d7b0170b486292958dfc4445301da3db6a8482e522cc
