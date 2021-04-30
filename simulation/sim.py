@@ -29,17 +29,17 @@ k, n = 3, 10
 
 @dataclass(order=True)
 class PrioritizedCustomer:
-    priority: float
+    t_next_login: float
     customer: Any = field(compare=False)
 
 
 def run():
-    customers = bootstrap_procedure(k, n, bank)
-    customers = customers + [Customer("customer" + str(i), bank, login_interval[i]) for i in range(n+1, nbr_of_customers)]
+    global customers
+    customers = bootstrap_procedure(k, n, bank, login_interval)
+    customers = customers + [Customer(f"customer{i}", bank, login_interval[i]) for i in range(n+1, nbr_of_customers)]
     for i in range(nbr_of_customers):
         customer_queue.put(PrioritizedCustomer(time.perf_counter(), customers[i]))
-    with ThreadPoolExecutor(max_workers=3) as executor:
-        executor.submit(customer_thread_run)
+    with ThreadPoolExecutor(max_workers=2) as executor:
         executor.submit(customer_thread_run)
         executor.submit(run_bank_thread)
 
@@ -48,14 +48,15 @@ def customer_thread_run():
     while True:
         now = time.perf_counter()
         entry = customer_queue.get()
-        delta = entry.priority - now
+        delta = entry.t_next_login - now
         if delta > 0:
+            print(f"{entry.customer.name} is ahead of time")
             time.sleep(delta)
+        entry.customer.nbr_logins += 1
         has_been_revoked = run_customer(entry.customer)
-        entry.priority = now + entry.customer.login_interval
+        entry.t_next_login = now + entry.customer.login_interval
         if not has_been_revoked:
             customer_queue.put(entry)
-            # print(f"{entry.customer.name} was added {entry.priority}, delta: {delta}")
         else:
             logging.info(f"{entry.customer.name} saw their name in rev_list and decided to log off forever")
 
@@ -85,8 +86,7 @@ def run_bank_thread():
     rev_complete_counter = 0
     revoked = set()
     time.sleep(d_time_logins)
-    # should poll the rev_list more or less constantly and try to restore the entries
-    # should only get_rev_data every d_time_revokation
+    global revocation_timer
     while True:
         rev_pub_cred = choice(bank.cred_list.read())
         while rev_pub_cred in revoked:
@@ -110,9 +110,27 @@ def run_bank_thread():
 
 
 def print_revocation_times():
+    """
+    Prints the delta revocation time, for each request.
+    """
     with open(f"{k}-{n}-{nbr_of_customers}-revocation-times.log", "w") as file:
-        [file.write(f"{t[0]}: revocation took {t[1]-t[0]} seconds, ({(t[1]-t[0])/seconds_per_day} days)\n")
-         for k, t in revocation_timer.items() if len(t) == 2]
+        file.write("BEGIN\n")
+        [file.write(f"{t[0]}: revocation request! Restored after {t[1]-t[0]} seconds, ({(t[1]-t[0])/seconds_per_day} days)\n") 
+         if len(t) == 2
+         else file.write(f"{t[0]}: revocation request! Was never restored. Time since request: {time.perf_counter()-t[0]} seconds, ({(time.perf_counter()-t[0])/seconds_per_day} days)\n") 
+         for k, t in revocation_timer.items()]
+        file.write("END\n")
+
+
+def print_nbr_logins():
+    """
+    Just to check that the queue is working, and that no one gets left out.
+    """
+    with open(f"{k}-{n}-{nbr_of_customers}-nbr-of-logins_per_user.log", "w") as file:
+        file.write("BEGIN\n")
+        [file.write(f"{c.name}: {c.nbr_logins}, (login interval: {c.login_interval/seconds_per_day} day(s))\n")
+         for c in customers]
+        file.write("END\n")
 
 
 def main():
@@ -129,3 +147,4 @@ if __name__ == '__main__':
         pass
     finally:
         print_revocation_times()
+        print_nbr_logins()
