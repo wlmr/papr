@@ -2,6 +2,7 @@ from papr.issuer import Issuer
 from bit import PrivateKeyTestnet, wif_to_key
 from pickle import dump, load
 from json import dumps
+from papr.ecdsa import sign
 from hashlib import sha256
 from papr.utils import pub_key_to_addr
 
@@ -48,8 +49,10 @@ class Bank(Issuer):
     def publish_hash(self, ledger):
         b = dumps([ledger, self.hashes[ledger]]).encode("utf-8")
         m = sha256(b).hexdigest()
+        (_, p, g0, _) = self.params
+        r, s = sign(p, g0, self.x_sign, [m])
         self.hashes[ledger].append(m)
-        self.txnid = self.key.send([(self.key.address, 1, "satoshi")], message=m, message_is_hex=True)
+        self.txnid = self.key.send([(self.key.address, 1, "satoshi")], message=m+f"({r},{s})", message_is_hex=True)
 
     def get_address(self):
         return self.key.address

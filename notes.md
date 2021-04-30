@@ -69,7 +69,7 @@ The credential is of course not accepted as valid until the whole credential iss
 #### cred_list
 pub_cred = (y_e, y_s) = (y_encr, y_sign)
 #### rev_list
-(pub_cred, self.rev_data[pub_cred]) where rev_data[pub_cred] = (escrow_shares, custodians_encr_public_key)
+(pub_cred, self.rev_data[pub_cred]) where rev_data[pub_cred] = (escrow_shares, custodians_encr_public_key) where escrow_shares = [s_e] and custodian_encr_pub_key = [pub_cred[0]] 
 dict.items()
 
 

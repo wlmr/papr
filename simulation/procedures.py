@@ -2,7 +2,7 @@ from papr.ecdsa import verify
 from papr_money.customer_with_issuer import Customer
 
 
-def bootstrap_procedure(k, n, bank):
+def bootstrap_procedure(k, n, bank, login_interval):
     params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list = bank.setup(k, n)
     (G, p, g0, _) = params
     bootstrap_users = []
@@ -10,9 +10,9 @@ def bootstrap_procedure(k, n, bank):
     customers = []
     pub_ids = []
     pub_creds = []
-    # generate pub_creds for each user
+    # generate credential for each user
     for i in range(n+1):
-        customer = Customer("customer"+str(i), bank)
+        customer = Customer(f"customer{i}", bank, login_interval[i])
         t_id, sigma_pub_id, pub_id = customer.req_enroll()
         assert verify(G, p, g0, *sigma_pub_id, y_sign, [(customer.name, pub_id)])
         pub_cred = customer.cred_sign_1()
