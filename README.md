@@ -32,6 +32,15 @@ pipenv run pytest
 ```
 
 
+## Using devcontainer:
+Install VS Code plugin: 
+```
+ms-vscode-remote.remote-containers
+```
+
+Click the two meeting arrows down left. Select build container or open in container.
+Wait for the container to build and start.
+
 ## Setup bitcoin-testnet-box:
 Note this will install bitcoin-cli and bitcoind in user folder. Therefore it is recommended to use docker instead.
 
