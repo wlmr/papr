@@ -30,3 +30,29 @@ Using virtualenv:
 ```
 pipenv run pytest
 ```
+
+
+## Setup bitcoin-testnet-box:
+Note this will install bitcoin-cli and bitcoind in user folder. Therefore it is recommended to use docker instead.
+
+Make sure you have pulled the lastest git submodules:
+```
+git submodule update --init --recursive
+```
+
+Go into bitcoin-testnet-box. RECOMMENDED IN DOCKER.
+
+```
+cd bitcoin-testnet-box
+./setup.sh
+```
+
+The next time you run it, instead use 
+```
+./start.sh
+```
+
+To make sure all users have bitcoins. Run the script:
+```
+./simulation/give_out_money.sh
+```
