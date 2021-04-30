@@ -59,14 +59,17 @@ class TestPaprMoney:
 
     def test_bank_persistence(self):
         bank = Bank()
-        bank.registry['address1'] = 'pubkey1'
-        bank.registry['address2'] = 'pubkey2'
-        bank.registry['address3'] = 'pubkey3'
-        pubkey1 = bank.key.public_key
+        params, _, _, _, _, _, _ = bank.setup(3, 10)
+        (G, p, g0, g1) = params
+        pubkey1 = G.order().random() * g0
+        bank.registry['address1'] = pubkey1
+        bank.registry['address2'] = G.order().random() * g0
+        bank.registry['address3'] = G.order().random() * g0
+        bank_key = bank.key.public_key
         del bank
         bank = Bank()
-        assert pubkey1 == bank.key.public_key
-        assert bank.registry['address1'] == 'pubkey1'
+        assert bank_key == bank.key.public_key
+        assert bank.registry['address1'] == pubkey1
 
     # @pytest.mark.skip(reason="Disable since github actions creates a new wallet every run. Therefore the wallet will always be empty.")
     # NOTE: give Tito more coins if this test fails

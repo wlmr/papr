@@ -5,32 +5,35 @@ from json import dumps
 from papr.ecdsa import sign
 from hashlib import sha256
 from papr.utils import pub_key_to_addr
+from petlib.ec import EcGroup, EcPt
 
 
 class Bank(Issuer):
     def __init__(self):
-        try:
-            wif_file = open("data/bank-key", "r")
-            wif = wif_file.read()
-            self.key = wif_to_key(wif)
-            registry_file = open("data/bank-registry", "rb")
-            self.registry = load(registry_file)
-            registry_file.close()
-        except FileNotFoundError:
-            wif_file = open("data/bank-key", "w")
-            self.key = PrivateKeyTestnet()
-            wif_file.write(self.key.to_wif())
-            self.registry = {}  # swap to cred_list
-        except EOFError:
-            self.registry = {}  # swap to cred_list
-        wif_file.close()
         Issuer.__init__(self)
+        self.registry = {}
         self.hashes = {'sys_list': [0], 'user_list': [0], "cred_list": [0], "rev_list": [0]}  # TODO: continue on this thought
+        try:
+            with open("data/bank-key", "r") as file:
+                wif = file.read()
+                self.key = wif_to_key(wif)
+        except FileNotFoundError:
+            with open("data/bank-key", "w") as file:
+                self.key = PrivateKeyTestnet()
+                file.write(self.key.to_wif())
+        try:
+            with open("data/bank-registry", "rb") as file:
+                G = EcGroup(714)
+                byte_dict = load(file)
+                self.registry = {address: EcPt.from_binary(byte_string, G) for address, byte_string in byte_dict.items()}
+        except FileNotFoundError:
+            self.registry = {}
+        except EOFError:
+            self.registry = {}
 
-    # def __del__(self):
-    #     registry_file = open("data/bank-registry", "wb")
-    #     dump(self.registry, registry_file)
-    #     registry_file.close()
+    def __del__(self):
+        with open("data/bank-registry", "wb") as file:
+            dump({address: pub_key.export() for address, pub_key in self.registry.items()}, file)
 
     def cred_sign(self, pub_cred):
         """
