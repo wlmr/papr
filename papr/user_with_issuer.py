@@ -1,9 +1,9 @@
 from pvss.pvss import participant_decrypt_and_prove
 from papr.user import User
+import papr.utils as utils
 
 
 class UserWithIssuer(User):
-
     def __init__(self, real_id, issuer, x_sign=None):
         self.real_id = real_id
         self.issuer = issuer
@@ -14,6 +14,8 @@ class UserWithIssuer(User):
         self.k, self.n = self.issuer.k, self.issuer.n
         self.is_enrolled = False
         self.has_cred = False
+        self.last_rev_list_index_read = 0
+        self.last_hash = 0
         super().__init__(self.params, self.iparams, self.y_sign, self.y_encr, self.k, self.n, x_sign)
 
     def req_enroll(self):
@@ -63,8 +65,19 @@ class UserWithIssuer(User):
         return participant_decrypt_and_prove(self.params, x_encr, s_e)
 
     def curl_rev_list(self):
-        for (pub_cred, (escrow_shares, encryption_keys)) in self.issuer.rev_list.read():
+        (new_revocations, new_hashes) = self.issuer.rev_list.read_since(self.last_rev_list_index_read)
+        self.last_rev_list_index_read += len(new_revocations)
+        for ((pub_cred, (escrow_shares, encryption_keys)), new_hash) in zip(new_revocations, new_hashes):
+            if self.check_hash(self.last_hash, new_hash, (pub_cred, (escrow_shares, encryption_keys))):
+                self.last_hash = new_hash
+            else:
+                print("Hash check failed")
+                return None
             for i in range(len(encryption_keys)):
                 if self.pub_cred[0] == encryption_keys[i]:
                     s_e = escrow_shares[i]
                     self.issuer.get_response(pub_cred, self.pub_cred[0], self.respond(s_e))
+
+    def check_hash(self, last_hash, new_hash, entry):
+        m = utils.hash([entry, last_hash])
+        return new_hash == m
