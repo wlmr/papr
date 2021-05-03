@@ -24,7 +24,7 @@ bank = Bank()
 customers = []
 customer_queue = PriorityQueue()
 start_time = time.perf_counter()
-k, n = 3, 10
+k, n = 90, 100
 
 
 @dataclass(order=True)
@@ -115,10 +115,10 @@ def print_revocation_times():
     """
     with open(f"{k}-{n}-{nbr_of_customers}-revocation-times.log", "w") as file:
         file.write("BEGIN\n")
-        [file.write(f"{t[0]}: revocation request! Restored after {t[1]-t[0]} seconds, ({(t[1]-t[0])/seconds_per_day} days)\n") 
+        [file.write(f"{t[0]}: revocation request nbr {i+1}! Restored after {t[1]-t[0]} seconds, ({(t[1]-t[0])/seconds_per_day} days)\n")
          if len(t) == 2
-         else file.write(f"{t[0]}: revocation request! Was never restored. Time since request: {time.perf_counter()-t[0]} seconds, ({(time.perf_counter()-t[0])/seconds_per_day} days)\n") 
-         for k, t in revocation_timer.items()]
+         else file.write(f"{t[0]}: revocation request nbr {i+1}! Was never restored. Time since request: {time.perf_counter()-t[0]} seconds, ({(time.perf_counter()-t[0])/seconds_per_day} days)\n")
+         for (k, t), i in zip(revocation_timer.items(), range(len(revocation_timer)))]
         file.write("END\n")
 
 
