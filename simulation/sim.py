@@ -85,21 +85,21 @@ def run_bank_thread():
     rev_request_counter = 0
     rev_complete_counter = 0
     revoked = set()
-    revokeing = set()
+    revoking = set()
     time.sleep(d_time_logins)
     global revocation_timer
     no_more_left_to_revoke = False
     while not no_more_left_to_revoke:
         rev_pub_cred = choice(bank.cred_list.read())
-        while rev_pub_cred in revokeing:
-            if len(revokeing) >= nbr_of_customers:
+        while rev_pub_cred in revoking:
+            if len(revoking) >= nbr_of_customers:
                 no_more_left_to_revoke = True
                 break
             rev_pub_cred = choice(bank.cred_list.read())
         revocation_timer[rev_pub_cred] = [time.perf_counter()]
         logging.info("The Bank is revoking a public credential!")
         rev_request_counter += 1
-        revokeing.add(rev_pub_cred)
+        revoking.add(rev_pub_cred)
         bank.get_rev_data(rev_pub_cred)
         # restore part
         for rev_pub_cred, _ in bank.rev_list.read():
