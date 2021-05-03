@@ -21,9 +21,9 @@ with the previously used secret key, i.e. γ=l^d, and then use d again so as to 
 [ ] rename group_generator to h
 [ ] Bootstrap scale exponentially. See if this can be fixed
 [ ] anon auth takes t_id as argument -- even though the user could hold this value in self
-[ ] investigate how to best use case sensitivity
-[ ] Use self hosted bitcoin testnet if possible, otherwise investigate if regtest can be used instead
-[ ] Implement more tests for customer with issuer
+[x] Use self hosted bitcoin testnet if possible, otherwise investigate if regtest can be used instead
+[x] Implement more tests for customer with issuer
+[ ] Uncomment registry pickeling functionality in Bank (commented while testing)
 ---
 from root:
 ```
