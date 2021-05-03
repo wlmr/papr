@@ -21,17 +21,17 @@ class Bank(Issuer):
             with open("data/bank-key", "w") as file:
                 self.key = PrivateKeyTestnet()
                 file.write(self.key.to_wif())
-        try:
-            with open("data/bank-registry", "rb") as file:
-                G = EcGroup(714)
-                byte_dict = load(file)
-                self.registry = {address: EcPt.from_binary(byte_string, G) for address, byte_string in byte_dict.items()}
-        except (FileNotFoundError, EOFError):
-            self.registry = {}
+    #     try:
+    #         with open("data/bank-registry", "rb") as file:
+    #             G = EcGroup(714)
+    #             byte_dict = load(file)
+    #             self.registry = {address: EcPt.from_binary(byte_string, G) for address, byte_string in byte_dict.items()}
+    #     except (FileNotFoundError, EOFError):
+    #         self.registry = {}
 
-    def __del__(self):
-        with open("data/bank-registry", "wb") as file:
-            dump({address: pub_key.export() for address, pub_key in self.registry.items()}, file)
+    # def __del__(self):
+    #     with open("data/bank-registry", "wb") as file:
+    #         dump({address: pub_key.export() for address, pub_key in self.registry.items()}, file)
 
     def cred_sign(self, pub_cred):
         """
