@@ -2,7 +2,6 @@ from papr.ecdsa import verify
 import papr.utils as utils
 
 
-
 class Ledger():
 
     def __init__(self, y_sign):
@@ -47,7 +46,7 @@ class Ledger():
         return False
 
     def update_hash(self, entry):
-        if len(self.hashes) != 0: 
+        if len(self.hashes) != 0:
             last_hash = self.hashes[-1]
         else:
             last_hash = 0

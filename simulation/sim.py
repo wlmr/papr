@@ -1,6 +1,5 @@
 from papr_money.customer_with_issuer import Customer
 from papr_money.bank import Bank
-from papr.utils import pub_key_to_addr
 from random import choice, gauss
 import logging
 from concurrent.futures import ThreadPoolExecutor
@@ -112,7 +111,8 @@ def run_bank_thread():
                     revoked.add(rev_pub_cred)
                     for identity, pub_id in bank.user_list.read():
                         if rev_pub_id == pub_id:
-                            logging.info(f"""Bank revoked {identity}. {rev_complete_counter} out of {rev_request_counter} requests has been successfully revoked.""")
+                            logging.info(
+                                f"""Bank revoked {identity}. {rev_complete_counter} out of {rev_request_counter} requests has been successfully revoked.""")
         time.sleep(d_time_revokations)
 
     # Run restore an extra time for all users to have a chance to answer:
@@ -126,8 +126,10 @@ def run_bank_thread():
                 revoked.add(rev_pub_cred)
                 for identity, pub_id in bank.user_list.read():
                     if rev_pub_id == pub_id:
-                        logging.info(f"""Bank revoked {identity}. {rev_complete_counter} out of {rev_request_counter} requests has been successfully revoked.""")
-    logging.info(f"""Restore have run one extra time after all users have been revoked. Stopping. {rev_complete_counter} out of {rev_request_counter} requests has been successfully revoked.""")
+                        logging.info(
+                            f"""Bank revoked {identity}. {rev_complete_counter} out of {rev_request_counter} requests has been successfully revoked.""")
+    logging.info(
+        f"""Restore have run one extra time after all users have been revoked. Stopping. {rev_complete_counter} out of {rev_request_counter} requests has been successfully revoked.""")
 
 
 def print_revocation_times():

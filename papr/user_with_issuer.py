@@ -3,7 +3,6 @@ from papr.user import User
 import papr.utils as utils
 
 
-
 class UserWithIssuer(User):
     def __init__(self, real_id, issuer, x_sign=None):
         self.real_id = real_id
