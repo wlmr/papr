@@ -1,10 +1,13 @@
 from papr.ecdsa import verify
+import papr.utils as utils
+
 
 
 class Ledger():
 
     def __init__(self, y_sign):
         self.ledger = []
+        self.hashes = []
         self.issuer_y_sign = y_sign
 
     def peek(self):
@@ -21,6 +24,12 @@ class Ledger():
         else:
             return None
 
+    def read_since(self, index: int):
+        if index in range(0, len(self.ledger)):
+            return (self.ledger[index:], self.hashes[index:])
+        else:
+            return ([], [])
+
     def has(self, field_value, tuple_index):
         return field_value in [entry[tuple_index] for entry in self.ledger]
 
@@ -33,8 +42,17 @@ class Ledger():
         r, s = issue_signature
         if verify(G, p, g, r, s, self.issuer_y_sign, [entry]):
             self.ledger.append(entry)
+            self.update_hash(entry)
             return True
         return False
+
+    def update_hash(self, entry):
+        if len(self.hashes) != 0: 
+            last_hash = self.hashes[-1]
+        else:
+            last_hash = 0
+        m = utils.hash([entry, last_hash])
+        self.hashes.append(m)
 
 
 class LedgerDict():
