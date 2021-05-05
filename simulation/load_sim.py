@@ -62,14 +62,15 @@ def bootstrap_procedure(k, n, bank):
         assert verify(G, p, g0, *sigma_y_e, y_sign, [pub_cred[0]])
         assert verify(G, p, g0, *sigma_y_s, y_sign, [pub_cred[1]])
         pub_cred_times.append(time.perf_counter() - t_cred_iss_start)
-    logging.info(f"{k}, {n}, {sum(pub_cred_times)/len(pub_cred_times)} s")
+    logging.info(f"{k};{n};{sum(pub_cred_times)/len(pub_cred_times)}")
     return customers
 
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s %(message)s', filename='load-sim.log', level=logging.INFO)
-    logging.info("k, n, average time for credential issuance")
-    for n in range(100, 200, 10):
-        for k in range(int(n/10), int((n/5)), 5):
+    logging.info("finish_time;k;n;avg_time")
+    counter = 0
+    for n in range(100, 500, 50):
+        for k in range(10, int((n/5)), 5):
             bank = Bank()
             bootstrap_procedure(k, n, bank)
