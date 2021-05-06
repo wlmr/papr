@@ -74,9 +74,8 @@ def run_thread(start_nr):
     step_size_k = 5
     for n in range(100, 1000, step_size_n):
         for k in range(5 + step_size_k*start_nr, int((n/2)), step_size_k*16):
-            print(f"{k},{n}")
-            # bank = Bank()
-            # bootstrap_procedure(k, n, bank)
+            bank = Bank()
+            bootstrap_procedure(k, n, bank)
 
 
 if __name__ == '__main__':
