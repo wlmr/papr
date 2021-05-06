@@ -4,6 +4,8 @@ from papr_money.customer_with_issuer import Customer
 from papr.ecdsa import verify
 import time
 from concurrent.futures import ThreadPoolExecutor
+import multiprocessing 
+import sys
 
 
 def bootstrap_procedure(k, n, bank):
@@ -72,14 +74,22 @@ def run_thread(start_nr):
     step_size_k = 5
     for n in range(100, 1000, step_size_n):
         for k in range(5 + step_size_k*start_nr, int((n/2)), step_size_k*16):
-            bank = Bank()
-            bootstrap_procedure(k, n, bank)
+            print(f"{k},{n}")
+            # bank = Bank()
+            # bootstrap_procedure(k, n, bank)
 
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s %(message)s', filename='load-sim.log', level=logging.INFO)
     logging.info("finish_time;k;n;avg_time")
     counter = 0
-    with ThreadPoolExecutor(max_workers=16) as executor:
-        for i in range(16):
-            executor.submit(run_thread, i)
+    # with ThreadPoolExecutor(max_workers=16) as executor:
+    #     for i in range(16):
+    #         executor.submit(run_thread, i)
+    processes = []
+    for i in range(16):
+        p = multiprocessing.Process(target=run_thread, args=(i,))
+        processes.append(p)
+        p.start()
+    for process in processes:
+        process.join()
