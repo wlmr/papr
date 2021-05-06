@@ -68,8 +68,9 @@ def bootstrap_procedure(k, n, bank):
 
 
 def run_thread(start_nr):
+    step_size_n = 10
     step_size_k = 5
-    for n in range(100, 1000, 50):
+    for n in range(100, 1000, step_size_n):
         for k in range(5 + step_size_k*start_nr, int((n/2)), step_size_k*16):
             bank = Bank()
             bootstrap_procedure(k, n, bank)
