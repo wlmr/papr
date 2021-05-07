@@ -72,28 +72,33 @@ def bootstrap_procedure(k, n, bank):
 def run_thread(start_nr):
     n = 100
     #for n in range(100, 1000, step_size_n):
+    pub_cred_times_1 = []
     for k in range(5, n+1, 5):
         bank = Bank()
         bootstrap_procedure(k, n, bank)
-        time_start = time.perf_counter()
+        #time_start = time.perf_counter()
         for i in range(101,201):
             customer = Customer(f"customer{i}", bank)
             customer.req_enroll()
+            time_start = time.perf_counter()
             customer.req_cred()
-        time_end = time.perf_counter()
-        logging.info(f"{k};{n};{((time_end-time_start)/100)}")
+            pub_cred_times_1.append(time.perf_counter()-time_start)
+        #time_end = time.perf_counter()
+        logging.info(f"{k};{n};{((sum(pub_cred_times_1))/100)}")
 
     k = 5
+    pub_cred_times_2 = []
     for n in range(10, 101, 10):
         bank = Bank()
         bootstrap_procedure(k, n, bank)
-        time_start = time.perf_counter()
+        
         for i in range(101,201):
             customer = Customer(f"customer{i}", bank)
             customer.req_enroll()
+            time_start = time.perf_counter()
             customer.req_cred()
-        time_end = time.perf_counter()
-        logging.info(f"{k};{n};{((time_end-time_start)/100)}")
+            pub_cred_times_2.append(time.perf_counter()-time_start)
+        logging.info(f"{k};{n};{((sum(pub_cred_times_2))/100)}")
 
 
 

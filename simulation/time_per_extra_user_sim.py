@@ -75,13 +75,13 @@ def run_thread(start_nr):
     bank = Bank()
     bootstrap_procedure(k, n, bank)
     
-    for i in range(101,201):
-        time_start = time.perf_counter()
+    for i in range(101,1101):
         customer = Customer(f"customer{i}", bank)
         customer.req_enroll()
+        time_start = time.perf_counter()
         customer.req_cred()
         time_end = time.perf_counter()
-        logging.info(f"{i};{((time_end-time_start)/100)}")
+        logging.info(f"{i};{((time_end-time_start))}")
 
 
 
@@ -93,9 +93,10 @@ if __name__ == '__main__':
     #     for i in range(16):
     #         executor.submit(run_thread, i)
     processes = []
-    for i in range(1):
-        p = multiprocessing.Process(target=run_thread, args=(i,))
-        processes.append(p)
-        p.start()
-    for process in processes:
-        process.join()
+    #for i in range(1):
+    #    p = multiprocessing.Process(target=run_thread, args=(i,))
+    #    processes.append(p)
+    #    p.start()
+    #for process in processes:
+    #    process.join()
+    run_thread(1)
