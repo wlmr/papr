@@ -3,9 +3,8 @@ from papr_money.bank import Bank
 from papr_money.customer_with_issuer import Customer
 from papr.ecdsa import verify
 import time
-from concurrent.futures import ThreadPoolExecutor
-import multiprocessing 
-import sys
+#from concurrent.futures import ThreadPoolExecutor
+from multiprocessing import Pool, Process
 
 
 def bootstrap_procedure(k, n, bank):
@@ -65,30 +64,44 @@ def bootstrap_procedure(k, n, bank):
         assert verify(G, p, g0, *sigma_y_e, y_sign, [pub_cred[0]])
         assert verify(G, p, g0, *sigma_y_s, y_sign, [pub_cred[1]])
         pub_cred_times.append(time.perf_counter() - t_cred_iss_start)
-    logging.info(f"{k};{n};{sum(pub_cred_times)/len(pub_cred_times)}")
+    logging.info(f";{k};{n};{sum(pub_cred_times)/len(pub_cred_times)}")
     return customers
 
 
-def run_thread(start_nr):
-    step_size_n = 10
-    step_size_k = 5
-    for n in range(100, 1000, step_size_n):
-        for k in range(5 + step_size_k*start_nr, int((n/2)), step_size_k*16):
-            bank = Bank()
-            bootstrap_procedure(k, n, bank)
+# def run_thread(start_nr):
+
+#     step_size_n = 10
+#     step_size_k = 5
+#     for n in range(270, 1000, step_size_n):
+#         for k in range(5 + step_size_k*start_nr, int((n/2)), step_size_k*16):
+#             bank = Bank()
+#             bootstrap_procedure(k, n, bank)
+
+def run_process(params):
+    k, n = params
+    bank = Bank()
+    bootstrap_procedure(k, n, bank)
 
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s %(message)s', filename='load-sim.log', level=logging.INFO)
     logging.info("finish_time;k;n;avg_time")
-    counter = 0
+    params = []
+    for n in range(10, 250, 10):
+        for k in range(5, n, 5):
+            params.append((k, n))
+
     # with ThreadPoolExecutor(max_workers=16) as executor:
     #     for i in range(16):
     #         executor.submit(run_thread, i)
-    processes = []
-    for i in range(16):
-        p = multiprocessing.Process(target=run_thread, args=(i,))
-        processes.append(p)
-        p.start()
-    for process in processes:
-        process.join()
+    # --------
+    # processes = []
+    # for i in range(16):
+    #     p = multiprocessing.Process(target=run_thread, args=(i,))
+    #     processes.append(p)
+    #     p.start()
+    # for process in processes:
+    #     process.join()
+    # --------
+    with Pool() as p:
+        p.map(run_process, params)
