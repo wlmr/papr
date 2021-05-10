@@ -1,4 +1,5 @@
 import logging
+from simulation.load_sim import run_process
 from papr_money.bank import Bank
 from papr_money.customer_with_issuer import Customer
 from papr.ecdsa import verify
@@ -6,6 +7,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 import multiprocessing 
 import sys
+from multiprocessing import Pool, Process
 
 
 def bootstrap_procedure(k, n, bank):
@@ -69,36 +71,22 @@ def bootstrap_procedure(k, n, bank):
     return customers
 
 
-def run_thread(start_nr):
-    n = 100
-    #for n in range(100, 1000, step_size_n):
+def run_process(params):
+    (k, n) = params
     pub_cred_times_1 = []
-    for k in range(5, n+1, 5):
-        bank = Bank()
-        bootstrap_procedure(k, n, bank)
-        #time_start = time.perf_counter()
-        for i in range(101,201):
-            customer = Customer(f"customer{i}", bank)
-            customer.req_enroll()
-            time_start = time.perf_counter()
-            customer.req_cred()
-            pub_cred_times_1.append(time.perf_counter()-time_start)
-        #time_end = time.perf_counter()
-        logging.info(f"{k};{n};{((sum(pub_cred_times_1))/100)}")
+    bank = Bank()
+    bootstrap_procedure(k, n, bank)
+    
+    for i in range(101, 201):
+        customer = Customer(f"customer{i}", bank)
+        customer.req_enroll()
+        time_start = time.perf_counter()
+        customer.req_cred()
+        pub_cred_times_1.append(time.perf_counter()-time_start)
+    logging.info(f"{k};{n};{((sum(pub_cred_times_1))/100)}")
 
-    k = 5
-    pub_cred_times_2 = []
-    for n in range(10, 101, 10):
-        bank = Bank()
-        bootstrap_procedure(k, n, bank)
-        
-        for i in range(101,201):
-            customer = Customer(f"customer{i}", bank)
-            customer.req_enroll()
-            time_start = time.perf_counter()
-            customer.req_cred()
-            pub_cred_times_2.append(time.perf_counter()-time_start)
-        logging.info(f"{k};{n};{((sum(pub_cred_times_2))/100)}")
+    
+    
 
 
 
@@ -106,13 +94,27 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s %(message)s', filename='more-users-sim.log', level=logging.INFO)
     logging.info("finish_time;k;n;avg_time")
     counter = 0
-    # with ThreadPoolExecutor(max_workers=16) as executor:
-    #     for i in range(16):
-    #         executor.submit(run_thread, i)
-    processes = []
-    for i in range(1):
-        p = multiprocessing.Process(target=run_thread, args=(i,))
-        processes.append(p)
-        p.start()
-    for process in processes:
-        process.join()
+
+    params = []
+    for k in range(5, 100, 5):
+        params.append((k, 100))
+
+    for n in range(10, 101, 10):
+        params.append((5, n))
+
+    
+    with Pool() as p:
+        p.map(run_process, params)
+
+
+
+
+
+
+    # processes = []
+    #for i in range(1):
+    #    p = multiprocessing.Process(target=run_thread, args=(i,))
+    #    processes.append(p)
+    #    p.start()
+    #for process in processes:
+    #    process.join()
