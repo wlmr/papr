@@ -26,15 +26,3 @@ def encrypt(pk, m):
 
 def decrypt(sk, ciphertext):
     return ciphertext['c2'] - sk['x'] * ciphertext['c1']
-
-
-if __name__ == "__main__":
-    G = EcGroup(714)
-    p = G.order()
-    g = G.generator()
-
-    m = p.from_binary(b'god is dead')
-    params = (g, p)
-    (pk, sk) = keygen(params)
-    (ciphertext, r) = encrypt(pk, m)
-    print(decrypt(sk, ciphertext))

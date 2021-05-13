@@ -10,8 +10,7 @@ from multiprocessing import Pool
 def run(params):
     # setup
     k, n, nbr_of_customers = params
-    logging.basicConfig(format='%(message)s', filename=f'revocation_fail_{k}_{n}_{nbr_of_customers}.log', level=logging.INFO)
-    logging.info('total_revocations;total_successful_revocations;total_failed_revocations')
+    logging.basicConfig(format='%(message)s', filename=f'revocation_fail.log', level=logging.INFO)
     customers = []
     rev_counter = 0
     rev_fail_counter = 0
@@ -47,10 +46,11 @@ def run(params):
             revoked.add(rev_pub_cred)
         else:
             rev_fail_counter += 1
-        logging.info(f"{rev_counter+rev_fail_counter};{rev_counter};{rev_fail_counter}")
+        logging.info(f"\"{k}, {n}\";{rev_counter+rev_fail_counter};{rev_counter};{rev_fail_counter}")
 
 
 if __name__ == '__main__':
-    params = [(10, 100, 1000), (3, 10, 1000), (30, 100, 1000), (5, 10, 1000), (50, 100, 1000), (9, 10, 1000), (90, 100, 1000)]
-    with Pool() as p:
-        p.map(run, params)
+    run((50,100,1000))
+    # params = [(10, 100, 1000), (3, 10, 1000), (30, 100, 1000), (5, 10, 1000), (50, 100, 1000), (9, 10, 1000), (90, 100, 1000)]
+    # with Pool() as p:
+    #     p.map(run, params)

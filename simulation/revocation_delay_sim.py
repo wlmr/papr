@@ -11,8 +11,8 @@ from typing import Any
 
 
 nbr_of_customers = 20
-seconds_per_day = 20
-mu = 5 * seconds_per_day
+seconds_per_day = 10
+mu = 2 * seconds_per_day
 sigma = 1 * seconds_per_day
 login_interval = [gauss(mu, sigma) for _ in range(nbr_of_customers)]
 revocation_timer = {}
@@ -23,7 +23,7 @@ bank = Bank()
 customers = []
 customer_queue = PriorityQueue()
 start_time = time.perf_counter()
-k, n = 3, 10
+k, n = 4, 5
 
 
 @dataclass(order=True)
@@ -51,6 +51,8 @@ def customer_thread_run():
         if delta > 0:
             print(f"{entry.customer.name} is ahead of time")
             time.sleep(delta)
+        else:
+            print(f"{entry.customer.name} arrived late")
         entry.customer.nbr_logins += 1
         has_been_revoked = run_customer(entry.customer)
         entry.t_next_login = now + entry.customer.login_interval
@@ -116,7 +118,7 @@ def run_bank_thread():
         time.sleep(d_time_revokations)
 
     # Run restore an extra time for all users to have a chance to answer:
-    time.sleep(30)
+    time.sleep(max(login_interval))
     for rev_pub_cred, _ in bank.rev_list.read():
         if rev_pub_cred not in revoked:
             rev_pub_id = bank.restore(rev_pub_cred)
