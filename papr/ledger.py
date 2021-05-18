@@ -53,6 +53,12 @@ class Ledger():
         m = utils.hash([entry, last_hash])
         self.hashes.append(m)
 
+    def last_hash(self):
+        if len(self.hashes) != 0:
+            last_hash = self.hashes[-1]
+            return last_hash
+        return None
+
 
 class LedgerDict():
 
