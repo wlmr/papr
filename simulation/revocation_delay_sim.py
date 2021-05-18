@@ -189,7 +189,9 @@ def main(params):
 
 if __name__ == '__main__':
     params = []
+    # params.append((2, 0.5, 3, 5))
     for mu, sigma in [(2, 0.5), (7, 2)]:
+        # params.append((mu, sigma, 5, 10)) # pauls request
         for k in [5, 20]:
             for n in [50, 100, 150, 200]:
                 params.append((mu, sigma, k, n))
