@@ -65,7 +65,7 @@ class UserWithIssuer(User):
         return participant_decrypt_and_prove(self.params, x_encr, s_e)
 
     def curl_rev_list(self):
-         for (pub_cred, (escrow_shares, encryption_keys)) in self.issuer.rev_list.read():
+        for (pub_cred, (escrow_shares, encryption_keys)) in self.issuer.rev_list.read():
             for i in range(len(encryption_keys)):
                 if self.pub_cred[0] == encryption_keys[i]:
                     s_e = escrow_shares[i]
