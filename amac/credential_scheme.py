@@ -22,7 +22,7 @@ def setup(k: int) -> Params:
     field underlying the EC.
     Returns params := (G,p,g,h)
     """
-    return setup_ggm(k)
+    return setup_ggm()
 
 
 def cred_keygen(params: Params) -> tuple[EcPtDict, BnDict]:

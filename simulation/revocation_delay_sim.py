@@ -201,6 +201,7 @@ if __name__ == '__main__':
         for k in [5, 20]:
             for n in [50, 100, 150, 200]:
                 params.append((mu, sigma, k, n))
-    with Pool(1) as p:
+    # params = [(2, 0.5, 5, 10), (7, 2, 5, 10)]
+    with Pool() as p:
         p.map(main, params)
     
