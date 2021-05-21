@@ -65,18 +65,24 @@ class UserWithIssuer(User):
         return participant_decrypt_and_prove(self.params, x_encr, s_e)
 
     def curl_rev_list(self):
-        (new_revocations, new_hashes) = self.issuer.rev_list.read_since(self.last_rev_list_index_read)
-        self.last_rev_list_index_read += len(new_revocations)
-        for ((pub_cred, (escrow_shares, encryption_keys)), new_hash) in zip(new_revocations, new_hashes):
-            if self.check_hash(self.last_hash, new_hash, (pub_cred, (escrow_shares, encryption_keys))):
-                self.last_hash = new_hash
-            else:
-                print("Hash check failed")
-                return None
+        for (pub_cred, (escrow_shares, encryption_keys)) in self.issuer.rev_list.read():
             for i in range(len(encryption_keys)):
                 if self.pub_cred[0] == encryption_keys[i]:
                     s_e = escrow_shares[i]
                     self.issuer.get_response(pub_cred, self.pub_cred[0], self.respond(s_e))
+        
+        #(new_revocations, new_hashes) = self.issuer.rev_list.read_since(self.last_rev_list_index_read)
+        #self.last_rev_list_index_read += len(new_revocations)
+        #for ((pub_cred, (escrow_shares, encryption_keys)), new_hash) in zip(new_revocations, new_hashes):
+        #    if self.check_hash(self.last_hash, new_hash, (pub_cred, (escrow_shares, encryption_keys))):
+        #        self.last_hash = new_hash
+        #    else:
+        #        print("Hash check failed")
+        #        return None
+        #    for i in range(len(encryption_keys)):
+        #        if self.pub_cred[0] == encryption_keys[i]:
+        #            s_e = escrow_shares[i]
+        #            self.issuer.get_response(pub_cred, self.pub_cred[0], self.respond(s_e))
 
     def check_hash(self, last_hash, new_hash, entry):
         m = utils.hash([entry, last_hash])

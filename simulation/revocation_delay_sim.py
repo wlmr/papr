@@ -62,7 +62,7 @@ def customer_thread_run():
         entry = customer_queue.get()
         delta = entry.t_next_login - now
         if delta > 0:
-            print(f"{entry.customer.name} is ahead of time")
+            #print(f"{entry.customer.name} is ahead of time")
             time.sleep(delta)
         else:
             print(f"{entry.customer.name} arrived late")
