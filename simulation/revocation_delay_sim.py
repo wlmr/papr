@@ -17,7 +17,9 @@ mu = 2 * seconds_per_day
 sigma = 1 * seconds_per_day
 login_interval = [abs(gauss(mu, sigma)) for _ in range(nbr_of_customers)]
 revocation_timer = {}
-d_time_revokations = 1 * seconds_per_day  # day
+wakeups_per_day = 10
+d_time_login = seconds_per_day / wakeups_per_day # * seconds_per_day  # day
+
 rev_counter = 0
 bank = Bank()
 customers = []
@@ -62,7 +64,7 @@ def customer_thread_run():
         entry = customer_queue.get()
         delta = entry.t_next_login - now
         if delta > 0:
-            #print(f"{entry.customer.name} is ahead of time")
+            print(f"{entry.customer.name} is ahead of time")
             time.sleep(delta)
         else:
             print(f"{entry.customer.name} arrived late")
@@ -102,21 +104,24 @@ def run_bank_thread():
     revoking = set()
     global revocation_timer
     no_more_left_to_revoke = False
+    count = 0
     while not no_more_left_to_revoke:
-        rev_pub_cred = choice(bank.cred_list.read())
-        while rev_pub_cred in revoking:
-            if len(revoking) >= nbr_of_customers:
-                no_more_left_to_revoke = True
-                break
+        if count%wakeups_per_day == 0:
             rev_pub_cred = choice(bank.cred_list.read())
-        if no_more_left_to_revoke:
-            break
-        revocation_timer[rev_pub_cred] = [time.perf_counter()]
-        logging.info("The Bank is revoking a public credential!")
-        print("The Bank is revoking a public credential!")
-        rev_request_counter += 1
-        revoking.add(rev_pub_cred)
-        bank.get_rev_data(rev_pub_cred)
+            while rev_pub_cred in revoking:
+                if len(revoking) >= nbr_of_customers:
+                    no_more_left_to_revoke = True
+                    break
+                rev_pub_cred = choice(bank.cred_list.read())
+            if no_more_left_to_revoke:
+                break
+            revocation_timer[rev_pub_cred] = [time.perf_counter()]
+            logging.info("The Bank is revoking a public credential!")
+            print("The Bank is revoking a public credential!")
+            rev_request_counter += 1
+            revoking.add(rev_pub_cred)
+            bank.get_rev_data(rev_pub_cred)
+            count = 0
         # restore part
         for rev_pub_cred, _ in bank.rev_list.read():
             if rev_pub_cred not in revoked:
@@ -131,7 +136,8 @@ def run_bank_thread():
                                 f"""Bank revoked {identity}. {rev_complete_counter} out of {rev_request_counter} requests has been successfully revoked.""")
                             print(
                                 f"""Bank revoked {identity}. {rev_complete_counter} out of {rev_request_counter} requests has been successfully revoked.""")
-        time.sleep(d_time_revokations)
+        count+=1
+        time.sleep(d_time_login)
 
     # Run restore an extra time for all users to have a chance to answer:
     time.sleep(max(login_interval))
@@ -195,6 +201,6 @@ if __name__ == '__main__':
         for k in [5, 20]:
             for n in [50, 100, 150, 200]:
                 params.append((mu, sigma, k, n))
-    with Pool() as p:
+    with Pool(1) as p:
         p.map(main, params)
     
