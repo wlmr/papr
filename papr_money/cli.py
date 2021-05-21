@@ -2,6 +2,11 @@ from papr_money.bank import Bank
 from papr_money.customer_with_issuer import Customer as CustomerWithIssuer
 
 from papr.utils import pub_key_to_addr
+from test.procedures import bootstrap_procedure, enroll_procedure, authentication_procedure, revoke_procedure
+from bit.network import NetworkAPI
+from petlib.bn import Bn
+
+
 
 class CLI:
     
@@ -9,7 +14,7 @@ class CLI:
         self.k, self.n = 5, 20
         self.node = NetworkAPI.connect_to_node(user='admin1', password='123', host='localhost', port='19001', use_https=False, testnet=True)
         self.bank = Bank()
-        self.node.importaddress(customer.get_address(), "Bank", True)
+        # self.node.importaddress(self.bank.get_address(), "Bank", True)
         self.params, (self.y_sign, self.y_encr), self.iparams, self.sys_list, self.user_list, self.cred_list, self.rev_list, self.customers, self.pub_creds, self.pub_ids = bootstrap_procedure(self.k, self.n, self.bank)
            
         #assert cred_list.peek() is not None

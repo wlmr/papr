@@ -54,9 +54,9 @@ class Bank(Issuer):
         sigma_y_s = sign(p, g0, self.x_sign, [pub_cred[1]])
         self.ledger_add(self.cred_list, pub_cred)
 
-        hash_val = self.ledger.last_hash()
-        
-        self.publish_hash(hash_val)
+        hash_val = self.cred_list.last_hash()
+        #if hash_val is not None:
+        #    self.publish_hash(hash_val) # CRSTES ODD ERRORS
         self.res_list[pub_cred] = {k: None for k in custodian_encr_keys}
         return (sigma_y_e, sigma_y_s)
 
@@ -78,7 +78,7 @@ class Bank(Issuer):
     #    self.txnid = self.key.send([(self.key.address, 1, "satoshi")], message=m+f"({r},{s})", message_is_hex=True)
 
     def publish_hash(self, hash):
-        m = hash
+        m = hash.hex()
         (_, p, g0, _) = self.params
         r, s = sign(p, g0, self.x_sign, [m])
         self.txnid = self.key.send([(self.key.address, 1, "satoshi")], message=m+f"({r},{s})", message_is_hex=True)
