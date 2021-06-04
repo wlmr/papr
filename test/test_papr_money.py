@@ -68,6 +68,7 @@ class TestPaprMoney:
         assert float(customer.get_balance("satoshi")) > 0.0
         assert customer.send(not_registered_pub_addr, 1, 'satoshi', bank) is None
 
+    @pytest.mark.skip(reason="Disabled")
     def test_bank_persistence(self):
         bank = Bank()
         params, _, _, _, _, _, _ = bank.setup(3, 10)
