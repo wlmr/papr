@@ -4,7 +4,7 @@ from bit import PrivateKeyTestnet, wif_to_key
 
 
 class Customer(User):
-    def __init__(self, name: str, bank, login_interval=5):
+    def __init__(self, name: str, bank, login_interval=0):
         self.name = name.replace(' ', '-').lower()
         self.login_interval = login_interval
         self.nbr_logins = 0

@@ -2,13 +2,6 @@ from petlib.ec import EcGroup
 
 
 def keygen(params):
-    """
-    Simple exponential Elgamal implementation which lets you import
-    the group along with a generator. Encoding/decoding is
-    done outside of the implementation. Should be instantiated
-    with ElGamal((G,p,g,h)), where G is a Group of order p, with
-    generators g and h
-    """
     (g, p) = params
     x = p.random()
     h = x * g
@@ -26,15 +19,3 @@ def encrypt(pk, m):
 
 def decrypt(sk, ciphertext):
     return ciphertext['c2'] - sk['x'] * ciphertext['c1']
-
-
-if __name__ == "__main__":
-    G = EcGroup(714)
-    p = G.order()
-    g = G.generator()
-
-    m = p.from_binary(b'god is dead')
-    params = (g, p)
-    (pk, sk) = keygen(params)
-    (ciphertext, r) = encrypt(pk, m)
-    print(decrypt(sk, ciphertext))

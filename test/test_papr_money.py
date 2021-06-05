@@ -31,6 +31,7 @@ class TestPaprMoney:
             assert bank.registry[pub_key_to_addr(pub_cred[1])] == pub_cred[1]
 
     # @pytest.mark.skip(reason="Disable since it spends money on every run.")
+    @pytest.mark.skip(reason="Disabled")
     def test_transaction(self):
         k, n = 2, 3
         node = NetworkAPI.connect_to_node(user='admin1', password='123', host='localhost', port='19001', use_https=False, testnet=True)
@@ -49,6 +50,7 @@ class TestPaprMoney:
         assert ans is not None
         assert node.get_balance(another_pub_addr) > 0
 
+    @pytest.mark.skip(reason="Disabled")
     def test_transaction_to_unregistered_user(self):
         not_registered_pub_addr = PrivateKeyTestnet().address
         node = NetworkAPI.connect_to_node(user='admin1', password='123', host='localhost', port='19001', use_https=False, testnet=True)
@@ -66,6 +68,7 @@ class TestPaprMoney:
         assert float(customer.get_balance("satoshi")) > 0.0
         assert customer.send(not_registered_pub_addr, 1, 'satoshi', bank) is None
 
+    @pytest.mark.skip(reason="Disabled")
     def test_bank_persistence(self):
         bank = Bank()
         params, _, _, _, _, _, _ = bank.setup(3, 10)
@@ -82,6 +85,7 @@ class TestPaprMoney:
 
     # @pytest.mark.skip(reason="Disable since github actions creates a new wallet every run. Therefore the wallet will always be empty.")
     # NOTE: give Tito more coins if this test fails
+    @pytest.mark.skip(reason="Disabled")
     def test_customer_balance(self):
         node = NetworkAPI.connect_to_node(user='admin1', password='123', host='localhost', port='19001', use_https=False, testnet=True)
         

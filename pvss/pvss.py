@@ -215,6 +215,6 @@ def participant_decrypt_and_prove(params, x_i, Y_i) -> tuple[decrypted_share_typ
 
 
 def get_pub_key(params, x_i):
-    (_, _, g0, G) = params
+    (_, _, g0, _) = params
     y_i = x_i * g0
     return y_i

@@ -6,10 +6,12 @@ from amac.credential_scheme import setup as setup_cmz
 from bit.format import bytes_to_wif
 from petlib.ec import EcPt
 import papr.utils as utils
+import pytest
 
 from bit.network import NetworkAPI
 
 class TestBTC:
+    @pytest.mark.skip(reason="Disabled")
     def test_correct_curve(self):
         node = NetworkAPI.connect_to_node(user='admin1', password='123', host='localhost', port='19001', use_https=False, testnet=True)
         

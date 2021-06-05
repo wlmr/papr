@@ -11,7 +11,7 @@ Mac = tuple[EcPt, EcPt]
 # TODO: make k control which group is generated
 
 
-def setup(k: int) -> Params:
+def setup() -> Params:
     """ generate all public parameters """
     G = EcGroup(714)
     g = G.generator()
@@ -45,12 +45,3 @@ def verify(params: Params, sk: BnDict, m: Bn, sigma: Mac) -> bool:
     (u, u_prime) = sigma
     hx = sk['x0'] + sk['x1'] * m
     return u != G.infinite() and u_prime == hx * u
-
-
-if __name__ == "__main__":
-    params = setup(500)
-    m = Bn.from_binary(b'my secret identity')
-    n = len(m)
-    (sk, _) = keygen(params, 1)
-    sigma = mac(params, sk, m)
-    assert verify(params, sk, m, sigma)
