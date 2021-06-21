@@ -13,10 +13,10 @@ from bit.network import NetworkAPI
 class TestBTC:
     @pytest.mark.skip(reason="Disabled")
     def test_correct_curve(self):
-        node = NetworkAPI.connect_to_node(user='admin1', password='123', host='localhost', port='19001', use_https=False, testnet=True)
+        # node = NetworkAPI.connect_to_node(user='admin1', password='123', host='localhost', port='19001', use_https=False, testnet=True)
         
         btc_key = PrivateKeyTestnet()
-        node.importaddress(btc_key.address, "test_addr", True)
+        # node.importaddress(btc_key.address, "test_addr", True)
 
         (G, _, g0, _) = setup_cmz(3)
 
