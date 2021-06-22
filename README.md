@@ -41,7 +41,7 @@ ms-vscode-remote.remote-containers
 Click the two meeting arrows down left. Select build container or open in container.
 Wait for the container to build and start.
 
-## Setup bitcoin-testnet-box:
+## Setup bitcoin-testnet-box (NOTE: not needed for most tests):
 Note this will install bitcoin-cli and bitcoind in user folder. Therefore it is recommended to use docker instead.
 
 Make sure you have pulled the lastest git submodules:
