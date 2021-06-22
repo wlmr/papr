@@ -46,8 +46,8 @@ make altinstall
 cd ..
 
 ## Install dependencies
-apt-get install python-dev
-apt-get install libssl-dev libffi-dev
+apt-get install python-dev -y
+apt-get install libssl-dev libffi-dev -y
 export PATH='~/.local/bin':$PATH
 
 ## Install Python dependencies
