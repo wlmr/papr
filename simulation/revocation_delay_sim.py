@@ -18,7 +18,7 @@ sigma = 1 * seconds_per_day
 login_interval = [abs(gauss(mu, sigma)) for _ in range(nbr_of_customers)]
 revocation_timer = {}
 wakeups_per_day = 10
-d_time_login = seconds_per_day / wakeups_per_day # * seconds_per_day  # day
+d_time_login = seconds_per_day / wakeups_per_day  # * seconds_per_day  # day
 
 rev_counter = 0
 bank = Bank()
@@ -106,7 +106,7 @@ def run_bank_thread():
     no_more_left_to_revoke = False
     count = 0
     while not no_more_left_to_revoke:
-        if count%wakeups_per_day == 0:
+        if count % wakeups_per_day == 0:
             rev_pub_cred = choice(bank.cred_list.read())
             while rev_pub_cred in revoking:
                 if len(revoking) >= nbr_of_customers:
@@ -136,7 +136,7 @@ def run_bank_thread():
                                 f"""Bank revoked {identity}. {rev_complete_counter} out of {rev_request_counter} requests has been successfully revoked.""")
                             print(
                                 f"""Bank revoked {identity}. {rev_complete_counter} out of {rev_request_counter} requests has been successfully revoked.""")
-        count+=1
+        count += 1
         time.sleep(d_time_login)
 
     # Run restore an extra time for all users to have a chance to answer:
@@ -197,11 +197,9 @@ if __name__ == '__main__':
     params = []
     # params.append((2, 0.5, 3, 5))
     for mu, sigma in [(2, 0.5), (7, 2)]:
-        # params.append((mu, sigma, 5, 10)) # pauls request
+        params.append((mu, sigma, 5, 10)) # pauls request
         for k in [5, 20]:
             for n in [50, 100, 150, 200]:
                 params.append((mu, sigma, k, n))
-    # params = [(2, 0.5, 5, 10), (7, 2, 5, 10)]
     with Pool() as p:
         p.map(main, params)
-    
