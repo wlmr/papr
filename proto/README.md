@@ -5,7 +5,7 @@ This code provides a solid base upon which you could build a network interface f
 2. `grpc_user.py` -- provides a framework of gRPC methods that could be filled with PAPR-procedure-logic
 3. `papr.proto` -- gRPC messages have been implemented
 
-To compile the .proto-files you will need to download a few dependencies (see https://grpc.io/docs/languages/python/quickstart/) and then issue the following commands:
+To compile the .proto-files you will need to download a few dependencies (see https://grpc.io/docs/languages/python/quickstart/) and then issue the following commands (from src):
 
 ```
 python -m grpc_tools.protoc -Iproto --python_out=prototest --grpc_python_out=prototest proto/papr.proto
