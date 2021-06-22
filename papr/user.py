@@ -123,7 +123,7 @@ class User():
         return False
 
     # Show/verify credential
-    def show_cred_1(self, m):  # Need this from issuer.
+    def show_cred_1(self, m):
         '''
         Show credential. Used to prove that the user is a valid registered user.
         '''
@@ -171,13 +171,6 @@ class User():
         return res
 
 
-# def check_hash(i_hash, ledger):
-#    b = dumps(ledger).encode("utf-8")
-#    m = sha256(b).hexdigest()
-#    return m == i_hash
-#    self.txnid = self.key.send([(self.key.address, 1, "satoshi")], message=m, message_is_hex=True)
-
-
 def unpack_ecpt(ecpt_str, G):
     return EcPt.from_binary(unhexlify(ecpt_str), G)
 
@@ -192,5 +185,5 @@ def data_distribution_commit_encrypt_prove(params, PrivID, data_custodians_publi
 def data_distribution_random_commit(params):
     (_, p, _, G) = params
     r = p.random()
-    c = r * G  # Is it ok to use G here?
+    c = r * G
     return (c, r)

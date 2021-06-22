@@ -132,7 +132,3 @@ dmypy.json
 .vscode/settings.json
 
 .vscode/launch.json
-prototest/
-
-
-papr_money/testing_key.txt

@@ -11,21 +11,10 @@ from bit.network import NetworkAPI
 
 class TestPaprMoney:
 
-    # @pytest.fixture(autouse=True)
-    # def run_before_and_after_tests(tmpdir):
-    #     """Runs code befora and after each test"""
-    #     # Setup
-    #     node = NetworkAPI.connect_to_node(user='admin1', password='123', host='localhost', port='19001', use_https=False, testnet=True)
-
-    #     yield  # Run a test
-    #     # Teardown 
-
-
     def test_registry(self):
         k, n = 2, 3
         bank = Bank()
-        params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, customers, pub_creds, pub_ids = bootstrap_procedure(k, n, bank)
-
+        _, (_, _), _, _, _, cred_list, _, _, _, _ = bootstrap_procedure(k, n, bank)
         assert cred_list.peek() is not None
         for pub_cred in cred_list.read():
             assert bank.registry[pub_key_to_addr(pub_cred[1])] == pub_cred[1]
@@ -34,36 +23,25 @@ class TestPaprMoney:
     @pytest.mark.skip(reason="Disabled")
     def test_transaction(self):
         k, n = 2, 3
-        # node = NetworkAPI.connect_to_node(user='admin1', password='123', host='localhost', port='19001', use_https=False, testnet=True)
         bank = Bank()
-        params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, customers, pub_creds, pub_ids = bootstrap_procedure(k, n, bank)
+        _, (_, _), _, _, _, cred_list, _, _, _, _ = bootstrap_procedure(k, n, bank)
         customer = CustomerWithIssuer("Josip Tito", bank)
         another_pub_cred = cred_list.peek()
         another_pub_addr = pub_key_to_addr(another_pub_cred[1])
 
-        # node.importaddress(customer.get_address(), "test_addr", True)
-        # node.importaddress(another_pub_addr, "recieve_addr2", True)
         assert float(customer.get_balance("satoshi")) > 0.0
-        
-        ans = customer.send(another_pub_addr, 0.00000001, 'btc')
-        # print(ans)
-        assert ans is not None
-        # assert node.get_balance(another_pub_addr) > 0
 
+        ans = customer.send(another_pub_addr, 0.00000001, 'btc')
+        assert ans is not None
+       
     @pytest.mark.skip(reason="Disabled")
     def test_transaction_to_unregistered_user(self):
         not_registered_pub_addr = PrivateKeyTestnet().address
-        # node = NetworkAPI.connect_to_node(user='admin1', password='123', host='localhost', port='19001', use_https=False, testnet=True)
-
-
-        # node.importaddress(not_registered_pub_addr, "not_reg", True)
 
         k, n = 2, 3
         bank = Bank()
         params, (y_sign, y_encr), iparams, _, _, _, _ = bank.setup(2, 3)
         customer = Customer("Josip Tito", bank, params, iparams, y_sign, y_encr, k, n)
-      
-        # node.importaddress(customer.get_address(), "test_addr", True)
 
         assert float(customer.get_balance("satoshi")) > 0.0
         assert customer.send(not_registered_pub_addr, 1, 'satoshi', bank) is None
@@ -72,7 +50,7 @@ class TestPaprMoney:
     def test_bank_persistence(self):
         bank = Bank()
         params, _, _, _, _, _, _ = bank.setup(3, 10)
-        (G, p, g0, g1) = params
+        (G, _, g0, _) = params
         pubkey1 = G.order().random() * g0
         bank.registry['address1'] = pubkey1
         bank.registry['address2'] = G.order().random() * g0
@@ -87,15 +65,10 @@ class TestPaprMoney:
     # NOTE: give Tito more coins if this test fails
     @pytest.mark.skip(reason="Disabled")
     def test_customer_balance(self):
-        # node = NetworkAPI.connect_to_node(user='admin1', password='123', host='localhost', port='19001', use_https=False, testnet=True)
-        
         k, n = 3, 10
         bank = Bank()
         params, (y_sign, y_encr), iparams, _, _, _, _ = bank.setup(3, 10)
         customer = Customer("Josip Tito", bank, params, iparams, y_sign, y_encr, k, n)
-
-        # node.importaddress(customer.get_address(), "test_addr", True)
-
         assert float(customer.get_balance("satoshi")) > 0.0
 
     def test_customer_persistence(self):
@@ -111,7 +84,7 @@ class TestPaprMoney:
     def test_new_user_procedure(self):
         k, n = 3, 5
         bank = Bank()
-        params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, customers, pub_creds, pub_ids = bootstrap_procedure(k, n, bank)
+        _, (_, _), _, _, user_list, _, rev_list, customers, pub_creds, _ = bootstrap_procedure(k, n, bank)
         authentication_procedure(customers[0], bank)
         pub_id_revealed = revoke_procedure(bank, rev_list, customers, pub_creds[3])
         for id, pub_id in user_list.read():

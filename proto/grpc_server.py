@@ -82,7 +82,6 @@ def make_get_public_params_rsp(y_sign, y_encr, iparams, sys_list, user_list, cre
 
 
 def make_iss_enroll_rsp(sigma_pub_id, u, e_u_prime, pi_issue, biparams):
-    # print("sigma_pub_id: ", sigma_pub_id, "u ", u, "e_u_prime: ", e_u_prime, "pi_issue: ", pi_issue, "biparams: ", biparams)
     return iss_enroll_rsp(load=encode([sigma_pub_id, u, e_u_prime, pi_issue, biparams]))
 
 

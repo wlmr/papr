@@ -53,8 +53,7 @@ def bootstrap_procedure(k, n, issuer):
         # Proof of eq id:
         y, c, gamma = user.eq_id(u2, group_generator, z, cl, C_list[0])
         assert issuer.eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
-        # Fixme: message to user so that it knows that it can submit credentails (anonymously)
-
+        
         # Cred signing:
         sigma_pub_cred = issuer.cred_sign(pub_cred)
         assert user.cred_sign_2(sigma_pub_cred)

@@ -5,17 +5,14 @@ from petlib.bn import Bn
 from petlib.ec import EcGroup, EcPt
 import pvss.cpni as cpni
 
-# A = tuple[Bn, Bn]
 encrypted_share_type = Bn
 encrypted_shares_type = list[encrypted_share_type]
 commitments_type = list[Bn]
 pub_keys_type = list[Bn]
-# proof_type = dict[{'c': Bn}, {'r_list': list[Bn]}, {'a_1_list': list[Bn]}, {'a_2_list': list[Bn]}]
 proof_type = dict[str, Any]
 share_type = Bn
 single_proof_type = dict[str, Bn]
 generator_type = EcPt
-# secret_type = Bn
 decrypted_share_type = Bn
 decrypted_shares_list_type = list[decrypted_share_type]
 index_list_type = list[Bn]
@@ -64,16 +61,15 @@ def verify_decryption_proof(proof_of_decryption: single_proof_type, decrypted_sh
     '''
     return verify_correct_decryption(decrypted_share, encrypted_share, proof_of_decryption, pub_key, p, g0)
 
-# __DEPRECATED__
 
-
+# __Helper methods__
 def gen_proof(params, k, n, secret, pub_keys):
     '''
     Generate polynomial and proof
     '''
     assert n > k
     assert len(pub_keys) == n
-    (Gq, p, g0, h) = params
+    (_, p, _, h) = params
 
     px = gen_polynomial(k, secret, p)
     commitments = get_commitments(h, px)
@@ -82,14 +78,13 @@ def gen_proof(params, k, n, secret, pub_keys):
 
     pub = {'C_list': commitments, 'Y_list': enc_shares}
 
-    # params = (Gq, p, g, G)
     proof = cpni.DLEQ_prove_list(p, h, commitments, enc_shares, pub_keys, shares_list)
 
     # Debug:
     assert len(px) == k
     assert len(commitments) == k
     assert len(shares_list) == n
-    assert shares_list[0] != secret  # I think this is correct
+    assert shares_list[0] != secret
     assert len(enc_shares) == n
 
     return pub, proof
@@ -134,7 +129,6 @@ def __get_encrypted_shares(pub_keys: pub_keys_type, shares: list[share_type]) ->
     Calculates the encrypted shares Y_i for all i in (1,n)
     '''
     assert len(pub_keys) == len(shares)
-    # FIXME: Should we have mod p
     Y_i_list = [(shares[i]) * y_i for (y_i, i)
                 in zip(pub_keys, range(len(pub_keys)))]
     return Y_i_list
@@ -169,7 +163,6 @@ def verify_correct_decryption(S_i, Y_i, decrypt_proof, pub_key, p, G):
     '''
     Verifies the participants proof of correct decryption of their share
     '''
-    # params = (Gq, p, g, G)
     return cpni.DLEQ_verify_single(p, G, S_i, pub_key, Y_i, decrypt_proof)
 
 
@@ -187,7 +180,7 @@ def helper_generate_key_pair(params):
     '''
     Generates a key-pair, returns both the private key and the public key
     '''
-    (_, p, g0, g1) = params
+    (_, p, g0, _) = params
     x_i = p.random()
     y_i = x_i * g0
     return (x_i, y_i)
@@ -205,7 +198,7 @@ def participant_decrypt_and_prove(params, x_i, Y_i) -> tuple[decrypted_share_typ
     '''
     Decrypts a encrypted share with stored private key, and generates proof of it being done correctly.
     '''
-    (_, p, g0, _) = params
+    (_, _, g0, _) = params
     S_i = participant_decrypt(params, x_i, Y_i)
 
     y_i = x_i * g0

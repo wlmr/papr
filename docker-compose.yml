@@ -4,5 +4,4 @@ services:
   python:
     build: . 
 
-  # bitcoin-testnet:
-  #   build: bitcoin-testnet-box/.
+# This is only used for VS code's devcontainer

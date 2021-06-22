@@ -3,12 +3,11 @@ from papr_money.bank import Bank
 from papr_money.customer_with_issuer import Customer
 from papr.ecdsa import verify
 import time
-#from concurrent.futures import ThreadPoolExecutor
-from multiprocessing import Pool, Process
+from multiprocessing import Pool
 
 
 def bootstrap_procedure(k, n, bank):
-    params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list = bank.setup(k, n)
+    params, (y_sign, _), _, _, _, _, _ = bank.setup(k, n)
     (G, p, g0, _) = params
     bootstrap_users = []
     pub_creds_encr = []
@@ -55,8 +54,7 @@ def bootstrap_procedure(k, n, bank):
         # Proof of eq id:
         y, c, gamma = customer.eq_id(u2, group_generator, z, cl, C_list[0])
         assert bank.eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
-        # Fixme: message to user so that it knows that it can submit credentials (anonymously)
-
+        
         # Cred signing:
         sigma_pub_cred = bank.cred_sign(pub_cred)
         assert customer.cred_sign_2(sigma_pub_cred)
@@ -68,15 +66,6 @@ def bootstrap_procedure(k, n, bank):
     return customers
 
 
-# def run_thread(start_nr):
-
-#     step_size_n = 10
-#     step_size_k = 5
-#     for n in range(270, 1000, step_size_n):
-#         for k in range(5 + step_size_k*start_nr, int((n/2)), step_size_k*16):
-#             bank = Bank()
-#             bootstrap_procedure(k, n, bank)
-
 def run_process(params):
     k, n = params
     bank = Bank()
@@ -87,8 +76,8 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s%(message)s', filename='load-sim.log', level=logging.INFO)
     logging.info(";finish_time;k;n;avg_time")
     params = []
-    
-    for n in range(10, 400, 10): # TODO: swap range back to 10, 250, 10
+
+    for n in range(10, 400, 10):
         for k in range(5, n, 5):
             params.append((k, n))
 

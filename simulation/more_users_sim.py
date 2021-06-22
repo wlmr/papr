@@ -4,9 +4,6 @@ from papr_money.bank import Bank
 from papr_money.customer_with_issuer import Customer
 from papr.ecdsa import verify
 import time
-from concurrent.futures import ThreadPoolExecutor
-import multiprocessing 
-import sys
 from multiprocessing import Pool, Process
 
 
@@ -58,7 +55,6 @@ def bootstrap_procedure(k, n, bank):
         # Proof of eq id:
         y, c, gamma = customer.eq_id(u2, group_generator, z, cl, C_list[0])
         assert bank.eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
-        # Fixme: message to user so that it knows that it can submit credentials (anonymously)
 
         # Cred signing:
         sigma_pub_cred = bank.cred_sign(pub_cred)
@@ -67,7 +63,6 @@ def bootstrap_procedure(k, n, bank):
         assert verify(G, p, g0, *sigma_y_e, y_sign, [pub_cred[0]])
         assert verify(G, p, g0, *sigma_y_s, y_sign, [pub_cred[1]])
         pub_cred_times.append(time.perf_counter() - t_cred_iss_start)
-    #logging.info(f"{k};{n};{sum(pub_cred_times)/len(pub_cred_times)}")
     return customers
 
 
@@ -76,7 +71,7 @@ def run_process(params):
     pub_cred_times_1 = []
     bank = Bank()
     bootstrap_procedure(k, n, bank)
-    
+
     for i in range(101, 201):
         customer = Customer(f"customer{i}", bank)
         customer.req_enroll()
@@ -84,10 +79,6 @@ def run_process(params):
         customer.req_cred()
         pub_cred_times_1.append(time.perf_counter()-time_start)
     logging.info(f"{k};{n};{((sum(pub_cred_times_1))/100)}")
-
-    
-    
-
 
 
 if __name__ == '__main__':
@@ -102,19 +93,13 @@ if __name__ == '__main__':
     for n in range(10, 101, 10):
         params.append((5, n))
 
-    
     with Pool() as p:
         p.map(run_process, params)
 
-
-
-
-
-
     # processes = []
-    #for i in range(1):
+    # for i in range(1):
     #    p = multiprocessing.Process(target=run_thread, args=(i,))
     #    processes.append(p)
     #    p.start()
-    #for process in processes:
+    # for process in processes:
     #    process.join()

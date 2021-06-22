@@ -3,7 +3,7 @@ from papr_money.customer_with_issuer import Customer
 
 
 def bootstrap_procedure(k, n, bank, login_interval):
-    params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list = bank.setup(k, n)
+    params, (y_sign, _), _, _, _, _, _ = bank.setup(k, n)
     (G, p, g0, _) = params
     bootstrap_users = []
     pub_creds_encr = []
@@ -48,7 +48,6 @@ def bootstrap_procedure(k, n, bank, login_interval):
         # Proof of eq id:
         y, c, gamma = customer.eq_id(u2, group_generator, z, cl, C_list[0])
         assert bank.eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
-        # Fixme: message to user so that it knows that it can submit credentials (anonymously)
 
         # Cred signing:
         sigma_pub_cred = bank.cred_sign(pub_cred)
@@ -57,4 +56,3 @@ def bootstrap_procedure(k, n, bank, login_interval):
         assert verify(G, p, g0, *sigma_y_e, y_sign, [pub_cred[0]])
         assert verify(G, p, g0, *sigma_y_s, y_sign, [pub_cred[1]])
     return customers
-    # return params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, users, pub_creds, pub_ids

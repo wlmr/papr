@@ -5,7 +5,7 @@ from amac.credential_scheme import blind_issue, blind_obtain, blind_show, show_v
 class TestAmac():
     def test_valid_procedure(self):
         params = setup(1)
-        (G, p, g, h) = params
+        (_, p, _, _) = params
         (iparams, i_sk) = cred_keygen(params)
         m = p.from_binary(b"DreadPirateRoberts")
         (u_sk, u_pk, ciphertext, pi_prepare_obtain) = prepare_blind_obtain(params, m)
@@ -16,10 +16,10 @@ class TestAmac():
 
     def test_altered_pi_prepare_obtain(self):
         params = setup(1)
-        (G, p, g, h) = params
+        (_, p, _, _) = params
         (iparams, i_sk) = cred_keygen(params)
         m = p.from_binary(b"DreadPirateRoberts")
-        (u_sk, u_pk, ciphertext, (_, response)) = prepare_blind_obtain(params, m)
+        (_, u_pk, ciphertext, (_, response)) = prepare_blind_obtain(params, m)
         c = p.from_decimal("100")
         pi_prepare_obtain = (c, response)
         assert blind_issue(params, iparams, i_sk, u_pk['h'], ciphertext, pi_prepare_obtain) is None
