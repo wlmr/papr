@@ -10,9 +10,13 @@ from petlib.ec import EcGroup, EcPt
 
 class Bank(Issuer):
     def __init__(self):
+        """
+        Initiates the hash-chains, and reads its address from file. 
+        Also parses the registry file to obtain all the users' addresses.
+        """
         Issuer.__init__(self)
         self.registry = {}
-        self.hashes = {'sys_list': [0], 'user_list': [0], "cred_list": [0], "rev_list": [0]}  # TODO: continue on this thought
+        self.hashes = {'sys_list': [0], 'user_list': [0], "cred_list": [0], "rev_list": [0]}
         try:
             with open("data/bank-key", "r") as file:
                 wif = file.read()
@@ -21,17 +25,17 @@ class Bank(Issuer):
             with open("data/bank-key", "w") as file:
                 self.key = PrivateKeyTestnet()
                 file.write(self.key.to_wif())
-    #     try:
-    #         with open("data/bank-registry", "rb") as file:
-    #             G = EcGroup(714)
-    #             byte_dict = load(file)
-    #             self.registry = {address: EcPt.from_binary(byte_string, G) for address, byte_string in byte_dict.items()}
-    #     except (FileNotFoundError, EOFError):
-    #         self.registry = {}
+        try:
+            with open("data/bank-registry", "rb") as file:
+                G = EcGroup(714)
+                byte_dict = load(file)
+                self.registry = {address: EcPt.from_binary(byte_string, G) for address, byte_string in byte_dict.items()}
+        except (FileNotFoundError, EOFError):
+            self.registry = {}
 
-    # def __del__(self):
-    #     with open("data/bank-registry", "wb") as file:
-    #         dump({address: pub_key.export() for address, pub_key in self.registry.items()}, file)
+    def __del__(self):
+        with open("data/bank-registry", "wb") as file:
+            dump({address: pub_key.export() for address, pub_key in self.registry.items()}, file)
 
     def cred_sign(self, pub_cred):
         """

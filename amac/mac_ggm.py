@@ -8,9 +8,6 @@ EcPtDict = dict[str, EcPt]
 Mac = tuple[EcPt, EcPt]
 
 
-# TODO: make k control which group is generated
-
-
 def setup() -> Params:
     """ generate all public parameters """
     G = EcGroup(714)
@@ -29,7 +26,6 @@ def keygen(params: Params) -> tuple[Bn, EcPtDict]:
 
 def mac(params: Params, sk: BnDict, m: Bn) -> Mac:
     """ compute mac GGM """
-    # assert len(sk) > 0 and m
     (G, _, _, _) = params
     u = G.hash_to_point(b"u")
     hx = sk['x0'] + sk['x1'] * m

@@ -5,10 +5,8 @@ from amac.proofs import to_challenge
 from papr.ecdsa import sign
 from pvss.pvss import distribute_secret
 from papr.utils import prng
-
 from petlib.pack import encode, decode
 import grpc
-
 from papr.papr_pb2 import iss_enroll_msg, iss_enroll_rsp
 from papr.papr_pb2_grpc import ConnectorStub
 from papr.issuer import Issuer
@@ -41,8 +39,8 @@ class User():
         self.sigma_pub_id, u, e_u_prime, pi_issue, biparams = unpack_iss_enroll_rsp(rsp)
         self.u, self.u_prime = blind_obtain_cmz(self.params, self.iparams, self.user_sk, u, e_u_prime, pi_issue, biparams,
                                                 self.gamma, self.ciphertext)
-    # anonymous authentication
 
+    # Anonymous authentication
     def anon_auth(self, t_id):
         """
         sigma = (u, Cm, Cu_prime)
@@ -99,10 +97,6 @@ class User():
         Responds with decrypted share upon request from L_rev list
         '''
         pass
-        # return
-        # L_res.add(params, participant_decrypt_and_prove(params, priv_key))
-        # Publish s_r_i to L_res
-
 
 class Connector():
 
@@ -117,16 +111,7 @@ def make_iss_enroll_msg(id, pub_id, gamma, ciphertext, proof):
 
 def unpack_iss_enroll_rsp(rsp):
     [sigma_pub_id, u, e_u_prime, pi_issue, biparams] = decode(rsp.load)
-    # print("sigma_pub_id: ", sigma_pub_id, "u ", u, "e_u_prime: ", e_u_prime, "pi_issue: ", pi_issue, "biparams: ", biparams)
     return tuple(sigma_pub_id), u, e_u_prime, tuple(pi_issue), biparams
-
-
-if __name__ == '__main__':
-    issuer = Issuer()
-    id = "Abradolf Lincler"
-    (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list = issuer.setup(3, 10)
-    user = User(params, iparams, y_sign, y_encr, 3, 10)
-    user.req_enroll(id)
 
 
 def data_distrubution_select(public_credentials, u_random, i_random, n, p):
@@ -139,12 +124,11 @@ def data_distrubution_select(public_credentials, u_random, i_random, n, p):
 def data_distrubution_commit_encrypt_prove(params, PrivID, data_custodians_public_credentials, k, n):
     (Gq, p, _, _) = params
     E_list, C_list, proof, group_generator = distribute_secret(data_custodians_public_credentials, PrivID, p, k, n, Gq)
-    # Send to I
     return E_list, C_list, proof, group_generator
 
 
 def data_distrubution_random_commit(params):
     (_, p, _, G) = params
     r = p.random()
-    c = r * G  # Is it ok to use G here?
+    c = r * G
     return (c, r)

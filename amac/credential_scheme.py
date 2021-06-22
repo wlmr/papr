@@ -18,8 +18,6 @@ Sigma = tuple[EcPt, EcPt, EcPt]
 
 def setup(k: int) -> Params:
     """
-    TODO: should take a number k that determines the number of bits of the
-    field underlying the EC.
     Returns params := (G,p,g,h)
     """
     return setup_ggm()

@@ -70,10 +70,11 @@ class UserWithIssuer(User):
                 if self.pub_cred[0] == encryption_keys[i]:
                     s_e = escrow_shares[i]
                     self.issuer.get_response(pub_cred, self.pub_cred[0], self.respond(s_e))
-        
+
+        ## (probably) Not thread safe hash check. Disabled for multithreaded tests to work.  ##
         #(new_revocations, new_hashes) = self.issuer.rev_list.read_since(self.last_rev_list_index_read)
         #self.last_rev_list_index_read += len(new_revocations)
-        #for ((pub_cred, (escrow_shares, encryption_keys)), new_hash) in zip(new_revocations, new_hashes):
+        # for ((pub_cred, (escrow_shares, encryption_keys)), new_hash) in zip(new_revocations, new_hashes):
         #    if self.check_hash(self.last_hash, new_hash, (pub_cred, (escrow_shares, encryption_keys))):
         #        self.last_hash = new_hash
         #    else:

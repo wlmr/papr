@@ -11,7 +11,7 @@ class TestPaprSplit:
 
     def test_ledger(self):
         issuer = Issuer()
-        params, y, iparams, sys_list, _, _, _ = issuer.setup(3, 4)
+        _, _, _, sys_list, _, _, _ = issuer.setup(3, 4)
         assert len(issuer.sys_list.read()) == 2
         issuer.ledger_add(issuer.sys_list, "JAMAN")
         assert len(sys_list.read()) == 3
@@ -32,7 +32,7 @@ class TestPaprSplit:
     def test_eq_id(self):
         issuer = Issuer()
         id = "Bertrand Russel"
-        params, (_, _), iparams, _, user_list, _, _ = issuer.setup(3, 10)
+        params, (_, _), iparams, _, _, _, _ = issuer.setup(3, 10)
         user = User(params, iparams, _, _, 3, 10)
         ret = enroll_procedure(id, issuer, user)
         assert ret is not None
@@ -43,7 +43,7 @@ class TestPaprSplit:
         y, c, gamma = user.eq_id(u, h, z, cl, c0)
         assert issuer.eq_id(u, h, y, c, gamma, cl, c0)
 
-    def helper_data_dist_to_get_h(self, k, n, params, user, issuer):
+    def helper_data_dist_to_get_h(self, _, n, params, user, issuer):
         '''
         This is only used to make testing of equal identity possible without a full test of data distrubution
         '''
@@ -86,7 +86,7 @@ class TestPaprSplit:
         issuer = Issuer()
 
         # Bootstrap
-        params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, users, pub_creds, pub_ids = bootstrap_procedure(k, n, issuer)
+        params, (y_sign, y_encr), iparams, _, _, _, rev_list, users, pub_creds, pub_ids = bootstrap_procedure(k, n, issuer)
         for i in range(10):
             user = User(params, iparams, y_sign, y_encr, k, n)
             enroll_procedure("extra"+str(i), issuer, user)
@@ -110,25 +110,21 @@ class TestPaprSplit:
     def test_revoke(self):
         (k, n) = (3, 4)
         issuer = Issuer()
-
-        # Bootstrap
-        params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, users, pub_creds, pub_ids = bootstrap_procedure(k, n, issuer)
+        _, (_, _), _, _, _, _, rev_list, users, pub_creds, pub_ids = bootstrap_procedure(k, n, issuer)
 
         # Select one user for testing
         user = users[0]
         pub_cred_to_revoke = pub_creds[0]
         pub_id = pub_ids[0]
 
-        # User authentication:
+        # User authentication
         m = issuer.ver_cred_1()
         sigma_m, pub_cred, sigma_pub_cred = user.show_cred_1(m)
         assert issuer.ver_cred_2(pub_cred, sigma_pub_cred, m, sigma_m)
 
         # Reconstruction
-
         wanted_number_of_answers = 3
         issuer.get_rev_data(pub_cred_to_revoke)
-
         assert rev_list.peek() is not None
 
         # Users polling rev_list and answering if applicable
@@ -157,7 +153,7 @@ class TestPaprSplit:
         issuer = Issuer()
 
         # Bootstrap
-        params, (y_sign, y_encr), iparams, sys_list, user_list, cred_list, rev_list, users, pub_creds, pub_ids = bootstrap_procedure(k, n, issuer)
+        _, (_, _), _, _, _, _, rev_list, users, pub_creds, _ = bootstrap_procedure(k, n, issuer)
 
         # Select one user for testing
         user = users[0]
@@ -192,7 +188,6 @@ class TestPaprSplit:
                 break
 
         answer = issuer.restore(pub_cred_to_revoke)
-
         assert answer is None
 
     def test_sign_verify(self):
@@ -205,11 +200,10 @@ class TestPaprSplit:
         r, s = sign(p, g0, x_sign, [m])
         assert verify(G, p, g0, r, s, y_sign, [m])
 
-    # @pytest.mark.run_these_please
     def test_bootstrap(self):
         (k, n) = (3, 10)
         issuer = Issuer()
-        params, (y_sign, y_encr), iparams, _, user_list, cred_list, rev_list = issuer.setup(k, n)
+        params, (y_sign, y_encr), iparams, _, _, cred_list, rev_list = issuer.setup(k, n)
         (G, p, g0, _) = params
         bootstrap_users = []
         pub_creds_encr = []
@@ -238,17 +232,16 @@ class TestPaprSplit:
             assert custodian_list is not None
             assert pub_cred[0] not in custodian_list  # Verify that we are not a custodian of ourself
 
-            # Anonymous auth:
+            # Anonymous authentication
             sigma, pi_show, z = user.anon_auth(t_id)
             assert issuer.anon_auth(sigma, pi_show)
             (u2, cl, _) = sigma
 
-            # Proof of eq id:
+            # Proof of eq id
             y, c, gamma = user.eq_id(u2, group_generator, z, cl, C_list[0])
             assert issuer.eq_id(u2, group_generator, y, c, gamma, cl, C_list[0])
-            # Fixme: message to user so that it knows that it can submit credentails (anonymously)
 
-            # Cred signing:
+            # Cred signing
             sigma_pub_cred = issuer.cred_sign(pub_cred)
             assert user.cred_sign_2(sigma_pub_cred)
             (sigma_y_e, sigma_y_s) = sigma_pub_cred
@@ -256,7 +249,7 @@ class TestPaprSplit:
             assert verify(G, p, g0, *sigma_y_s, y_sign, [pub_cred[1]])
             assert cred_list.peek() == pub_cred
 
-            # User authentication:
+            # User authentication
             m = issuer.ver_cred_1()
             sigma_m, pub_cred, sigma_pub_cred = user.show_cred_1(m)
             assert issuer.ver_cred_2(pub_cred, sigma_pub_cred, m, sigma_m)
@@ -277,7 +270,3 @@ class TestPaprSplit:
         answer = issuer.restore(bootstrap_users[0]['pub_cred'])
         assert answer is not None
         assert answer == bootstrap_users[0]['pub_id']
-
-        # [x] Enc shares empty. : Fixed
-        # [x] Index repeat sometimes?
-        # [ ] verify correct decryption fail, called in issuer.restore

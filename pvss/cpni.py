@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
 from petlib.bn import Bn
-# from hashlib import sha256
 import papr.utils as utils
 
 
@@ -113,9 +111,7 @@ def DLEQ_verify_list(p, g, y_list, C_list, Y_list, proof):
     c_claimed = proof['c']
     a_1_orig_list = proof['a_1_list']
     a_2_orig_list = proof['a_2_list']
-
     n = len(r_list)
-
     X_list = get_X_i_list(C_list, n)
     c = hash(p, X_list, Y_list, a_1_orig_list, a_2_orig_list)
     # If prover lied about c
@@ -145,7 +141,6 @@ def DLEQ_verify(g_1, g_2, h_1, h_2, proof):
     '''
     (c, r, a_1, a_2) = proof
     (a_1_new, a_2_new) = DLEQ_verifyer_calc_a(r, c, g_1, h_1, g_2, h_2)
-
     if a_1 == a_1_new and a_2 == a_2_new:
         return True
     return False

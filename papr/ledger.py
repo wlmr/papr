@@ -55,6 +55,10 @@ class Ledger():
 
 
 class LedgerDict():
+    """
+    The following class is never used, although it could replace some of the lists, 
+    namely L_sys, L_c and possibly L_u. Those lists are more lookup focused and should hence be implemented with dicts.
+    """
 
     def __init__(self, y_sign):
         self.ledger = {}

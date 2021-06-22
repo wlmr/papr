@@ -36,26 +36,20 @@ class TestPapr:
 
     def test_data_distrubution(self):
         (k, n) = (3, 10)
-
-        params, (x_sign, x_encr), (y_sign, y_encr), (iparams, i_sk), sys_list, user_list, cred_list, rev_list, res_list = setup(k, n)
-
+        params, _, _, _, _, _, _, _, _ = setup(k, n)
         (_, p, _, _) = params
         priv_keys = []
         pub_keys = []
-        for i in range(n*2):
+        for _ in range(n*2):
             (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
-        (my_priv_key, my_pub_key) = pvss.helper_generate_key_pair(params)
-
-        # r1 = data_distrubution_U_1(params)
-        # r2 = data_distrubution_I_1(params)
-
+        (my_priv_key, _) = pvss.helper_generate_key_pair(params)
         (c1, r1) = data_distrubution_random_commit(params)
         (c2, r2) = data_distrubution_random_commit(params)
-        # Both publishes their commits. When they recive the other ones commit they send their random value.
-        # and verifyes that the commit and random value they recived are correct.
+        # Both publishes their commits. When they receive the others' commit they send their random value.
+        # and verifies that the commit and random value they recived are correct.
         assert data_distrubution_verify_commit(params, c1, r1)
         assert data_distrubution_verify_commit(params, c2, r2)
 
@@ -65,30 +59,27 @@ class TestPapr:
         assert data_distrubution_issuer_verify(E_list, C_list, proof, selected_pub_keys, group_generator, p)
 
     def test_data_distrubution_2(self):
-
-        # r1 U generates a random number and commitment req_data_dist_1 and sends the commitment to I.
-        # i1 I stores the commitment, generates a random value with commitment and sends commitment to U.
-        # r2 U sends the commited to random value to I.
-        # i2 I responds with their random value. **??** And calculates which custodians to use and stores it.
-        # r3 U recives the random value and calulates the custodians, and generates a encrypted shares to the custodians, commitments and proof
-        # i3 I verifies proof. If valid. Proof of identity is initaited.
+        """
+        r1 U generates a random number and commitment req_data_dist_1 and sends the commitment to I.
+        i1 I stores the commitment, generates a random value with commitment and sends commitment to U.
+        r2 U sends the commited to random value to I.
+        i2 I responds with their random value. **??** And calculates which custodians to use and stores it.
+        r3 U recives the random value and calulates the custodians, and generates a encrypted shares to the custodians, commitments and proof
+        i3 I verifies proof. If valid. Proof of identity is initaited.
+        """
         (k, n) = (3, 10)
 
-        params, (x_sign, x_encr), (y_sign, y_encr), (iparams, i_sk), sys_list, user_list, cred_list, rev_list, res_list = setup(k, n)
+        params, _, _, _, _, _, _, _, _ = setup(k, n)
 
-        (_, p, _, _) = params
+        (_, _, _, _) = params
         priv_keys = []
         pub_keys = []
-        for i in range(n*2):
+        for _ in range(n*2):
             (x_i, y_i) = pvss.helper_generate_key_pair(params)
             priv_keys.append(x_i)
             pub_keys.append(y_i)
 
-        (my_priv_key, my_pub_key) = pvss.helper_generate_key_pair(params)
-
-        # r1 = data_distrubution_U_1(params)
-        # r2 = data_distrubution_I_1(params)
-
+        (my_priv_key, _) = pvss.helper_generate_key_pair(params)
         (requester_commit, requester_random) = req_data_dist_1(params)
         (issuer_commit, issuer_random) = iss_data_dist_1(params)
         # Both publishes their commits. When they recive the other ones commit they send their random value.
@@ -107,9 +98,8 @@ class TestPapr:
     def test_restore(self):
         (k, n) = (3, 10)
 
-        params, (x_sign, x_encr), (y_sign, y_encr), (iparams, i_sk), sys_list, user_list, cred_list, rev_list, res_list = setup(k, n)
+        params, _, _, _, _, _, _, _, _ = setup(k, n)
 
-        (_, p, _, _) = params
         priv_keys = []
         pub_keys = []
         for i in range(n*2):
